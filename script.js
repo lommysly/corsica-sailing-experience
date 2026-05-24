@@ -234,7 +234,6 @@ function addMember(boat, prefill) {
         <option>Skipper</option>
         <option>Co-skipper</option>
         <option>Equipaggio</option>
-        <option>Ospite</option>
       </select>
     </div>
     <div class="crew-field cf-field">
