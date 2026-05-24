@@ -347,6 +347,39 @@ body {
 .section-desc { font-size: 1.05rem; color: var(--text-mid); margin-top: 12px; font-weight: 300; line-height: 1.65; }
 .section-desc.light { color: rgba(255,255,255,.6); }
 
+/* ──────────────────── QUOTA ──────────────────── */
+.quota { padding: 80px 0; background: var(--bg-light); }
+.quota-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 0; }
+.quota-card {
+  border-radius: var(--r-lg); padding: 36px 32px;
+  box-shadow: var(--sh-card);
+}
+.quota-card.incluso {
+  background: #fff;
+  border: 1px solid rgba(28,167,168,.2);
+  border-top: 4px solid var(--turq);
+}
+.quota-card.non-incluso {
+  background: #fff;
+  border: 1px solid rgba(11,60,93,.1);
+  border-top: 4px solid var(--ocean);
+}
+.quota-card-title {
+  font-size: .72rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .12em; margin-bottom: 20px;
+}
+.incluso .quota-card-title { color: var(--turq); }
+.non-incluso .quota-card-title { color: var(--ocean); }
+.quota-list { list-style: none; padding: 0; margin: 0; }
+.quota-list li {
+  font-size: .95rem; color: var(--text-mid); line-height: 1.6;
+  padding: 8px 0 8px 20px; border-bottom: 1px solid rgba(11,60,93,.06);
+  position: relative;
+}
+.quota-list li:last-child { border-bottom: none; }
+.incluso .quota-list li::before { content: '✓'; position: absolute; left: 0; color: var(--turq); font-weight: 700; }
+.non-incluso .quota-list li::before { content: '—'; position: absolute; left: 0; color: var(--text-light); }
+
 /* ──────────────────── INTRO ──────────────────── */
 .intro { padding: 100px 0; background: #fff; position: relative; }
 .intro::after {
@@ -1143,6 +1176,7 @@ body {
 
 /* ──────────────────── RESPONSIVE ──────────────────── */
 @media (max-width: 1024px) {
+  .quota-grid { grid-template-columns: 1fr; }
   .intro-grid { grid-template-columns: 1fr; gap: 48px; }
   .barche-grid { grid-template-columns: 1fr; max-width: 540px; margin: 0 auto; }
   .spiagge-grid { grid-template-columns: 1fr; }
