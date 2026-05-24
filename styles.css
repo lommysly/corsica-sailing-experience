@@ -1328,7 +1328,7 @@ body {
   .crew-boat-cards { grid-template-columns: 1fr; max-width: 400px; }
   .cbc-img { height: 140px; }
   /* form: 2 colonne su 640 */
-  .crew-member-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .crew-member-row { grid-template-columns: 1fr 1fr; gap: 10px; max-width: 100%; }
   .cf-field { grid-column: span 2; }
   .crew-field-actions { grid-column: span 2; flex-direction: row; gap: 10px; }
   .btn-wa-member { flex: 1; }
@@ -1337,8 +1337,8 @@ body {
   .crew-form-header { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
 
-/* iPhone 13 mini e schermi ≤ 390px */
-@media (max-width: 390px) {
+/* iPhone 13 mini / 14 e schermi ≤ 430px */
+@media (max-width: 430px) {
   .container { padding: 0 16px; }
   .hero-title { font-size: 3rem; }
   .h2 { font-size: 2rem; }
