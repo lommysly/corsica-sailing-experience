@@ -211,16 +211,16 @@ function addMember(boat, prefill) {
       <input type="text" placeholder="00100" data-field="cap" maxlength="10" />
     </div>
     <div class="crew-field">
-      <label>Tipo Documento</label>
+      <label>Tipo Documento <span style="color:#e05">*</span></label>
       <select data-field="tipoDoc">
-        <option value="">Seleziona</option>
+        <option value="" disabled selected>— Seleziona tipo —</option>
         <option>Passaporto</option>
         <option>Carta d'Identità</option>
         <option>Patente</option>
       </select>
     </div>
     <div class="crew-field">
-      <label>N° Documento</label>
+      <label>N° Documento <span style="color:#e05">*</span></label>
       <input type="text" placeholder="AA0000000" data-field="numDoc" />
     </div>
     <div class="crew-field">
@@ -228,9 +228,9 @@ function addMember(boat, prefill) {
       <input type="date" data-field="scadDoc" />
     </div>
     <div class="crew-field">
-      <label>Ruolo</label>
+      <label>Ruolo a Bordo <span style="color:#e05">*</span></label>
       <select data-field="ruolo">
-        <option value="">Seleziona</option>
+        <option value="" disabled selected>— Seleziona il tuo ruolo —</option>
         <option>Skipper</option>
         <option>Co-skipper</option>
         <option>Equipaggio</option>
@@ -240,9 +240,6 @@ function addMember(boat, prefill) {
     <div class="crew-field cf-field">
       <label>Codice Fiscale</label>
       <input type="text" placeholder="RSSMRA80A01H501U" data-field="cf" style="text-transform:uppercase" />
-    </div>
-    <div class="crew-field-actions">
-      <button class="btn-remove-member" onclick="removeMember('${boat}', ${idx})" title="Rimuovi membro">✕</button>
     </div>
   `;
   container.appendChild(row);
@@ -287,8 +284,21 @@ async function saveMemberToSheets(boat) {
 
   const row = rows[0];
   const get = f => row.querySelector(`[data-field="${f}"]`)?.value.trim() || '';
-  const nome = get('nome');
-  if (!nome) { alert('Inserisci il Nome e Cognome prima di salvare.'); return; }
+  const nome    = get('nome');
+  const nascita = get('nascita');
+  const numDoc  = get('numDoc');
+  const tipoDoc = get('tipoDoc');
+  const ruolo   = get('ruolo');
+  const mancanti = [];
+  if (!nome)    mancanti.push('Nome e Cognome');
+  if (!nascita) mancanti.push('Data di Nascita');
+  if (!tipoDoc) mancanti.push('Tipo Documento');
+  if (!numDoc)  mancanti.push('N° Documento');
+  if (!ruolo)   mancanti.push('Ruolo a Bordo');
+  if (mancanti.length > 0) {
+    alert('Campi obbligatori mancanti:\n• ' + mancanti.join('\n• '));
+    return;
+  }
 
   const btn = document.getElementById('btnSalva-' + boat);
   if (btn) { btn.textContent = 'Salvataggio...'; btn.disabled = true; }
