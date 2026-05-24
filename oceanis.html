@@ -47,6 +47,29 @@
     </div>
   </div>
 
+  <!-- PROGRESS STEPS -->
+  <div class="progress-steps" id="progressSteps">
+    <div class="ps-step active" id="step1">
+      <div class="ps-num">1</div>
+      <div class="ps-label">Leggi le regole</div>
+    </div>
+    <div class="ps-connector"></div>
+    <div class="ps-step" id="step2">
+      <div class="ps-num">2</div>
+      <div class="ps-label">Accetta e conferma</div>
+    </div>
+    <div class="ps-connector"></div>
+    <div class="ps-step" id="step3">
+      <div class="ps-num">3</div>
+      <div class="ps-label">Compila Crew List</div>
+    </div>
+    <div class="ps-connector"></div>
+    <div class="ps-step" id="step4">
+      <div class="ps-num">4</div>
+      <div class="ps-label">Scarica PDF</div>
+    </div>
+  </div>
+
   <!-- REGOLE -->
   <section class="regole" id="regole" style="padding-top:60px">
     <div class="container">
@@ -183,10 +206,21 @@
         <p class="section-desc" style="color:rgba(255,255,255,.65)">Compila i dati di ogni membro dell'equipaggio e scarica il PDF per il charter.</p>
       </div>
 
-      <div class="crew-members" id="members-oceanis"></div>
-      <button class="btn-add-member" onclick="addMember('oceanis')" style="display:block;margin:0 auto 24px">+ Aggiungi membro</button>
-      <div class="crew-actions">
-        <button class="btn-dl-pdf" onclick="downloadCrewPDF('oceanis', 'Beneteau Oceanis 48')">Scarica PDF Oceanis 48</button>
+      <!-- Blocco se regole non accettate -->
+      <div class="crew-locked" id="crewLocked">
+        <div class="crew-locked-icon">🔒</div>
+        <p>Devi prima <strong>leggere e accettare le regole di bordo</strong> qui sopra per sbloccare la crew list.</p>
+        <a href="#regole" class="btn-ghost" onclick="document.getElementById('regole').scrollIntoView({behavior:'smooth'});return false;">Vai alle regole</a>
+      </div>
+
+      <!-- Form (visibile solo dopo accettazione) -->
+      <div class="crew-unlocked" id="crewUnlocked" style="display:none">
+        <div class="crew-members" id="members-oceanis"></div>
+        <div class="crew-counter" id="crewCounter">0 membri aggiunti</div>
+        <button class="btn-add-member" onclick="addMemberAndCount('oceanis')">+ Aggiungi membro</button>
+        <div class="crew-actions">
+          <button class="btn-dl-pdf" onclick="downloadCrewPDFValidated('oceanis', 'Beneteau Oceanis 48')">Scarica PDF Oceanis 48</button>
+        </div>
       </div>
     </div>
   </section>
@@ -208,22 +242,66 @@
   <script>
     const BOAT_KEY = 'oceanis';
 
+    function updateCounter() {
+      const n = document.getElementById('members-oceanis').querySelectorAll('.crew-member-row').length;
+      document.getElementById('crewCounter').textContent = n + (n === 1 ? ' membro aggiunto' : ' membri aggiunti');
+      document.getElementById('step3').classList.toggle('done', n > 0);
+      document.getElementById('step4').classList.toggle('active', n > 0);
+    }
+
+    function addMemberAndCount(boat, prefill) {
+      addMember(boat, prefill);
+      updateCounter();
+    }
+
+    function unlockCrew(accepted) {
+      document.getElementById('crewLocked').style.display   = accepted ? 'none'  : 'flex';
+      document.getElementById('crewUnlocked').style.display = accepted ? 'block' : 'none';
+      document.getElementById('step2').classList.toggle('done',   accepted);
+      document.getElementById('step3').classList.toggle('active', accepted);
+    }
+
     function toggleAccetta(cb) {
       localStorage.setItem('regole_' + BOAT_KEY, cb.checked ? '1' : '');
       document.getElementById('accettaStatus').style.display = cb.checked ? 'flex' : 'none';
+      unlockCrew(cb.checked);
+    }
+
+    function downloadCrewPDFValidated(boat, boatName) {
+      const container = document.getElementById('members-' + boat);
+      const rows = container.querySelectorAll('.crew-member-row');
+      let invalid = [];
+      rows.forEach((row, i) => {
+        const nome    = row.querySelector('[data-field="nome"]')?.value.trim();
+        const nascita = row.querySelector('[data-field="nascita"]')?.value.trim();
+        const numDoc  = row.querySelector('[data-field="numDoc"]')?.value.trim();
+        if (!nome || !nascita || !numDoc) invalid.push(i + 1);
+      });
+      if (invalid.length > 0) {
+        alert('Campi obbligatori mancanti nel membro ' + invalid.join(', ') + '.\nCompila: Nome, Data di Nascita e N° Documento.');
+        return;
+      }
+      document.getElementById('step4').classList.add('done');
+      downloadCrewPDF(boat, boatName);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('regole_' + BOAT_KEY) === '1') {
+      const accepted = localStorage.getItem('regole_' + BOAT_KEY) === '1';
+      if (accepted) {
         document.getElementById('checkRegole').checked = true;
         document.getElementById('accettaStatus').style.display = 'flex';
       }
-      const saved = (() => { try { return JSON.parse(localStorage.getItem('crew_oceanis')) || []; } catch(e) { return []; } })();
-      if (saved.length > 0) {
-        saved.forEach(data => addMember('oceanis', data));
-      } else {
-        addMember('oceanis');
+      unlockCrew(accepted);
+      if (accepted) {
+        const saved = (() => { try { return JSON.parse(localStorage.getItem('crew_oceanis')) || []; } catch(e) { return []; } })();
+        if (saved.length > 0) {
+          saved.forEach(data => addMemberAndCount('oceanis', data));
+        } else {
+          addMemberAndCount('oceanis');
+        }
+        updateCounter();
       }
+      document.getElementById('step1').classList.add('done');
     });
   </script>
 </body>

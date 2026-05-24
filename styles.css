@@ -1050,6 +1050,61 @@ body {
 }
 .btn-dl-pdf:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(28,167,168,.5); }
 
+/* ──────────────────── PROGRESS STEPS ──────────────────── */
+.progress-steps {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; padding: 20px 24px; background: #fff;
+  border-bottom: 1px solid rgba(11,60,93,.08);
+  flex-wrap: nowrap; overflow-x: auto;
+}
+.ps-step {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  min-width: 80px; opacity: .35; transition: opacity .3s, transform .3s;
+}
+.ps-step.active { opacity: 1; }
+.ps-step.done   { opacity: 1; }
+.ps-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; font-weight: 800;
+  background: rgba(11,60,93,.08); color: var(--ocean);
+  border: 2px solid rgba(11,60,93,.15);
+  transition: background .3s, border-color .3s, color .3s;
+}
+.ps-step.active .ps-num {
+  background: var(--ocean); color: #fff; border-color: var(--ocean);
+}
+.ps-step.done .ps-num {
+  background: var(--turq); color: transparent; border-color: var(--turq);
+  position: relative;
+}
+.ps-step.done .ps-num::after {
+  content: '✓'; position: absolute; color: #fff;
+  font-size: .9rem; font-weight: 700;
+}
+.ps-label { font-size: .72rem; font-weight: 600; color: var(--ocean); text-align: center; white-space: nowrap; }
+.ps-connector {
+  flex: 1; min-width: 24px; max-width: 60px; height: 2px;
+  background: rgba(11,60,93,.12); margin-bottom: 22px;
+}
+
+/* ──────────────────── CREW LOCKED / COUNTER ────────────── */
+.crew-locked {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 16px; padding: 48px 24px; text-align: center;
+  background: rgba(255,255,255,.06); border: 1.5px dashed rgba(255,255,255,.2);
+  border-radius: var(--r-lg); max-width: 480px; margin: 0 auto;
+}
+.crew-locked-icon { font-size: 2.4rem; }
+.crew-locked p { color: rgba(255,255,255,.8); font-size: .98rem; line-height: 1.6; }
+.crew-locked p strong { color: #fff; }
+
+.crew-counter {
+  text-align: center; font-size: .85rem; font-weight: 700;
+  color: rgba(255,255,255,.5); letter-spacing: .06em;
+  text-transform: uppercase; margin-bottom: 12px;
+}
+
 /* ──────────────────── PAGE HERO (pagine interne) ───────── */
 .page-hero {
   position: relative; height: 380px; display: flex; align-items: flex-end;
