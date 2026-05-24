@@ -45,6 +45,7 @@ body {
 }
 
 .container { max-width: 1140px; margin: 0 auto; padding: 0 28px; }
+.container-wide { max-width: 1000px; margin: 0 auto; padding: 0 28px; box-sizing: border-box; width: 100%; }
 
 /* ──────────────────── PRELOADER ──────────────────── */
 .preloader {
@@ -1025,9 +1026,7 @@ body {
   border-radius: var(--r-md);
   padding: 20px;
   margin-bottom: 14px;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   box-sizing: border-box;
 }
 .crew-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
