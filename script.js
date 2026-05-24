@@ -4,7 +4,11 @@
 
 /* ── Google Sheets API ──────────────────────────── */
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz47cX2Mb04xvkmrOBj8IXoACXp_SiMzuhr8xxftoTy4nTHwYiIcxXdOboBz5HCa9w5/exec';
-const ADMIN_PASSWORD = 'skipper2025';
+const ADMIN_PASSWORDS = {
+  lagoon:   'lagoon2025',
+  oceanis:  'oceanis2025',
+  atlantica: 'atlantica2026'
+};
 
 /* ── Preloader ──────────────────────────────────── */
 window.addEventListener('load', () => {
@@ -262,6 +266,19 @@ function removeMember(boat, idx) {
 }
 
 
+/* ── Triple-click sul contatore → sblocca bottone admin ── */
+const _counterClicks = {};
+function handleCounterClick(boat, el) {
+  _counterClicks[boat] = (_counterClicks[boat] || 0) + 1;
+  clearTimeout(el._resetTimer);
+  el._resetTimer = setTimeout(() => { _counterClicks[boat] = 0; }, 600);
+  if (_counterClicks[boat] >= 3) {
+    _counterClicks[boat] = 0;
+    const btn = document.getElementById('btnAdminPDF-' + boat);
+    if (btn) btn.style.display = btn.style.display === 'none' ? 'inline-flex' : 'none';
+  }
+}
+
 /* ── Salva membro su Google Sheets ──────────────── */
 async function saveMemberToSheets(boat) {
   const container = document.getElementById('members-' + boat);
@@ -302,7 +319,7 @@ async function saveMemberToSheets(boat) {
 /* ── Admin: scarica PDF con tutti i membri da Sheets ── */
 async function adminDownloadPDF(boat, boatName, departureDate, arrivalDate) {
   const pwd = prompt('Password amministratore:');
-  if (pwd !== ADMIN_PASSWORD) { alert('Password errata.'); return; }
+  if (pwd !== ADMIN_PASSWORDS[boat]) { alert('Password errata.'); return; }
 
   const btn = document.getElementById('btnAdminPDF-' + boat);
   if (btn) { btn.textContent = 'Caricamento dati...'; btn.disabled = true; }
