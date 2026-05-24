@@ -245,7 +245,7 @@ function addMember(boat, prefill) {
     </div>
     <div class="crew-field">
       <label>N° Documento <span style="color:#e05">*</span></label>
-      <input type="text" placeholder="AA0000000" data-field="numDoc" style="text-transform:uppercase" />
+      <input type="text" placeholder="AA0000000" data-field="numDoc" style="text-transform:uppercase" maxlength="20" />
     </div>
     <div class="crew-field">
       <label>Scadenza Documento</label>
@@ -262,7 +262,7 @@ function addMember(boat, prefill) {
     </div>
     <div class="crew-field cf-field">
       <label>Codice Fiscale</label>
-      <input type="text" placeholder="RSSMRA80A01H501U" data-field="cf" style="text-transform:uppercase" />
+      <input type="text" placeholder="RSSMRA80A01H501U" data-field="cf" style="text-transform:uppercase" maxlength="16" pattern="[A-Z0-9]{16}" />
       <div data-cf-hint style="font-size:.72rem; margin-top:4px; min-height:16px;"></div>
     </div>
   `;
@@ -277,8 +277,12 @@ function addMember(boat, prefill) {
   }
   // Auto-calcolo CF e autosave
   const cfTriggers = ['nome','cognome','sesso','nascita','comuneNascita','cf'];
+  const upperFields = ['cf','numDoc','prov','provNascita'];
   row.querySelectorAll('input, select').forEach(el => {
     const field = el.dataset.field;
+    if (upperFields.includes(field)) {
+      el.addEventListener('input', () => { el.value = el.value.toUpperCase(); });
+    }
     el.addEventListener('input', () => { if (cfTriggers.includes(field)) tryCalcCF(row); saveToStorage(boat); });
     el.addEventListener('change', () => { if (cfTriggers.includes(field)) tryCalcCF(row); saveToStorage(boat); });
   });
@@ -446,6 +450,14 @@ async function saveMemberToSheets(boat) {
     alert('Campi obbligatori mancanti:\n• ' + mancanti.join('\n• '));
     return;
   }
+  const cf = get('cf');
+  if (cf && !/^[A-Z0-9]{16}$/.test(cf.toUpperCase())) {
+    alert('Codice Fiscale non valido.\nDeve essere esattamente 16 caratteri (lettere maiuscole e numeri).');
+    return;
+  }
+  if (numDoc.length < 6) { alert('Numero documento non valido — deve contenere almeno 6 caratteri.'); return; }
+  if (nome.length < 2)    { alert('Nome troppo corto — verifica di aver inserito il nome completo.'); return; }
+  if (cognome.length < 2) { alert('Cognome troppo corto — verifica di aver inserito il cognome completo.'); return; }
 
   const btn = document.getElementById('btnSalva-' + boat);
   if (btn) { btn.textContent = 'Salvataggio...'; btn.disabled = true; }
