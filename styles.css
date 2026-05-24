@@ -1003,9 +1003,10 @@ body {
 .crew-form-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; color: #fff; }
 
 .crew-member-row {
-  display: grid; grid-template-columns: repeat(4, 1fr) 40px; gap: 12px; align-items: end;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end;
   background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
   border-radius: var(--r-md); padding: 20px; margin-bottom: 14px;
+  max-width: 760px; margin-left: auto; margin-right: auto;
 }
 .crew-field { display: flex; flex-direction: column; gap: 6px; }
 .cf-field { grid-column: span 2; }

@@ -307,7 +307,8 @@ async function saveMemberToSheets(boat) {
     boat, nome, nascita: get('nascita'), luogo: get('luogo'),
     nazionalita: get('nazionalita'), residenza: get('residenza'),
     cap: get('cap'), tipoDoc: get('tipoDoc'), numDoc: get('numDoc'),
-    scadDoc: get('scadDoc'), ruolo: get('ruolo'), cf: get('cf')
+    scadDoc: get('scadDoc'), ruolo: get('ruolo'), cf: get('cf'),
+    regolaAccettata: true
   };
 
   try {
