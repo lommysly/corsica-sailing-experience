@@ -215,15 +215,15 @@ function addMember(boat, prefill) {
       <input type="text" placeholder="RM" data-field="provNascita" maxlength="3" style="text-transform:uppercase" />
     </div>
     <div class="crew-field">
-      <label>Nazionalità</label>
+      <label>Nazionalità <span style="color:#e05">*</span></label>
       <input type="text" placeholder="Italiana" data-field="nazionalita" />
     </div>
     <div class="crew-field crew-field-full">
-      <label>Via / Indirizzo di Residenza</label>
+      <label>Via / Indirizzo di Residenza <span style="color:#e05">*</span></label>
       <input type="text" placeholder="Via Roma 1" data-field="via" autocomplete="street-address" />
     </div>
     <div class="crew-field">
-      <label>Città di Residenza</label>
+      <label>Città di Residenza <span style="color:#e05">*</span></label>
       <input type="text" placeholder="Roma" data-field="citta" autocomplete="address-level2" />
     </div>
     <div class="crew-field">
@@ -231,7 +231,7 @@ function addMember(boat, prefill) {
       <input type="text" placeholder="RM" data-field="prov" maxlength="3" style="text-transform:uppercase" />
     </div>
     <div class="crew-field">
-      <label>CAP</label>
+      <label>CAP <span style="color:#e05">*</span></label>
       <input type="text" placeholder="00100" data-field="cap" maxlength="5" inputmode="numeric" pattern="[0-9]{5}" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
     </div>
     <div class="crew-field">
@@ -248,7 +248,7 @@ function addMember(boat, prefill) {
       <input type="text" placeholder="AA0000000" data-field="numDoc" style="text-transform:uppercase" maxlength="20" />
     </div>
     <div class="crew-field">
-      <label>Scadenza Documento</label>
+      <label>Scadenza Documento <span style="color:#e05">*</span></label>
       <input type="date" data-field="scadDoc" />
     </div>
     <div class="crew-field">
@@ -261,7 +261,7 @@ function addMember(boat, prefill) {
       </select>
     </div>
     <div class="crew-field cf-field">
-      <label>Codice Fiscale</label>
+      <label>Codice Fiscale <span style="color:#e05">*</span></label>
       <input type="text" placeholder="RSSMRA80A01H501U" data-field="cf" style="text-transform:uppercase" maxlength="16" pattern="[A-Z0-9]{16}" />
       <div data-cf-hint style="font-size:.72rem; margin-top:4px; min-height:16px;"></div>
     </div>
@@ -437,21 +437,27 @@ async function saveMemberToSheets(boat) {
   const numDoc  = get('numDoc');
   const tipoDoc = get('tipoDoc');
   const ruolo   = get('ruolo');
+  const cf      = get('cf');
   const mancanti = [];
   if (!nome)    mancanti.push('Nome');
   if (!cognome) mancanti.push('Cognome');
   if (!sesso)   mancanti.push('Sesso');
   if (!nascita) mancanti.push('Data di Nascita');
   if (!comuneNascita) mancanti.push('Comune di Nascita');
+  if (!get('nazionalita')) mancanti.push('Nazionalità');
+  if (!get('via'))   mancanti.push('Indirizzo di Residenza');
+  if (!get('citta')) mancanti.push('Città di Residenza');
+  if (!get('cap'))   mancanti.push('CAP');
   if (!tipoDoc) mancanti.push('Tipo Documento');
   if (!numDoc)  mancanti.push('N° Documento');
+  if (!get('scadDoc')) mancanti.push('Scadenza Documento');
   if (!ruolo)   mancanti.push('Ruolo a Bordo');
+  if (!cf)      mancanti.push('Codice Fiscale');
   if (mancanti.length > 0) {
     alert('Campi obbligatori mancanti:\n• ' + mancanti.join('\n• '));
     return;
   }
-  const cf = get('cf');
-  if (cf && !/^[A-Z0-9]{16}$/.test(cf.toUpperCase())) {
+  if (!/^[A-Z0-9]{16}$/.test(cf)) {
     alert('Codice Fiscale non valido.\nDeve essere esattamente 16 caratteri (lettere maiuscole e numeri).');
     return;
   }
