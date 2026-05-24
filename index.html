@@ -1185,8 +1185,9 @@
         <div class="crew-panel" id="crew-lagoon">
           <div class="crew-members" id="members-lagoon"></div>
           <button class="btn-add-member" onclick="addMember('lagoon')">＋ Aggiungi membro</button>
+          <div class="save-status" id="saveStatus-lagoon" style="display:none; margin:12px 0; padding:12px 16px; background:rgba(28,167,168,.15); border:1px solid var(--turq); border-radius:10px; color:#fff; font-size:.9rem;"></div>
           <div class="crew-actions">
-            <button class="btn-dl-pdf" onclick="downloadCrewPDF('lagoon', 'Lagoon 40')">⬇ Scarica PDF Lagoon 40</button>
+            <button class="btn-dl-pdf" id="btnSalva-lagoon" onclick="saveMemberToSheets('lagoon')">💾 Salva i miei dati</button>
           </div>
         </div>
 
@@ -1194,8 +1195,9 @@
         <div class="crew-panel" id="crew-oceanis">
           <div class="crew-members" id="members-oceanis"></div>
           <button class="btn-add-member" onclick="addMember('oceanis')">＋ Aggiungi membro</button>
+          <div class="save-status" id="saveStatus-oceanis" style="display:none; margin:12px 0; padding:12px 16px; background:rgba(28,167,168,.15); border:1px solid var(--turq); border-radius:10px; color:#fff; font-size:.9rem;"></div>
           <div class="crew-actions">
-            <button class="btn-dl-pdf" onclick="downloadCrewPDF('oceanis', 'Beneteau Oceanis 48')">⬇ Scarica PDF Oceanis 48</button>
+            <button class="btn-dl-pdf" id="btnSalva-oceanis" onclick="saveMemberToSheets('oceanis')">💾 Salva i miei dati</button>
           </div>
         </div>
       </div>
