@@ -273,6 +273,7 @@ function addMember(boat, prefill) {
       const el = row.querySelector(`[data-field="${f}"]`);
       if (el && prefill[f]) el.value = prefill[f];
     });
+    tryCalcCF(row);
   }
   // Auto-calcolo CF e autosave
   const cfTriggers = ['nome','cognome','sesso','nascita','comuneNascita','cf'];
@@ -292,7 +293,11 @@ function tryCalcCF(row) {
   if (!nome || !cognome || !sesso || !nascita || !comune) { if (hint) hint.textContent = ''; return; }
   const calcolato = calcolaCodiceFiscale(cognome, nome, sesso, nascita, comune);
   if (!calcolato) {
-    if (hint) { hint.textContent = '⚠️ Comune non trovato — inserisci il CF manualmente'; hint.style.color = '#ffb347'; }
+    const cfGiaValido = /^[A-Z0-9]{16}$/i.test(row.querySelector('[data-field="cf"]')?.value || '');
+    if (hint) {
+      if (cfGiaValido) { hint.textContent = ''; }
+      else { hint.textContent = '⚠️ Comune non in tabella — inserisci il CF manualmente'; hint.style.color = '#ffb347'; }
+    }
     return;
   }
   const cfEl = row.querySelector('[data-field="cf"]');
