@@ -152,7 +152,6 @@ function backToBoatSelect() {
 /* ── Crew member row template ─────────────────── */
 let memberCount = { lagoon: 0, oceanis: 0 };
 const CREW_FIELDS = ['nome','nascita','luogo','nazionalita','residenza','cap','tipoDoc','numDoc','scadDoc','ruolo','cf'];
-const WA_NUMBER = '393518447888';
 
 function saveToStorage(boat) {
   const container = document.getElementById('members-' + boat);
@@ -235,8 +234,7 @@ function addMember(boat, prefill) {
       <input type="text" placeholder="RSSMRA80A01H501U" data-field="cf" style="text-transform:uppercase" />
     </div>
     <div class="crew-field-actions">
-      <button class="btn-wa-member" onclick="sendMemberWhatsApp('${boat}', ${idx})" title="Invia su WhatsApp">📤 Invia</button>
-      <button class="btn-remove-member" onclick="removeMember('${boat}', ${idx})" title="Rimuovi">✕</button>
+      <button class="btn-remove-member" onclick="removeMember('${boat}', ${idx})" title="Rimuovi membro">✕</button>
     </div>
   `;
   container.appendChild(row);
@@ -259,25 +257,6 @@ function removeMember(boat, idx) {
   if (row) { row.remove(); saveToStorage(boat); }
 }
 
-function sendMemberWhatsApp(boat, idx) {
-  const row = document.getElementById(`member-${boat}-${idx}`);
-  if (!row) return;
-  const get = f => row.querySelector(`[data-field="${f}"]`)?.value || 'N/D';
-  const boatName = boat === 'lagoon' ? 'Lagoon 40' : 'Beneteau Oceanis 48';
-  const msg = [
-    `⛵ *Crew List — ${boatName}*`,
-    `Corsica Experience · 29 Maggio – 2 Giugno`,
-    ``,
-    `👤 *${get('nome')}*`,
-    `🎂 Nato il: ${get('nascita')} a ${get('luogo')}`,
-    `🏳️ Nazionalità: ${get('nazionalita')}`,
-    `🏠 Residenza: ${get('residenza')} ${get('cap')}`,
-    `📌 Ruolo: ${get('ruolo')}`,
-    `📍 ${get('tipoDoc')} n° ${get('numDoc')} (scad. ${get('scadDoc')})`,
-    `🇮🇹 C.F.: ${get('cf')}`,
-  ].join('\n');
-  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-}
 
 /* ── Crew PDF download (print-based) ────────────── */
 function downloadCrewPDF(boat, boatName) {
