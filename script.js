@@ -291,7 +291,7 @@ function downloadCrewPDF(boat, boatName) {
 
   const members = [];
   rows.forEach((row, i) => {
-    const get = (field) => (row.querySelector(`[data-field="${field}"]`)?.value || '—');
+    const get = (field) => (row.querySelector(`[data-field="${field}"]`)?.value || '');
     members.push({
       n: i + 1,
       nome: get('nome'),
@@ -308,19 +308,19 @@ function downloadCrewPDF(boat, boatName) {
     });
   });
 
+  const skipper = members.find(m => m.ruolo === 'Skipper') || members[0];
+
   const rows_html = members.map(m => `
     <tr>
-      <td>${m.n}</td>
-      <td><strong>${m.nome}</strong></td>
-      <td>${m.nascita}</td>
-      <td>${m.luogo}</td>
-      <td>${m.nazionalita}</td>
-      <td>${m.residenza} ${m.cap}</td>
-      <td>${m.tipoDoc}</td>
-      <td>${m.numDoc}</td>
-      <td>${m.scadDoc}</td>
-      <td>${m.ruolo}</td>
-      <td>${m.cf}</td>
+      <td class="num">${m.n}</td>
+      <td class="name">${m.nome || '—'}</td>
+      <td>${m.nascita ? new Date(m.nascita).toLocaleDateString('it-IT') : '—'}</td>
+      <td>${m.luogo || '—'}</td>
+      <td>${m.nazionalita || '—'}</td>
+      <td>${m.tipoDoc || '—'}</td>
+      <td>${m.numDoc || '—'}</td>
+      <td>${m.scadDoc ? new Date(m.scadDoc).toLocaleDateString('it-IT') : '—'}</td>
+      <td>${m.ruolo || '—'}</td>
     </tr>
   `).join('');
 
@@ -332,42 +332,147 @@ function downloadCrewPDF(boat, boatName) {
   <title>Crew List — ${boatName}</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 11px; color: #111; padding: 24px; }
-    h1 { font-size: 18px; margin-bottom: 4px; color: #0b3c5d; }
-    .subtitle { font-size: 12px; color: #555; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th { background: #0b3c5d; color: #fff; padding: 8px 6px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
-    td { padding: 7px 6px; border-bottom: 1px solid #ddd; vertical-align: top; }
-    tr:nth-child(even) td { background: #f5f8fc; }
-    .footer { margin-top: 28px; font-size: 10px; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
-    @media print { body { padding: 10px; } }
+    body { font-family: 'Arial', sans-serif; font-size: 10.5px; color: #111; background: #fff; }
+    .page { padding: 28px 32px; max-width: 900px; margin: 0 auto; }
+
+    /* Header */
+    .doc-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #0b3c5d; padding-bottom: 14px; margin-bottom: 18px; }
+    .doc-title { }
+    .doc-title h1 { font-size: 20px; color: #0b3c5d; letter-spacing: .02em; margin-bottom: 2px; }
+    .doc-title p { font-size: 11px; color: #555; }
+    .doc-flag { font-size: 28px; line-height: 1; }
+
+    /* Vessel info box */
+    .vessel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid #c0cdd8; margin-bottom: 18px; }
+    .vessel-cell { padding: 8px 10px; border-right: 1px solid #c0cdd8; }
+    .vessel-cell:last-child { border-right: none; }
+    .vessel-cell .vc-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: .08em; color: #7a9cb8; margin-bottom: 3px; }
+    .vessel-cell .vc-val { font-size: 11px; font-weight: 700; color: #0b3c5d; }
+
+    /* Voyage info */
+    .voyage-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid #c0cdd8; border-top: none; margin-bottom: 24px; }
+    .voyage-cell { padding: 8px 10px; border-right: 1px solid #c0cdd8; border-top: 1px solid #c0cdd8; }
+    .voyage-cell:last-child { border-right: none; }
+    .voyage-cell .vc-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: .08em; color: #7a9cb8; margin-bottom: 3px; }
+    .voyage-cell .vc-val { font-size: 11px; font-weight: 700; color: #0b3c5d; }
+
+    /* Section title */
+    .section-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #fff; background: #0b3c5d; padding: 6px 10px; margin-bottom: 0; }
+
+    /* Crew table */
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #e8f0f7; }
+    th { padding: 7px 8px; text-align: left; font-size: 8.5px; text-transform: uppercase; letter-spacing: .07em; color: #0b3c5d; border: 1px solid #c0cdd8; font-weight: 700; }
+    td { padding: 7px 8px; border: 1px solid #dce5ed; font-size: 10px; vertical-align: middle; }
+    td.num { text-align: center; color: #7a9cb8; font-weight: 700; width: 28px; }
+    td.name { font-weight: 700; color: #0b3c5d; }
+    tr:nth-child(even) td { background: #f4f8fc; }
+
+    /* Signature block */
+    .sig-block { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 36px; }
+    .sig-item { border-top: 1px solid #0b3c5d; padding-top: 6px; }
+    .sig-item .sig-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: .08em; color: #7a9cb8; margin-bottom: 22px; }
+    .sig-item .sig-name { font-size: 10px; color: #0b3c5d; font-weight: 700; }
+
+    /* Footer */
+    .doc-footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #c0cdd8; display: flex; justify-content: space-between; font-size: 8.5px; color: #9aacba; }
+
+    @media print {
+      body { font-size: 9.5px; }
+      .page { padding: 14px 18px; }
+      .doc-header { padding-bottom: 10px; margin-bottom: 12px; }
+    }
   </style>
 </head>
 <body>
-  <h1>⛵ Crew List — ${boatName}</h1>
-  <div class="subtitle">Corsica Sailing Experience &nbsp;·&nbsp; 29 Maggio – 2 Giugno 2025 &nbsp;·&nbsp; Partenza: Porto Mirabello, La Spezia</div>
+<div class="page">
+
+  <div class="doc-header">
+    <div class="doc-title">
+      <h1>CREW LIST — LISTA EQUIPAGGIO</h1>
+      <p>Documento richiesto per navigazione in acque straniere &nbsp;·&nbsp; Art. 184 Codice della Navigazione</p>
+    </div>
+    <div class="doc-flag">🇮🇹</div>
+  </div>
+
+  <div class="vessel-grid">
+    <div class="vessel-cell">
+      <div class="vc-label">Nome Imbarcazione</div>
+      <div class="vc-val">${boatName}</div>
+    </div>
+    <div class="vessel-cell">
+      <div class="vc-label">Bandiera</div>
+      <div class="vc-val">Italiana</div>
+    </div>
+    <div class="vessel-cell">
+      <div class="vc-label">Porto di Iscrizione</div>
+      <div class="vc-val">La Spezia</div>
+    </div>
+    <div class="vessel-cell">
+      <div class="vc-label">Comandante / Skipper</div>
+      <div class="vc-val">${skipper?.nome || '—'}</div>
+    </div>
+  </div>
+
+  <div class="voyage-grid">
+    <div class="voyage-cell">
+      <div class="vc-label">Porto di Partenza</div>
+      <div class="vc-val">Porto Mirabello, La Spezia</div>
+    </div>
+    <div class="voyage-cell">
+      <div class="vc-label">Data Partenza</div>
+      <div class="vc-val">29 Maggio 2025</div>
+    </div>
+    <div class="voyage-cell">
+      <div class="vc-label">Porto di Arrivo</div>
+      <div class="vc-val">Porto Mirabello, La Spezia</div>
+    </div>
+    <div class="voyage-cell">
+      <div class="vc-label">Data Arrivo</div>
+      <div class="vc-val">2 Giugno 2025</div>
+    </div>
+  </div>
+
+  <div class="section-title">Composizione Equipaggio &nbsp;·&nbsp; ${members.length} persone a bordo</div>
   <table>
     <thead>
       <tr>
         <th>#</th>
-        <th>Nome e Cognome</th>
-        <th>Data Nascita</th>
-        <th>Luogo Nascita</th>
+        <th>Cognome e Nome</th>
+        <th>Data di Nascita</th>
+        <th>Luogo di Nascita</th>
         <th>Nazionalità</th>
-        <th>Residenza / CAP</th>
-        <th>Tipo Doc.</th>
+        <th>Tipo Documento</th>
         <th>N° Documento</th>
         <th>Scadenza</th>
-        <th>Ruolo</th>
-        <th>Codice Fiscale</th>
+        <th>Ruolo a Bordo</th>
       </tr>
     </thead>
     <tbody>${rows_html}</tbody>
   </table>
-  <div class="footer">
-    Documento generato il ${new Date().toLocaleDateString('it-IT')} &nbsp;·&nbsp; Corsica Experience &nbsp;·&nbsp; +39 351 844 7888
+
+  <div class="sig-block">
+    <div class="sig-item">
+      <div class="sig-label">Firma Comandante</div>
+      <div class="sig-name">${skipper?.nome || '___________________________'}</div>
+    </div>
+    <div class="sig-item">
+      <div class="sig-label">Timbro / Visto Autorità</div>
+      <div class="sig-name">&nbsp;</div>
+    </div>
+    <div class="sig-item">
+      <div class="sig-label">Data e Luogo</div>
+      <div class="sig-name">La Spezia, ${new Date().toLocaleDateString('it-IT')}</div>
+    </div>
   </div>
-  <script>window.onload=()=>{window.print();}<\/script>
+
+  <div class="doc-footer">
+    <span>Corsica Sailing Experience &nbsp;·&nbsp; Porto Mirabello, La Spezia &nbsp;·&nbsp; +39 351 844 7888</span>
+    <span>Generato il ${new Date().toLocaleDateString('it-IT', {day:'2-digit',month:'long',year:'numeric'})}</span>
+  </div>
+
+</div>
+<script>window.onload=()=>{ window.print(); }<\/script>
 </body>
 </html>`);
   win.document.close();
