@@ -1359,16 +1359,17 @@ body {
   /* Regole: colonna singola già impostata sopra */
   .regole-extra { padding: 20px 16px; }
 
-  /* Crew: colonna singola su 390px */
-  .crew-member-row { grid-template-columns: 1fr; padding: 16px 14px; gap: 14px; }
-  .cf-field { grid-column: 1; }
-  .crew-field input, .crew-field select { padding: 13px 12px; font-size: 16px; }
+  /* Crew: 2 colonne anche su mobile piccolo — campi lunghi a tutta larghezza */
+  .crew-member-row { grid-template-columns: 1fr 1fr; padding: 16px 14px; gap: 12px; }
+  .cf-field { grid-column: span 2; }
+  .crew-field-full { grid-column: span 2; }
+  .crew-field input, .crew-field select { padding: 13px 12px; font-size: 16px; touch-action: manipulation; }
   .crew-field label { font-size: .68rem; }
-  .crew-field-actions { grid-column: 1; flex-direction: row; gap: 10px; margin-top: 4px; }
+  .crew-field-actions { grid-column: span 2; flex-direction: row; gap: 10px; margin-top: 4px; }
   .btn-wa-member { flex: 1; padding: 12px; font-size: .82rem; }
   .btn-remove-member { flex: 0 0 48px; height: 48px; width: 48px; border-radius: 10px; }
   .btn-add-member { width: 100%; max-width: 100%; border-radius: 12px; padding: 14px; font-size: .9rem; }
-  .btn-dl-pdf { font-size: .88rem; padding: 14px 16px; }
+  .btn-dl-pdf { font-size: .88rem; padding: 14px 16px; width: 100%; max-width: 100%; justify-content: center; }
 
   /* Meteo: sempre 2 colonne */
   .meteo-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
