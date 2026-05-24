@@ -5,9 +5,9 @@
 /* ── Google Sheets API ──────────────────────────── */
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxP4UKTts8LtwOAp3VIYeqjKPLUbKlYYM2zec9tMakjmFTgjKIK1hEOgA7BJRBmCcM2/exec';
 const ADMIN_PASSWORDS = {
-  lagoon:   'lagoon2025',
-  oceanis:  'oceanis2025',
-  atlantica: 'atlantica2026'
+  lagoon:    'Skipper2026',
+  oceanis:   'Skipper2026',
+  atlantica: 'Skipper2026'
 };
 
 /* ── Preloader ──────────────────────────────────── */
