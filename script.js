@@ -232,7 +232,7 @@ function addMember(boat, prefill) {
     </div>
     <div class="crew-field">
       <label>CAP</label>
-      <input type="text" placeholder="00100" data-field="cap" maxlength="5" inputmode="numeric" />
+      <input type="text" placeholder="00100" data-field="cap" maxlength="5" inputmode="numeric" pattern="[0-9]{5}" oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
     </div>
     <div class="crew-field">
       <label>Tipo Documento <span style="color:#e05">*</span></label>
