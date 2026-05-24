@@ -413,7 +413,7 @@ const _counterClicks = {};
 function handleCounterClick(boat, el) {
   _counterClicks[boat] = (_counterClicks[boat] || 0) + 1;
   clearTimeout(el._resetTimer);
-  el._resetTimer = setTimeout(() => { _counterClicks[boat] = 0; }, 600);
+  el._resetTimer = setTimeout(() => { _counterClicks[boat] = 0; }, 2000);
   if (_counterClicks[boat] >= 3) {
     _counterClicks[boat] = 0;
     const btn = document.getElementById('btnAdminPDF-' + boat);
