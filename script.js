@@ -468,15 +468,45 @@ async function saveMemberToSheets(boat) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    if (btn) { btn.textContent = '✅ Dati salvati!'; btn.style.background = 'var(--turq)'; }
     saveToStorage(boat);
+    // Nascondi il form e mostra schermata di conferma
+    const container = document.getElementById('members-' + boat);
+    const addBtn = container?.parentElement?.querySelector('.btn-add-member');
+    const crewActions = document.getElementById('btnSalva-' + boat)?.closest('.crew-actions');
     const statusEl = document.getElementById('saveStatus-' + boat);
-    if (statusEl) { statusEl.textContent = '✅ ' + nome + ' — dati inviati correttamente.'; statusEl.style.display = 'block'; }
+    if (container) container.style.display = 'none';
+    if (addBtn) addBtn.style.display = 'none';
+    if (crewActions) crewActions.style.display = 'none';
+    if (statusEl) {
+      statusEl.innerHTML = `
+        <div style="font-size:1.4rem; margin-bottom:8px;">✅</div>
+        <strong>${nome} ${cognome}</strong> — dati inviati correttamente.<br>
+        <span style="font-size:.82rem; opacity:.75;">Puoi chiudere questa pagina. I tuoi dati sono stati salvati.</span><br>
+        <button onclick="window._showFormAgain('${boat}')" style="margin-top:12px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); color:#fff; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:.82rem;">✏️ Modifica i miei dati</button>
+      `;
+      statusEl.style.display = 'block';
+      statusEl.style.textAlign = 'center';
+    }
+    if (btn) { btn.textContent = '✅ Dati salvati!'; btn.style.background = 'var(--turq)'; }
   } catch(err) {
     if (btn) { btn.textContent = 'Salva i miei dati'; btn.disabled = false; }
     alert('Errore di rete. Riprova.');
   }
 }
+
+/* ── Mostra di nuovo il form dopo il salvataggio ── */
+window._showFormAgain = function(boat) {
+  const container = document.getElementById('members-' + boat);
+  const addBtn = container?.parentElement?.querySelector('.btn-add-member');
+  const crewActions = document.getElementById('btnSalva-' + boat)?.closest('.crew-actions');
+  const statusEl = document.getElementById('saveStatus-' + boat);
+  const btn = document.getElementById('btnSalva-' + boat);
+  if (container) container.style.display = '';
+  if (addBtn) addBtn.style.display = '';
+  if (crewActions) crewActions.style.display = '';
+  if (statusEl) { statusEl.style.display = 'none'; statusEl.innerHTML = ''; }
+  if (btn) { btn.textContent = '💾 Salva i miei dati'; btn.style.background = ''; btn.disabled = false; }
+};
 
 /* ── Admin: scarica PDF con tutti i membri da Sheets ── */
 async function adminDownloadPDF(boat, boatName, departureDate, arrivalDate) {
