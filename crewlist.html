@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crew List — Corsica Experience</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <nav class="nav scrolled" id="nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="index.html">
+        <span class="logo-icon">—</span>
+        <span>Corsica Experience</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#meteo">Meteo</a>
+        <a href="regole.html">Regole</a>
+      </div>
+      <button class="nav-burger" id="navBurger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="index.html">Home</a>
+      <a href="index.html#meteo">Meteo</a>
+      <a href="regole.html">Regole</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="page-hero-bg" style="background-image:url('img/hero.jpg')"></div>
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <a href="index.html" class="back-link">← Torna alla home</a>
+      <span class="label light">Documentazione</span>
+      <h1 class="page-hero-title">Crew List</h1>
+      <p class="page-hero-sub">Seleziona la tua barca, compila i dati e scarica il modulo PDF per il charter.</p>
+    </div>
+  </div>
+
+  <!-- CREW LIST -->
+  <section class="crewlist" id="crewlist" style="padding-top:60px">
+    <div class="container">
+
+      <!-- Banner stato accettazione regole -->
+      <div class="crew-regole-banner" id="crbBanner">
+        <span class="crb-icon">!</span>
+        <span>Non hai ancora accettato le Regole di Bordo. <a href="regole.html">Leggi e accetta prima di procedere →</a></span>
+      </div>
+
+      <!-- STEP 1: scelta barca -->
+      <div class="crew-boat-select reveal-up" id="crewBoatSelect">
+        <p class="crew-select-label">Su quale barca sei imbarcato?</p>
+        <div class="crew-boat-cards">
+          <button class="crew-boat-card" onclick="selectBoat('lagoon')">
+            <div class="cbc-img" style="background-image:url('img/lagoon40.webp')"></div>
+            <div class="cbc-body">
+              <div class="cbc-type">Catamarano</div>
+              <div class="cbc-name">Lagoon 40</div>
+              <div class="cbc-cta">Entra &amp; compila →</div>
+            </div>
+          </button>
+          <button class="crew-boat-card" onclick="selectBoat('oceanis')">
+            <div class="cbc-img" style="background-image:url('img/oceanis48.jpg')"></div>
+            <div class="cbc-body">
+              <div class="cbc-type">Monoscafo</div>
+              <div class="cbc-name">Beneteau Oceanis 48</div>
+              <div class="cbc-cta">Entra &amp; compila →</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: form per barca selezionata -->
+      <div class="crew-form-area" id="crewFormArea" style="display:none">
+        <div class="crew-form-header">
+          <button class="crew-back-btn" onclick="backToBoatSelect()">← Cambia barca</button>
+          <div class="crew-form-title" id="crewFormTitle"></div>
+        </div>
+
+        <!-- LAGOON panel -->
+        <div class="crew-panel" id="crew-lagoon">
+          <div class="crew-members" id="members-lagoon"></div>
+          <button class="btn-add-member" onclick="addMember('lagoon')">+ Aggiungi membro</button>
+          <div class="crew-actions">
+            <button class="btn-dl-pdf" onclick="downloadCrewPDF('lagoon', 'Lagoon 40')">Scarica PDF Lagoon 40</button>
+          </div>
+        </div>
+
+        <!-- OCEANIS panel -->
+        <div class="crew-panel" id="crew-oceanis">
+          <div class="crew-members" id="members-oceanis"></div>
+          <button class="btn-add-member" onclick="addMember('oceanis')">+ Aggiungi membro</button>
+          <div class="crew-actions">
+            <button class="btn-dl-pdf" onclick="downloadCrewPDF('oceanis', 'Beneteau Oceanis 48')">Scarica PDF Oceanis 48</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">Corsica Experience</div>
+      <p>Porto Mirabello · La Spezia · Ponte del 2 Giugno 2025</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#meteo">Meteo</a>
+        <a href="regole.html">Regole</a>
+      </div>
+      <p class="footer-copy">© 2025 Corsica Experience — Tutti i diritti riservati</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const banner = document.getElementById('crbBanner');
+      if (localStorage.getItem('regole_accettate') === '1') {
+        banner.classList.add('accepted');
+        banner.querySelector('.crb-icon').textContent = '✓';
+        banner.querySelector('span:last-child').innerHTML = 'Regole di Bordo accettate. Puoi compilare la crew list.';
+      }
+    });
+  </script>
+</body>
+</html>

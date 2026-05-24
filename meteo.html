@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meteo del Viaggio — Corsica Experience</title>
+  <meta name="description" content="Previsioni meteo aggiornate per la traversata La Spezia — Corsica. Vento, mare, temperatura per ogni tappa del viaggio." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav scrolled" id="nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="index.html">
+        <span class="logo-icon">—</span>
+        <span>Corsica Experience</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#itinerario">Itinerario</a>
+        <a href="index.html#barche">Le Barche</a>
+        <a href="index.html#spiagge">Spiagge</a>
+        <a href="regole.html">Regole</a>
+        <a href="crewlist.html" class="nav-cta">Crew List</a>
+      </div>
+      <button class="nav-burger" id="navBurger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="navMobile">
+      <a href="index.html">Home</a>
+      <a href="index.html#itinerario">Itinerario</a>
+      <a href="index.html#barche">Le Barche</a>
+      <a href="regole.html">Regole</a>
+      <a href="crewlist.html">Crew List</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="page-hero-bg" style="background-image:url('img/hero.jpg')"></div>
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <a href="index.html" class="back-link">← Torna alla home</a>
+      <span class="label light">Previsioni Aggiornate</span>
+      <h1 class="page-hero-title">Meteo del Viaggio</h1>
+      <p class="page-hero-sub">Dati aggiornati al <strong>23 maggio 2025</strong> — Tirreno &amp; Corsica Nord</p>
+    </div>
+  </div>
+
+  <!-- METEO CONTENT -->
+  <section class="meteo" id="meteo" style="padding-top:60px">
+    <div class="container">
+
+      <!-- Rotte meteo -->
+      <div class="meteo-routes reveal-up">
+        <div class="mr-tab active" data-route="spezia">La Spezia</div>
+        <div class="mr-tab" data-route="traversata">Traversata Tirrenica</div>
+        <div class="mr-tab" data-route="corsica">Corsica Nord</div>
+      </div>
+
+      <!-- LA SPEZIA -->
+      <div class="meteo-panel active" id="panel-spezia">
+        <div class="meteo-grid">
+          <div class="meteo-card reveal-up">
+            <div class="mc-icon">—</div>
+            <div class="mc-val">22–27°C</div>
+            <div class="mc-label">Temperatura Aria</div>
+            <div class="mc-sub">Notte 16–18°C</div>
+          </div>
+          <div class="meteo-card reveal-up d1">
+            <div class="mc-icon">—</div>
+            <div class="mc-val">18–21°C</div>
+            <div class="mc-label">Temperatura Mare</div>
+            <div class="mc-sub">Golfo di La Spezia</div>
+          </div>
+          <div class="meteo-card reveal-up d2">
+            <div class="mc-icon">—</div>
+            <div class="mc-val">8–15 kn</div>
+            <div class="mc-label">Vento</div>
+            <div class="mc-sub">Variabili SE–Ovest pomeriggio</div>
+          </div>
+          <div class="meteo-card reveal-up d3">
+            <div class="mc-icon">—</div>
+            <div class="mc-val">Poco mosso</div>
+            <div class="mc-label">Moto Ondoso</div>
+            <div class="mc-sub">Anticiclone sul Tirreno</div>
+          </div>
+          <div class="meteo-card reveal-up d4">
+            <div class="mc-icon">—</div>
+            <div class="mc-val">17:00–19:00</div>
+            <div class="mc-label">Imbarco &amp; Partenza</div>
+            <div class="mc-sub">Cambusa + briefing sicurezza</div>
+          </div>
+          <div class="meteo-card ideal reveal-up d5">
+            <div class="mc-val ideal-val">FAVOREVOLE</div>
+            <div class="mc-label">Tendenza meteo</div>
+            <div class="mc-sub">Venerdì 29 Maggio</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRAVERSATA -->
+      <div class="meteo-panel" id="panel-traversata">
+        <div class="meteo-grid">
+          <div class="meteo-card reveal-up">
+            <div class="mc-val">La Spezia → Cap Corse Est</div>
+            <div class="mc-label">Rotta</div>
+            <div class="mc-sub">Centuri / Macinaggio</div>
+          </div>
+          <div class="meteo-card reveal-up d1">
+            <div class="mc-val">~12–14 h</div>
+            <div class="mc-label">Durata Traversata</div>
+            <div class="mc-sub">Partenza 18–19:00 · Arrivo alba sab</div>
+          </div>
+          <div class="meteo-card reveal-up d2">
+            <div class="mc-val">8–15 kn</div>
+            <div class="mc-label">Vento atteso</div>
+            <div class="mc-sub">Variabili · Maestrale ideale</div>
+          </div>
+          <div class="meteo-card reveal-up d3">
+            <div class="mc-val">Poco mosso</div>
+            <div class="mc-label">Mare</div>
+            <div class="mc-sub">Possibile onda lunga con Libeccio</div>
+          </div>
+          <div class="meteo-card reveal-up d4">
+            <div class="mc-val">Notturna</div>
+            <div class="mc-label">Navigazione</div>
+            <div class="mc-sub">Colazione in rada · Cap Corse</div>
+          </div>
+          <div class="meteo-card ideal reveal-up d5">
+            <div class="mc-val ideal-val">DIRETTA</div>
+            <div class="mc-label">Rotta logica</div>
+            <div class="mc-sub">Arrivo sabato mattina riposati</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CORSICA NORD -->
+      <div class="meteo-panel" id="panel-corsica">
+        <div class="meteo-grid">
+          <div class="meteo-card reveal-up">
+            <div class="mc-val">24–29°C</div>
+            <div class="mc-label">Temperatura Aria</div>
+            <div class="mc-sub">Notte 16–20°C · Temperature estive</div>
+          </div>
+          <div class="meteo-card reveal-up d1">
+            <div class="mc-val">18–21°C</div>
+            <div class="mc-label">Temperatura Mare</div>
+            <div class="mc-sub">Golfo di Saint-Florent</div>
+          </div>
+          <div class="meteo-card reveal-up d2">
+            <div class="mc-val">Brezze termiche</div>
+            <div class="mc-label">Vento in Rada</div>
+            <div class="mc-sub">SE–Ovest moderato nel pomeriggio</div>
+          </div>
+          <div class="meteo-card reveal-up d3">
+            <div class="mc-val">Poco mosso</div>
+            <div class="mc-label">Moto Ondoso</div>
+            <div class="mc-sub">Acque protette · Rada ideale</div>
+          </div>
+          <div class="meteo-card reveal-up d4">
+            <div class="mc-val">Lotu · Saleccia · Ghignu</div>
+            <div class="mc-label">Spiagge programmate</div>
+            <div class="mc-sub">Dom mattina Lotu · pomeriggio Saleccia</div>
+          </div>
+          <div class="meteo-card ideal reveal-up d5">
+            <div class="mc-val ideal-val">PERFETTO</div>
+            <div class="mc-label">Condizioni Mare</div>
+            <div class="mc-sub">Anticiclone stabile sul Tirreno</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forecast giornaliero -->
+      <div class="forecast reveal-up">
+        <div class="forecast-title">Previsioni Giorno per Giorno</div>
+        <div class="forecast-grid">
+          <div class="fc-day">
+            <div class="fc-date">Ven 29</div>
+            <div class="fc-icon">—</div>
+            <div class="fc-temp">24°C</div>
+            <div class="fc-wind">SW 8 kn</div>
+            <div class="fc-sea">0.3 m</div>
+            <div class="fc-note">Partenza</div>
+          </div>
+          <div class="fc-day">
+            <div class="fc-date">Sab 30</div>
+            <div class="fc-icon">—</div>
+            <div class="fc-temp">26°C</div>
+            <div class="fc-wind">NW 12 kn</div>
+            <div class="fc-sea">0.5 m</div>
+            <div class="fc-note">Traversata</div>
+          </div>
+          <div class="fc-day active-day">
+            <div class="fc-date">Dom 31</div>
+            <div class="fc-icon">—</div>
+            <div class="fc-temp">27°C</div>
+            <div class="fc-wind">5 kn</div>
+            <div class="fc-sea">0.2 m</div>
+            <div class="fc-note">Spiagge</div>
+          </div>
+          <div class="fc-day">
+            <div class="fc-date">Lun 1</div>
+            <div class="fc-icon">—</div>
+            <div class="fc-temp">26°C</div>
+            <div class="fc-wind">W 10 kn</div>
+            <div class="fc-sea">0.4 m</div>
+            <div class="fc-note">Risalita</div>
+          </div>
+          <div class="fc-day">
+            <div class="fc-date">Mar 2</div>
+            <div class="fc-icon">—</div>
+            <div class="fc-temp">25°C</div>
+            <div class="fc-wind">NW 8 kn</div>
+            <div class="fc-sea">0.3 m</div>
+            <div class="fc-note">Rientro</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="meteo-note reveal-up">
+        <span>!</span>
+        <div><strong>Vento da monitorare: Libeccio (SW)</strong> — onda lunga, traverso scomodo tra Cap Corse e Liguria. Configurazione ideale: Maestrale leggero o brezze termiche con alta pressione stabile.<br/>
+        Previsioni affidabili disponibili <strong>5 giorni prima</strong> della partenza su <strong>Windy.com</strong> e <strong>Navily</strong>. Finestra meteo definitiva: 48–72h prima.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">Corsica Experience</div>
+      <p>Porto Mirabello · La Spezia · Ponte del 2 Giugno 2025</p>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#itinerario">Itinerario</a>
+        <a href="regole.html">Regole</a>
+        <a href="crewlist.html">Crew List</a>
+      </div>
+      <p class="footer-copy">© 2025 Corsica Experience — Tutti i diritti riservati</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
