@@ -1002,14 +1002,6 @@ body {
 .crew-back-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
 .crew-form-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; color: #fff; }
 
-.crew-member-row {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end;
-  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
-  border-radius: var(--r-md); padding: 20px; margin-bottom: 14px;
-  max-width: 760px; margin-left: auto; margin-right: auto;
-}
-.crew-field { display: flex; flex-direction: column; gap: 6px; }
-.cf-field { grid-column: span 2; }
 .crew-field label { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.45); }
 .crew-field input, .crew-field select {
   background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
@@ -1022,6 +1014,25 @@ body {
 .crew-field input::placeholder { color: rgba(255,255,255,.3); }
 .crew-field input:focus, .crew-field select:focus { border-color: var(--turq); background: rgba(28,167,168,.1); }
 .crew-field select option { background: var(--ocean); color: #fff; }
+
+.crew-member-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: end;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-md);
+  padding: 20px;
+  margin-bottom: 14px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+.crew-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cf-field { grid-column: span 2; }
+.crew-field-full { grid-column: span 4; }
 
 .crew-field-actions {
   display: flex; flex-direction: column; gap: 8px; justify-content: flex-end;
@@ -1330,6 +1341,7 @@ body {
   /* form: 2 colonne su 640 */
   .crew-member-row { grid-template-columns: 1fr 1fr; gap: 10px; max-width: 100%; }
   .cf-field { grid-column: span 2; }
+  .crew-field-full { grid-column: span 2; }
   .crew-field-actions { grid-column: span 2; flex-direction: row; gap: 10px; }
   .btn-wa-member { flex: 1; }
   .btn-remove-member { flex: 0 0 44px; height: 44px; grid-column: auto; width: auto; }

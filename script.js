@@ -218,7 +218,7 @@ function addMember(boat, prefill) {
       <label>Nazionalità</label>
       <input type="text" placeholder="Italiana" data-field="nazionalita" />
     </div>
-    <div class="crew-field cf-field">
+    <div class="crew-field crew-field-full">
       <label>Via / Indirizzo di Residenza</label>
       <input type="text" placeholder="Via Roma 1" data-field="via" autocomplete="street-address" />
     </div>
