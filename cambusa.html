@@ -26,6 +26,10 @@
     .kb-progress-label { font-size: .85rem; color: rgba(255,255,255,.65); margin-bottom: 8px; }
     .kb-progress-track { height: 8px; background: rgba(255,255,255,.08); border-radius: 20px; overflow: hidden; }
     .kb-progress-fill { height: 100%; width: 0; background: var(--turq); transition: width .25s ease; }
+    .kb-sync { display: flex; align-items: center; gap: 6px; font-size: .78rem; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,.06); color: rgba(255,255,255,.55); }
+    .kb-sync.ok { color: #4ade80; background: rgba(74,222,128,.08); }
+    .kb-sync.busy { color: var(--turq-light); }
+    .kb-sync.local { color: rgba(255,255,255,.4); }
     .kb-actions { display: flex; gap: 8px; flex-wrap: wrap; }
     .kb-action.secondary { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.75); }
     .kb-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
@@ -87,6 +91,7 @@
         <div class="kb-progress-label" id="kbProgressLabel">0 / 0 completati</div>
         <div class="kb-progress-track"><div class="kb-progress-fill" id="kbProgressFill"></div></div>
       </div>
+      <div id="kbSyncStatus" class="kb-sync local">💾 Locale</div>
       <div class="kb-actions">
         <button class="kb-action secondary" onclick="resetCambusa()">↺ Azzera</button>
         <button class="kb-action" onclick="window.print()">🖨️ Stampa</button>
@@ -100,6 +105,8 @@
 <script>
 const CAMBUSA_PASSWORD = 'Corsica';
 const CAMBUSA_KEY = 'cambusa_2_giugno_state_v1';
+// Inserisci qui l'URL del Google Apps Script dopo il deploy (lascia vuoto = solo localStorage)
+const SHEETS_URL = '';
 const CAMBUSA = [
   { id:'base-extra', icon:'🧂', title:'Base indispensabile', items:[
     ['sale-grosso','Sale grosso','1 kg','Dal file cambusa'], ['sale-fino','Sale fino','1 confezione piccola','Dal file cambusa'], ['olio','Olio','1 bottiglia','Dal file cambusa'], ['zucchero','Zucchero','1 busta','Dal file cambusa'], ['pepe-nero','Pepe nero','1 confezione','Base cucina'], ['limoni-extra','Limoni','almeno 2','Dal file cambusa'], ['carta-argento','Carta argento','1 rotolo','Dal file cambusa'], ['sacchetti-piccoli','Sacchetti piccoli','10','Dal file cambusa'], ['sacchetti-grandi','Sacchetti grandi neri','10','Dal file cambusa']
@@ -133,6 +140,13 @@ const CAMBUSA = [
   ]}
 ];
 let cambusaState = {};
+
+function setSyncStatus(state, text) {
+  const el = document.getElementById('kbSyncStatus');
+  el.className = 'kb-sync ' + state;
+  el.textContent = text;
+}
+
 function unlockCambusa(){
   const pwd = document.getElementById('kbPwd').value;
   if (pwd !== CAMBUSA_PASSWORD) { document.getElementById('kbErr').style.display='block'; return; }
@@ -140,11 +154,47 @@ function unlockCambusa(){
   document.getElementById('kbContent').style.display='block';
   loadCambusa();
 }
+
 function loadCambusa(){
   try { cambusaState = JSON.parse(localStorage.getItem(CAMBUSA_KEY)) || {}; } catch(e) { cambusaState = {}; }
-  renderCambusa();
+  if (SHEETS_URL) {
+    setSyncStatus('busy', '↻ Caricamento...');
+    fetchFromSheets();
+  } else {
+    setSyncStatus('local', '💾 Locale');
+    renderCambusa();
+  }
 }
+
+function fetchFromSheets() {
+  const cb = 'cb_' + Date.now();
+  window[cb] = function(data) {
+    delete window[cb];
+    if (data && typeof data === 'object') {
+      cambusaState = data;
+      localStorage.setItem(CAMBUSA_KEY, JSON.stringify(cambusaState));
+    }
+    setSyncStatus('ok', '☁️ Sincronizzato');
+    renderCambusa();
+  };
+  const script = document.createElement('script');
+  script.src = SHEETS_URL + '?action=get&callback=' + cb;
+  script.onerror = function() { delete window[cb]; setSyncStatus('local', '⚠️ Solo locale'); renderCambusa(); };
+  document.head.appendChild(script);
+}
+
+function pushToSheets(key, val) {
+  if (!SHEETS_URL) return;
+  const cb = 'cb_' + Date.now();
+  window[cb] = function() { delete window[cb]; setSyncStatus('ok', '☁️ Sincronizzato'); };
+  const script = document.createElement('script');
+  script.src = SHEETS_URL + '?action=set&id=' + encodeURIComponent(key) + '&val=' + val + '&callback=' + cb;
+  script.onerror = function() { delete window[cb]; setSyncStatus('local', '⚠️ Errore sync'); };
+  document.head.appendChild(script);
+}
+
 function saveCambusa(){ localStorage.setItem(CAMBUSA_KEY, JSON.stringify(cambusaState)); }
+
 function renderCambusa(){
   const grid = document.getElementById('kbGrid');
   grid.innerHTML = CAMBUSA.map(sec => {
@@ -163,7 +213,9 @@ function toggleItem(id, checked){
   const el = document.getElementById('item-' + id);
   if (el) el.classList.toggle('done', checked);
   updateProgress();
+  if (SHEETS_URL) { setSyncStatus('busy', '↻ Salvataggio...'); pushToSheets(id, checked); }
 }
+
 function updateProgress(){
   const total = CAMBUSA.reduce((n,s)=>n+s.items.length,0);
   const done = CAMBUSA.reduce((n,s)=>n+s.items.filter(it=>cambusaState[it[0]]).length,0);
@@ -176,9 +228,17 @@ function updateProgress(){
   });
 }
 function resetCambusa(){
-  if (!confirm('Azzerare tutte le spunte della cambusa su questo dispositivo?')) return;
+  if (!confirm('Azzerare tutte le spunte della cambusa?')) return;
   cambusaState = {};
   saveCambusa();
+  if (SHEETS_URL) {
+    setSyncStatus('busy', '↻ Azzeramento...');
+    const cb = 'cb_reset_' + Date.now();
+    window[cb] = function() { delete window[cb]; setSyncStatus('ok', '☁️ Sincronizzato'); };
+    const script = document.createElement('script');
+    script.src = SHEETS_URL + '?action=reset&callback=' + cb;
+    document.head.appendChild(script);
+  }
   renderCambusa();
 }
 </script>
