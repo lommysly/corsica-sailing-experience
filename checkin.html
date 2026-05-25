@@ -552,57 +552,65 @@ function setSyncState(state, msg) {
   lbl.textContent = msg;
 }
 
-// ── Load from Google Sheets ──────────────────────────
+// ── Load from Google Sheets via JSONP ───────────────
 function loadFromSheets(boat) {
   setSyncState('loading', 'Caricamento da Google Sheets…');
-  // Usa cache locale come fallback immediato
   const cached = getCached(boat);
   if (Object.keys(cached).length) {
     localState = cached;
     renderChecklist(boat);
   }
-  fetch(CHECKIN_API + '?boat=' + boat)
-    .then(r => r.json())
-    .then(res => {
-      if (res.ok) {
-        localState = {};
-        Object.keys(res.data).forEach(id => {
-          localState[id] = { stato: res.data[id].stato, nota: res.data[id].nota };
-        });
-        setCached(boat, localState);
-        renderChecklist(boat);
-        setSyncState('ok', 'Sincronizzato · ' + new Date().toLocaleTimeString('it-IT'));
-      } else {
-        setSyncState('err', 'Errore caricamento — dati locali in uso');
-        renderChecklist(boat);
-      }
-    })
-    .catch(() => {
-      setSyncState('err', 'Offline — dati locali in uso');
+  const cbName = '_ci_cb_' + Date.now();
+  const timeout = setTimeout(() => {
+    delete window[cbName];
+    const old = document.getElementById('_ci_script');
+    if (old) old.remove();
+    setSyncState('err', 'Timeout — dati locali in uso');
+    if (!Object.keys(localState).length) renderChecklist(boat);
+  }, 8000);
+  window[cbName] = function(res) {
+    clearTimeout(timeout);
+    delete window[cbName];
+    const old = document.getElementById('_ci_script');
+    if (old) old.remove();
+    if (res.ok) {
+      localState = {};
+      Object.keys(res.data).forEach(id => {
+        localState[id] = { stato: res.data[id].stato, nota: res.data[id].nota };
+      });
+      setCached(boat, localState);
       renderChecklist(boat);
-    });
+      setSyncState('ok', 'Sincronizzato · ' + new Date().toLocaleTimeString('it-IT'));
+    } else {
+      setSyncState('err', 'Errore Sheets — dati locali in uso');
+      renderChecklist(boat);
+    }
+  };
+  const s = document.createElement('script');
+  s.id = '_ci_script';
+  s.src = CHECKIN_API + '?boat=' + boat + '&callback=' + cbName;
+  document.head.appendChild(s);
+  s.onerror = () => {
+    clearTimeout(timeout);
+    delete window[cbName];
+    setSyncState('err', 'Offline — dati locali in uso');
+    if (!Object.keys(localState).length) renderChecklist(boat);
+  };
 }
 
-// ── Save single item to Sheets (debounced) ───────────
+// ── Save single item to Sheets via no-cors POST ──────
 function saveToSheets(voceId, stato, nota) {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     setSyncState('loading', 'Salvataggio…');
     const body = JSON.stringify({ boat: currentBoat, voceId, stato, nota, skipper: 'Skipper' });
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = CHECKIN_API;
-    form.style.display = 'none';
-    const inp = document.createElement('input');
-    inp.name = 'payload'; inp.value = body;
-    // Usa fetch con no-cors come fallback sicuro
     fetch(CHECKIN_API, {
       method: 'POST',
+      mode: 'no-cors',
       body: body,
       headers: { 'Content-Type': 'text/plain' }
     })
-    .then(r => r.json())
-    .then(res => setSyncState(res.ok ? 'ok' : 'err', res.ok ? 'Salvato · ' + new Date().toLocaleTimeString('it-IT') : 'Errore salvataggio'))
+    .then(() => setSyncState('ok', 'Salvato · ' + new Date().toLocaleTimeString('it-IT')))
     .catch(() => setSyncState('err', 'Offline — salvato in locale'));
   }, 800);
 }
@@ -715,7 +723,7 @@ function resetChecklist() {
   const sections = BOATS[currentBoat].sections;
   const allIds = sections.flatMap(s => s.items.map(it => it.id));
   const promises = allIds.map(id =>
-    fetch(CHECKIN_API, { method: 'POST', body: JSON.stringify({ boat: currentBoat, voceId: id, stato: false, nota: '' }), headers: { 'Content-Type': 'text/plain' } }).catch(() => {})
+    fetch(CHECKIN_API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ boat: currentBoat, voceId: id, stato: false, nota: '' }), headers: { 'Content-Type': 'text/plain' } }).catch(() => {})
   );
   Promise.all(promises).then(() => setSyncState('ok', 'Reset completato'));
 }
