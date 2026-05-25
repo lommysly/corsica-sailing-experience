@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cambusa — Corsica Experience</title>
+  <link rel="stylesheet" href="styles.css?v=20260525i" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <style>
+    body { background: var(--ocean); color: #fff; min-height: 100vh; }
+    .kb-wrap { max-width: 1040px; margin: 0 auto; padding: 52px 20px 90px; }
+    .kb-header { text-align: center; margin-bottom: 30px; }
+    .kb-header .label { display: block; margin-bottom: 10px; color: var(--turq); font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+    .kb-header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.6rem, 7vw, 4.4rem); font-weight: 300; margin-bottom: 10px; }
+    .kb-header p { max-width: 680px; margin: 0 auto; color: rgba(255,255,255,.65); line-height: 1.7; }
+    .kb-lock { max-width: 420px; margin: 70px auto; padding: 34px 28px; border-radius: 22px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); text-align: center; }
+    .kb-lock .icon { font-size: 3rem; margin-bottom: 14px; }
+    .kb-lock p { color: rgba(255,255,255,.62); margin-bottom: 20px; line-height: 1.6; }
+    .kb-lock input { width: 100%; padding: 13px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.08); color: #fff; text-align: center; font-size: 1rem; outline: none; margin-bottom: 12px; }
+    .kb-lock button, .kb-action { border: none; border-radius: 12px; background: var(--turq); color: #fff; padding: 12px 20px; font-weight: 700; cursor: pointer; }
+    .kb-err { display: none; margin-top: 12px; color: #f87171; font-size: .86rem; }
+    .kb-toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 22px; padding: 16px 18px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 18px; }
+    .kb-progress { flex: 1; min-width: 220px; }
+    .kb-progress-label { font-size: .85rem; color: rgba(255,255,255,.65); margin-bottom: 8px; }
+    .kb-progress-track { height: 8px; background: rgba(255,255,255,.08); border-radius: 20px; overflow: hidden; }
+    .kb-progress-fill { height: 100%; width: 0; background: var(--turq); transition: width .25s ease; }
+    .kb-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .kb-action.secondary { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.75); }
+    .kb-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .kb-section { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.1); border-radius: 20px; overflow: hidden; }
+    .kb-section-head { display: flex; align-items: center; gap: 12px; padding: 17px 18px; background: rgba(255,255,255,.055); }
+    .kb-section-head .emoji { font-size: 1.35rem; }
+    .kb-section-head h2 { flex: 1; font-size: 1rem; font-weight: 700; }
+    .kb-count { color: rgba(255,255,255,.45); font-size: .8rem; }
+    .kb-list { padding: 8px 0; }
+    .kb-item { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: start; padding: 11px 18px; border-top: 1px solid rgba(255,255,255,.055); }
+    .kb-item input { width: 20px; height: 20px; accent-color: var(--turq); margin-top: 2px; cursor: pointer; }
+    .kb-item-name { display: block; color: rgba(255,255,255,.86); font-size: .9rem; line-height: 1.35; }
+    .kb-item.done .kb-item-name { color: rgba(255,255,255,.38); text-decoration: line-through; }
+    .kb-qty { color: var(--turq-light); font-size: .78rem; font-weight: 700; white-space: nowrap; }
+    .kb-note { margin-top: 4px; color: rgba(255,255,255,.38); font-size: .75rem; line-height: 1.4; }
+    .kb-meta { margin-top: 22px; color: rgba(255,255,255,.45); font-size: .8rem; text-align: center; }
+    @media (max-width: 820px) { .kb-grid { grid-template-columns: 1fr; } .kb-toolbar { align-items: stretch; } .kb-actions { width: 100%; } .kb-action { flex: 1; } }
+    @media print { .nav, .kb-lock, .kb-toolbar { display: none !important; } body { background: #fff !important; color: #111 !important; } .kb-wrap { max-width: 100%; padding: 10mm !important; } .kb-header h1 { color: #0b3c5d !important; } .kb-header p, .kb-header .label { color: #555 !important; } .kb-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } .kb-section { break-inside: avoid; background: #fff !important; border: 1px solid #cbd5e1 !important; } .kb-section-head { background: #e8f0f7 !important; color: #0b3c5d !important; } .kb-item { border-top: 1px solid #eee !important; } .kb-item-name { color: #222 !important; } .kb-qty { color: #0b3c5d !important; } .kb-note { color: #666 !important; } }
+  </style>
+</head>
+<body>
+<nav class="nav scrolled" id="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html"><span class="logo-icon">—</span><span>Corsica Experience</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="regole.html">Regole</a>
+      <a href="crewlist.html">Crew List</a>
+      <a href="checkin.html">Check-in</a>
+    </div>
+    <button class="nav-burger" id="navBurger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="index.html">Home</a>
+    <a href="regole.html">Regole</a>
+    <a href="crewlist.html">Crew List</a>
+    <a href="checkin.html">Check-in</a>
+  </div>
+</nav>
+
+<main class="kb-wrap">
+  <div class="kb-header">
+    <span class="label">Cambusa condivisa</span>
+    <h1>Kambusa 2 Giugno</h1>
+    <p>Checklist della spesa e delle dotazioni base. Accesso partecipanti con password, stato salvato sul dispositivo per non perdere le spunte.</p>
+  </div>
+
+  <section class="kb-lock" id="kbLock">
+    <div class="icon">🧺</div>
+    <p>Inserisci la password della cambusa per vedere la checklist.</p>
+    <input type="password" id="kbPwd" placeholder="Password" onkeydown="if(event.key==='Enter')unlockCambusa()" />
+    <button onclick="unlockCambusa()">Accedi</button>
+    <div class="kb-err" id="kbErr">Password errata. Riprova.</div>
+  </section>
+
+  <section id="kbContent" style="display:none">
+    <div class="kb-toolbar">
+      <div class="kb-progress">
+        <div class="kb-progress-label" id="kbProgressLabel">0 / 0 completati</div>
+        <div class="kb-progress-track"><div class="kb-progress-fill" id="kbProgressFill"></div></div>
+      </div>
+      <div class="kb-actions">
+        <button class="kb-action secondary" onclick="resetCambusa()">↺ Azzera</button>
+        <button class="kb-action" onclick="window.print()">🖨️ Stampa</button>
+      </div>
+    </div>
+    <div class="kb-grid" id="kbGrid"></div>
+    <div class="kb-meta">Dati estratti da “Cambusa_2 giugno.numbers” e integrati con dotazioni base di bordo.</div>
+  </section>
+</main>
+
+<script>
+const CAMBUSA_PASSWORD = 'Corsica';
+const CAMBUSA_KEY = 'cambusa_2_giugno_state_v1';
+const CAMBUSA = [
+  { id:'base-extra', icon:'🧂', title:'Base indispensabile', items:[
+    ['sale-grosso','Sale grosso','1 kg','Dal file cambusa'], ['sale-fino','Sale fino','1 confezione piccola','Dal file cambusa'], ['olio','Olio','1 bottiglia','Dal file cambusa'], ['zucchero','Zucchero','1 busta','Dal file cambusa'], ['pepe-nero','Pepe nero','1 confezione','Base cucina'], ['limoni-extra','Limoni','almeno 2','Dal file cambusa'], ['carta-argento','Carta argento','1 rotolo','Dal file cambusa'], ['sacchetti-piccoli','Sacchetti piccoli','10','Dal file cambusa'], ['sacchetti-grandi','Sacchetti grandi neri','10','Dal file cambusa']
+  ]},
+  { id:'verdure', icon:'🥬', title:'Verdure', items:[
+    ['cavolo','Cavolo cappuccio','',''], ['rucola','Rucola / insalata mista','',''], ['pomodorini','Pomodorini','',''], ['zucchine','Zucchine','',''], ['carote','Carote','',''], ['peperoni','Peperoni','',''], ['patate','Patate','',''], ['cipolle','Cipolle','',''], ['aglio','Aglio','',''], ['cetrioli','Cetrioli','','']
+  ]},
+  { id:'frutta', icon:'🍎', title:'Frutta', items:[
+    ['pesche','Pesche','',''], ['mele-banane','Mele / banane','',''], ['uva','Uva','',''], ['arance','Arance','',''], ['melone','Melone','2',''], ['limoni','Limoni','2','']
+  ]},
+  { id:'colazione', icon:'☕', title:'Colazione', items:[
+    ['latte','Latte LC','2 litri',''], ['caffe','Caffè','1 confezione',''], ['biscotti','Biscotti','2 pacchi',''], ['brioche','Brioche / merendine','2 pacchi','']
+  ]},
+  { id:'pane-pasta', icon:'🍝', title:'Pane, pasta e cereali', items:[
+    ['pasta','Pasta','',''], ['riso','Riso','',''], ['cous-cous','Cous Cous','',''], ['pan-bauletto','Pan bauletto','',''], ['crackers','Crackers','',''], ['grissini','Grissini','','']
+  ]},
+  { id:'bevande', icon:'🥤', title:'Bevande', items:[
+    ['acqua','Acqua','10 cartoni',''], ['coca','Coca','',''], ['succo','Succo di frutta','3',''], ['birra','Birra','40 lattine / Corona',''], ['vino-bianco','Vino bianco','5',''], ['prosecco','Prosecco','4',''], ['gin','Gin','',''], ['tonica','Tonica','','']
+  ]},
+  { id:'freschi', icon:'🧀', title:'Affettati e formaggi', items:[
+    ['crudo','Crudo','',''], ['bresaola','Bresaola','',''], ['formaggi','Formaggi','',''], ['grana','Grana','',''], ['salame','Salame','',''], ['wurstel','Wurstel','',''], ['pancetta','Pancetta cubetti','',''], ['mozzarella','Mozzarella','',''], ['burro','Burro','',''], ['pasta-sfoglia','Pasta sfoglia','',''], ['uova','Uova','','']
+  ]},
+  { id:'snack', icon:'🥜', title:'Varie e snack', items:[
+    ['cioccolata','Cioccolata','',''], ['taralli','Taralli','',''], ['patatine','Patatine','',''], ['pistacchi','Pistacchi','',''], ['noci','Noci','',''], ['mandorle','Mandorle','',''], ['zenzero','Zenzero','','']
+  ]},
+  { id:'scatolame', icon:'🥫', title:'Scatolame e condimenti', items:[
+    ['tonno','Tonno','',''], ['mais','Mais','',''], ['piselli','Piselli','',''], ['acciughe','Acciughe','',''], ['salsa','Salsa','',''], ['pesto','Pesto','',''], ['capperi','Capperi','',''], ['olive','Olive','',''], ['fagioli','Fagioli','','']
+  ]},
+  { id:'pulizie', icon:'🧽', title:'Pulizie e casa', items:[
+    ['bio-piatti','Bio per piatti','1 confezione','Detersivo piatti'], ['sgrassatore','Sgrassatore','1',''], ['rotoloni','Rotoloni / Scottex','1 rotolone',''], ['carta-igienica','Carta igienica','10 rotoli',''], ['spugnette','Spugnette','1 confezione',''], ['stracci','Stracci / strofinacci','','']
+  ]}
+];
+let cambusaState = {};
+function unlockCambusa(){
+  const pwd = document.getElementById('kbPwd').value;
+  if (pwd !== CAMBUSA_PASSWORD) { document.getElementById('kbErr').style.display='block'; return; }
+  document.getElementById('kbLock').style.display='none';
+  document.getElementById('kbContent').style.display='block';
+  loadCambusa();
+}
+function loadCambusa(){
+  try { cambusaState = JSON.parse(localStorage.getItem(CAMBUSA_KEY)) || {}; } catch(e) { cambusaState = {}; }
+  renderCambusa();
+}
+function saveCambusa(){ localStorage.setItem(CAMBUSA_KEY, JSON.stringify(cambusaState)); }
+function renderCambusa(){
+  const grid = document.getElementById('kbGrid');
+  grid.innerHTML = CAMBUSA.map(sec => {
+    const done = sec.items.filter(it => cambusaState[it[0]]).length;
+    return `<section class="kb-section"><div class="kb-section-head"><span class="emoji">${sec.icon}</span><h2>${sec.title}</h2><span class="kb-count" id="count-${sec.id}">${done}/${sec.items.length}</span></div><div class="kb-list">${sec.items.map(it => itemHtml(it)).join('')}</div></section>`;
+  }).join('');
+  updateProgress();
+}
+function itemHtml(it){
+  const done = !!cambusaState[it[0]];
+  return `<label class="kb-item${done ? ' done' : ''}" id="item-${it[0]}"><input type="checkbox" ${done ? 'checked' : ''} onchange="toggleItem('${it[0]}',this.checked)" /><span><span class="kb-item-name">${it[1]}</span>${it[3] ? `<span class="kb-note">${it[3]}</span>` : ''}</span><span class="kb-qty">${it[2] || ''}</span></label>`;
+}
+function toggleItem(id, checked){
+  cambusaState[id] = checked;
+  saveCambusa();
+  const el = document.getElementById('item-' + id);
+  if (el) el.classList.toggle('done', checked);
+  updateProgress();
+}
+function updateProgress(){
+  const total = CAMBUSA.reduce((n,s)=>n+s.items.length,0);
+  const done = CAMBUSA.reduce((n,s)=>n+s.items.filter(it=>cambusaState[it[0]]).length,0);
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('kbProgressLabel').textContent = done + ' / ' + total + ' completati (' + pct + '%)';
+  document.getElementById('kbProgressFill').style.width = pct + '%';
+  CAMBUSA.forEach(sec => {
+    const el = document.getElementById('count-' + sec.id);
+    if (el) el.textContent = sec.items.filter(it=>cambusaState[it[0]]).length + '/' + sec.items.length;
+  });
+}
+function resetCambusa(){
+  if (!confirm('Azzerare tutte le spunte della cambusa su questo dispositivo?')) return;
+  cambusaState = {};
+  saveCambusa();
+  renderCambusa();
+}
+</script>
+<script src="script.js?v=20260525i"></script>
+</body>
+</html>
