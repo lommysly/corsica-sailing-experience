@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lagoon 40 — Regole &amp; Crew List · Corsica Experience</title>
-  <link rel="stylesheet" href="styles.css?v=20260525h" />
+  <link rel="stylesheet" href="styles.css?v=20260525i" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
@@ -236,8 +236,12 @@
         </div>
 
         <div class="crew-actions">
-          <button class="btn-dl-pdf" id="btnSalva-lagoon" onclick="saveMemberToSheets('lagoon')">📝 Compila i miei dati</button>
-          <button class="btn-dl-pdf admin-btn" id="btnAdminPDF-lagoon" onclick="adminDownloadPDF('lagoon','Lagoon 40','29 Maggio 2025','2 Giugno 2025')">📄 Crea PDF (solo skipper)</button>
+          <button class="btn-dl-pdf" id="btnSalva-lagoon" onclick="saveMemberToSheets('lagoon')">� Salva i miei dati</button>
+        </div>
+
+        <div style="margin-top:32px; padding-top:24px; border-top:1px solid rgba(255,255,255,.1);">
+          <p style="font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.35); margin-bottom:12px;">▸ Area riservata skipper</p>
+          <button class="btn-dl-pdf admin-btn" id="btnAdminPDF-lagoon" onclick="adminDownloadPDF('lagoon')">📄 Genera PDF equipaggio completo</button>
         </div>
       </div>
     </div>
@@ -256,7 +260,7 @@
     </div>
   </footer>
 
-  <script src="script.js?v=20260525h"></script>
+  <script src="script.js?v=20260525i"></script>
   <script>
     const BOAT_KEY = 'lagoon';
 
