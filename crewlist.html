@@ -55,35 +55,6 @@
         <span>Non hai ancora accettato le Regole di Bordo. <a href="regole.html">Leggi e accetta prima di procedere →</a></span>
       </div>
 
-      <!-- Pannello live: stato compilazione entrambe le barche -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:36px;" class="crew-status-grid">
-
-        <!-- Lagoon -->
-        <div style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:20px 24px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-            <span style="font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.45);">⛵ Lagoon 40</span>
-            <button onclick="loadCrewStatus('lagoon','crewStatusList-lagoon','crewStatusCount-lagoon')" style="background:none; border:none; color:rgba(255,255,255,.4); font-size:.75rem; cursor:pointer; padding:4px 8px;">↺</button>
-          </div>
-          <div id="crewStatusList-lagoon" style="display:flex; flex-wrap:wrap; gap:8px;">
-            <span style="color:rgba(255,255,255,.3); font-size:.85rem;">Caricamento...</span>
-          </div>
-          <div id="crewStatusCount-lagoon" style="margin-top:10px; font-size:.75rem; color:rgba(255,255,255,.4);"></div>
-        </div>
-
-        <!-- Oceanis -->
-        <div style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:20px 24px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-            <span style="font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.45);">⛵ Oceanis 48</span>
-            <button onclick="loadCrewStatus('oceanis','crewStatusList-oceanis','crewStatusCount-oceanis')" style="background:none; border:none; color:rgba(255,255,255,.4); font-size:.75rem; cursor:pointer; padding:4px 8px;">↺</button>
-          </div>
-          <div id="crewStatusList-oceanis" style="display:flex; flex-wrap:wrap; gap:8px;">
-            <span style="color:rgba(255,255,255,.3); font-size:.85rem;">Caricamento...</span>
-          </div>
-          <div id="crewStatusCount-oceanis" style="margin-top:10px; font-size:.75rem; color:rgba(255,255,255,.4);"></div>
-        </div>
-
-      </div>
-
       <!-- STEP 1: scelta barca -->
       <div class="crew-boat-select reveal-up" id="crewBoatSelect">
         <p class="crew-select-label">Su quale barca sei imbarcato?</p>
@@ -157,8 +128,6 @@
         banner.querySelector('.crb-icon').textContent = '✓';
         banner.querySelector('span:last-child').innerHTML = 'Regole di Bordo accettate. Puoi compilare la crew list.';
       }
-      loadCrewStatus('lagoon',  'crewStatusList-lagoon',  'crewStatusCount-lagoon');
-      loadCrewStatus('oceanis', 'crewStatusList-oceanis', 'crewStatusCount-oceanis');
     });
   </script>
 </body>
