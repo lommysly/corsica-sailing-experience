@@ -1,13 +1,14 @@
 // ============================================================
 // CAMBUSA PLANNER — Google Apps Script
-// Sistema completo: config → menu → ricette → spesa → sito
+// Menu giornaliero → lista spesa → cambusa.html
 //
 // COME USARE:
-// 1. Apri il foglio Google → vedrai il menu "🧭 Cambusa"
-// 2. Prima volta: clic su "Setup (prima volta)"
-// 3. Compila i tab: config, menu, ricette, dotazioni
-// 4. Clic su "Calcola Spesa" per generare la lista
-// 5. La cambusa.html legge automaticamente la lista aggiornata
+// 1. Apri il foglio → menu "🧭 Cambusa" → "⚙️ Setup (prima volta)"
+// 2. Configura il tab "config" (persone, date già pre-compilate)
+// 3. Compila il tab "menu": una riga per giorno, colonne Colazione/Pranzo/Cena
+// 4. Compila "ricette": ingredienti per ogni piatto
+// 5. Adatta "dotazioni" (acqua calcolata automaticamente)
+// 6. "🛒 Calcola Spesa" → genera la lista → cambusa.html si aggiorna
 // ============================================================
 
 function onOpen() {
@@ -26,10 +27,18 @@ function setup() {
     if (!ss.getSheetByName(name)) ss.insertSheet(name);
   });
   setupConfig(ss.getSheetByName('config'));
-  setupMenu(ss.getSheetByName('menu'));
+  setupMenu(ss.getSheetByName('menu'), ss);
   setupRicette(ss.getSheetByName('ricette'));
   setupDotazioni(ss.getSheetByName('dotazioni'));
-  SpreadsheetApp.getUi().alert('✅ Setup completato!\n\n1. Configura il tab "config" (persone, date)\n2. Aggiungi i menu nel tab "menu"\n3. Aggiungi le ricette nel tab "ricette"\n4. Adatta le dotazioni nel tab "dotazioni"\n5. Clicca "Calcola Spesa"');
+  SpreadsheetApp.getUi().alert(
+    '✅ Setup completato!\n\n' +
+    '1. Controlla "config" (persone, date)\n' +
+    '2. Compila "menu" — giorni già generati, inserisci i piatti\n' +
+    '3. Compila "ricette" — ingredienti per ogni piatto\n' +
+    '4. Adatta "dotazioni" se necessario\n' +
+    '5. Clicca "Calcola Spesa"\n\n' +
+    'Per rigenerare il menu: svuota il tab "menu" e ripeti Setup.'
+  );
 }
 
 function setupConfig(sheet) {
@@ -37,7 +46,7 @@ function setupConfig(sheet) {
   sheet.clearContents();
   sheet.setColumnWidth(1, 240); sheet.setColumnWidth(2, 160);
   sheet.getRange('A1:B1').setValues([['chiave','valore']]).setFontWeight('bold');
-  sheet.getRange('A2:B9').setValues([
+  sheet.getRange('A2:B8').setValues([
     ['persone', 10],
     ['data_inizio', '29/05/2026'],
     ['data_fine', '02/06/2026'],
@@ -45,50 +54,75 @@ function setupConfig(sheet) {
     ['check_out_ora', '17:00'],
     ['acqua_litri_per_persona_giorno', 1.5],
     ['acqua_litri_per_giorno_cucina', 3],
-    ['nota', 'Lagoon: 10 persone · Oceanis: 12 persone'],
   ]);
 }
 
-function setupMenu(sheet) {
+function setupMenu(sheet, ss) {
   if (sheet.getLastRow() > 1) return;
   sheet.clearContents();
-  ['A','B','C','D','E'].forEach((c,i) => sheet.setColumnWidth(i+1, [80,100,100,220,200][i]));
-  sheet.getRange('A1:E1').setValues([['Data','Giorno','Pasto','Piatto','Note']]).setFontWeight('bold');
+  [80, 80, 220, 220, 220, 200].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+
+  // Intestazioni
+  const headers = [['Data', 'Giorno', 'Colazione ☕', 'Pranzo 🥗', 'Cena 🍝', 'Note']];
+  sheet.getRange('A1:F1').setValues(headers).setFontWeight('bold').setBackground('#e8f0f7');
   sheet.setFrozenRows(1);
-  // Esempio
-  sheet.getRange('A2:E5').setValues([
-    ['02/06','Sabato','Cena','Pasta al pesto','prima sera in rada'],
-    ['03/06','Domenica','Colazione','Colazione continentale',''],
-    ['03/06','Domenica','Pranzo','Insalata di tonno',''],
-    ['03/06','Domenica','Cena','Grigliate','porto o rada'],
-  ]);
+
+  // Leggi config per date
+  const config = leggiConfig((ss || SpreadsheetApp.getActiveSpreadsheet()).getSheetByName('config'));
+  if (!config['data_inizio'] || !config['data_fine']) return;
+
+  const nomiGiorni = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+  const inizio = parseData(config['data_inizio']);
+  const fine   = parseData(config['data_fine']);
+  const checkIn  = config['check_in_ora']  || '';
+  const checkOut = config['check_out_ora'] || '';
+
+  const rows = [];
+  let giorno = new Date(inizio);
+  while (giorno <= fine) {
+    const dataStr = Utilities.formatDate(giorno, 'Europe/Rome', 'dd/MM/yyyy');
+    const nomeGiorno = nomiGiorni[giorno.getDay()];
+    const isFirst = giorno.getTime() === inizio.getTime();
+    const isLast  = giorno.getTime() === fine.getTime();
+    const nota = isFirst ? 'Check-in ' + checkIn : isLast ? 'Check-out ' + checkOut : '';
+    // Primo giorno: solo cena (arrivo ore 17). Ultimo: solo colazione+pranzo (partenza ore 17)
+    rows.push([dataStr, nomeGiorno, isFirst ? '—' : '', isLast ? '—' : '', isLast ? '—' : '', nota]);
+    giorno = new Date(giorno.getTime() + 86400000);
+  }
+
+  if (rows.length > 0) {
+    sheet.getRange(2, 1, rows.length, 6).setValues(rows);
+    // Colore alternato per leggibilità
+    rows.forEach((_, i) => {
+      if (i % 2 === 0) sheet.getRange(i + 2, 1, 1, 6).setBackground('#f4f8fc');
+    });
+    // Colore nota check-in/out
+    sheet.getRange(2, 6).setFontColor('#888888').setFontStyle('italic');
+    sheet.getRange(rows.length + 1, 6).setFontColor('#888888').setFontStyle('italic');
+  }
 }
 
 function setupRicette(sheet) {
   if (sheet.getLastRow() > 1) return;
   sheet.clearContents();
-  ['A','B','C','D','E'].forEach((c,i) => sheet.setColumnWidth(i+1, [200,200,80,80,140][i]));
-  sheet.getRange('A1:E1').setValues([['Piatto','Ingrediente','Qtà/persona','Unità','Categoria']]).setFontWeight('bold');
+  [200, 200, 80, 80, 140].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+  sheet.getRange('A1:E1').setValues([['Piatto','Ingrediente','Qtà/persona','Unità','Categoria']]).setFontWeight('bold').setBackground('#e8f0f7');
   sheet.setFrozenRows(1);
-  sheet.getRange('A2:E20').setValues([
+  sheet.getRange('A2:E16').setValues([
     ['Pasta al pesto','Pasta',100,'g','Pasta/Cereali'],
     ['Pasta al pesto','Pesto',60,'g','Scatolame'],
     ['Pasta al pesto','Grana',20,'g','Freschi'],
     ['Colazione continentale','Latte',200,'ml','Freschi'],
     ['Colazione continentale','Caffè',10,'g','Bevande'],
     ['Colazione continentale','Biscotti',50,'g','Varie'],
-    ['Colazione continentale','Brioche/cornetti',1,'pz','Varie'],
+    ['Colazione continentale','Brioche',1,'pz','Varie'],
     ['Insalata di tonno','Tonno',80,'g','Scatolame'],
     ['Insalata di tonno','Pomodorini',100,'g','Verdure'],
     ['Insalata di tonno','Rucola',30,'g','Verdure'],
     ['Insalata di tonno','Mais',40,'g','Scatolame'],
-    ['Grigliate','Pollo/manzo misto',250,'g','Carne/Pesce'],
-    ['Grigliate','Zucchine',100,'g','Verdure'],
-    ['Grigliate','Patate',150,'g','Verdure'],
-    ['','','','',''],
-    ['','','','',''],
-    ['','','','',''],
-    ['','','','',''],
+    ['Grigliate miste','Pollo/manzo',250,'g','Carne/Pesce'],
+    ['Grigliate miste','Zucchine',100,'g','Verdure'],
+    ['Grigliate miste','Patate',150,'g','Verdure'],
     ['','','','',''],
   ]);
 }
@@ -96,10 +130,10 @@ function setupRicette(sheet) {
 function setupDotazioni(sheet) {
   if (sheet.getLastRow() > 1) return;
   sheet.clearContents();
-  ['A','B','C','D','E'].forEach((c,i) => sheet.setColumnWidth(i+1, [220,80,120,140,200][i]));
-  sheet.getRange('A1:E1').setValues([['Articolo','Quantità','Unità','Categoria','Note']]).setFontWeight('bold');
+  [220, 80, 120, 140, 200].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+  sheet.getRange('A1:E1').setValues([['Articolo','Quantità','Unità','Categoria','Note']]).setFontWeight('bold').setBackground('#e8f0f7');
   sheet.setFrozenRows(1);
-  sheet.getRange('A2:E25').setValues([
+  sheet.getRange('A2:E24').setValues([
     ['Sale grosso',1,'kg','Cucina',''],
     ['Sale fino',1,'conf.','Cucina',''],
     ['Olio EVO',2,'bottiglie','Cucina',''],
@@ -130,27 +164,31 @@ function setupDotazioni(sheet) {
 // ---- CALCOLA SPESA ----------------------------------------
 function calcolaSpesa() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const config = leggiConfig(ss.getSheetByName('config'));
-  const menu = leggiMenu(ss.getSheetByName('menu'));
-  const ricette = leggiRicette(ss.getSheetByName('ricette'));
+  const config    = leggiConfig(ss.getSheetByName('config'));
+  const menu      = leggiMenu(ss.getSheetByName('menu'));
+  const ricette   = leggiRicette(ss.getSheetByName('ricette'));
   const dotazioni = leggiDotazioni(ss.getSheetByName('dotazioni'));
 
-  // Conta persone (somma tutte le chiavi che iniziano con "persone_")
-  const n_persone = Object.entries(config)
-    .filter(([k]) => k.startsWith('persone_'))
-    .reduce((s, [, v]) => s + (Number(v) || 0), 0);
+  const n_persone = Number(config['persone']) ||
+    Object.entries(config).filter(([k]) => k.startsWith('persone_'))
+      .reduce((s, [, v]) => s + (Number(v) || 0), 0);
 
   const giorni = daysBetween(config['data_inizio'], config['data_fine']);
-  const acqua_pp_gg = Number(config['acqua_litri_per_persona_giorno']) || 1.5;
-  const acqua_cucina_gg = Number(config['acqua_litri_per_giorno_cucina']) || 3;
+  const acqua_pp   = Number(config['acqua_litri_per_persona_giorno']) || 1.5;
+  const acqua_cuc  = Number(config['acqua_litri_per_giorno_cucina']) || 3;
 
   if (n_persone === 0) {
-    SpreadsheetApp.getUi().alert('⚠️ Nessuna persona configurata. Controlla il tab "config" e aggiungi le chiavi "persone_...".');
+    SpreadsheetApp.getUi().alert('⚠️ Imposta "persone" nel tab config prima di calcolare.');
     return;
   }
 
+  // Conteggio pasti
+  const n_col  = menu.filter(m => m.pasto === 'Colazione').length;
+  const n_pran = menu.filter(m => m.pasto === 'Pranzo').length;
+  const n_cen  = menu.filter(m => m.pasto === 'Cena').length;
+
   // Ingredienti da menu × ricette × persone
-  const ing = {}; // "nome__unità" → {nome, qty, unita, categoria}
+  const ing = {};
   menu.forEach(row => {
     if (!row.piatto) return;
     ricette.filter(r => r.piatto === row.piatto).forEach(r => {
@@ -161,39 +199,41 @@ function calcolaSpesa() {
   });
 
   // Acqua automatica
-  const acqua_totale = acqua_pp_gg * n_persone * giorni + acqua_cucina_gg * giorni;
-  ing['Acqua__litri'] = { nome: 'Acqua', qty: acqua_totale, unita: 'litri', categoria: 'Bevande' };
+  ing['Acqua__litri'] = {
+    nome: 'Acqua', categoria: 'Bevande', unita: 'litri',
+    qty: acqua_pp * n_persone * giorni + acqua_cuc * giorni
+  };
 
-  // Costruisci righe spesa
-  const rows = [];
+  // Ordine categorie
   const catOrder = ['Cucina','Verdure','Frutta','Pasta/Cereali','Carne/Pesce','Freschi','Scatolame','Colazione','Varie','Bevande','Pulizie'];
-  const catSorted = (a, b) => {
+  const sortCat = (a, b) => {
     const ia = catOrder.indexOf(a.categoria) >= 0 ? catOrder.indexOf(a.categoria) : 99;
     const ib = catOrder.indexOf(b.categoria) >= 0 ? catOrder.indexOf(b.categoria) : 99;
     return ia - ib || a.nome.localeCompare(b.nome);
   };
 
-  Object.values(ing).sort(catSorted).forEach(i => {
+  const rows = [];
+  Object.values(ing).sort(sortCat).forEach(i => {
     rows.push([slugify(i.nome), i.nome, formatQty(i.qty, i.unita), i.unita, i.categoria, 'menu']);
   });
-  dotazioni.sort(catSorted).forEach(d => {
-    const displayQty = d.quantita + (d.unita ? ' ' + d.unita : '');
-    rows.push([slugify(d.articolo), d.articolo, displayQty, d.unita, d.categoria, 'dotazione']);
+  dotazioni.sort(sortCat).forEach(d => {
+    rows.push([slugify(d.articolo), d.articolo, d.quantita + (d.unita ? ' ' + d.unita : ''), d.unita, d.categoria, 'dotazione']);
   });
 
   // Scrivi tab spesa
   const spesaSheet = ss.getSheetByName('spesa') || ss.insertSheet('spesa');
   spesaSheet.clearContents();
-  spesaSheet.getRange(1, 1, 1, 6).setValues([['ID','Articolo','Quantità','Unità','Categoria','Tipo']]).setFontWeight('bold');
+  spesaSheet.getRange(1, 1, 1, 6).setValues([['ID','Articolo','Quantità','Unità','Categoria','Tipo']]).setFontWeight('bold').setBackground('#e8f0f7');
   if (rows.length > 0) spesaSheet.getRange(2, 1, rows.length, 6).setValues(rows);
 
-  // Sincronizza tab cambusa (preserva spunte già fatte)
   sincronizzaCambusa(ss, rows.map(r => r[0]));
 
   SpreadsheetApp.getUi().alert(
     '✅ Spesa calcolata!\n\n' +
-    rows.length + ' articoli · ' + n_persone + ' persone · ' + giorni + ' giorni\n\n' +
-    'La cambusa.html si aggiornerà al prossimo caricamento della pagina.'
+    '👥 ' + n_persone + ' persone · 📅 ' + giorni + ' giorni\n' +
+    '☕ ' + n_col + ' colazioni · 🥗 ' + n_pran + ' pranzi · 🍝 ' + n_cen + ' cene\n' +
+    '📦 ' + rows.length + ' articoli in lista\n\n' +
+    'La cambusa.html si aggiorna al prossimo accesso.'
   );
 }
 
@@ -204,47 +244,64 @@ function sincronizzaCambusa(ss, ids) {
     sheet.getDataRange().getValues().forEach(r => { if (r[0]) existing[r[0]] = r[1] === true || r[1] === 'TRUE'; });
   }
   sheet.clearContents();
-  if (ids.length > 0) {
-    sheet.getRange(1, 1, ids.length, 2).setValues(ids.map(id => [id, !!existing[id]]));
-  }
+  if (ids.length > 0) sheet.getRange(1, 1, ids.length, 2).setValues(ids.map(id => [id, !!existing[id]]));
 }
 
 // ---- HELPERS -----------------------------------------------
 function leggiConfig(sheet) {
   const cfg = {};
   if (!sheet || sheet.getLastRow() < 2) return cfg;
-  sheet.getDataRange().getValues().slice(1).forEach(r => { if (r[0]) cfg[r[0]] = isNaN(r[1]) ? r[1] : Number(r[1]); });
+  sheet.getDataRange().getValues().slice(1).forEach(r => {
+    if (r[0]) cfg[String(r[0])] = isNaN(r[1]) || r[1] === '' ? r[1] : Number(r[1]);
+  });
   return cfg;
 }
+
 function leggiMenu(sheet) {
   if (!sheet || sheet.getLastRow() < 2) return [];
-  return sheet.getDataRange().getValues().slice(1)
-    .filter(r => r[2] && r[3])
-    .map(r => ({ data: r[0], giorno: r[1], pasto: r[2], piatto: r[3], note: r[4] }));
+  const meals = [];
+  sheet.getDataRange().getValues().slice(1).forEach(r => {
+    const [data, giorno, colazione, pranzo, cena] = r;
+    if (colazione && colazione !== '—') meals.push({ data, giorno, pasto: 'Colazione', piatto: String(colazione) });
+    if (pranzo   && pranzo   !== '—') meals.push({ data, giorno, pasto: 'Pranzo',    piatto: String(pranzo) });
+    if (cena     && cena     !== '—') meals.push({ data, giorno, pasto: 'Cena',      piatto: String(cena) });
+  });
+  return meals;
 }
+
 function leggiRicette(sheet) {
   if (!sheet || sheet.getLastRow() < 2) return [];
   return sheet.getDataRange().getValues().slice(1)
     .filter(r => r[0] && r[1] && r[2])
     .map(r => ({ piatto: r[0], ingrediente: r[1], qta_per_persona: Number(r[2]) || 0, unita: r[3] || '', categoria: r[4] || 'Varie' }));
 }
+
 function leggiDotazioni(sheet) {
   if (!sheet || sheet.getLastRow() < 2) return [];
   return sheet.getDataRange().getValues().slice(1)
     .filter(r => r[0])
     .map(r => ({ articolo: r[0], quantita: r[1], unita: r[2] || '', categoria: r[3] || 'Varie', note: r[4] }));
 }
+
+function parseData(s) {
+  if (s instanceof Date) return new Date(s.getFullYear(), s.getMonth(), s.getDate());
+  const p = String(s).split('/');
+  if (p.length === 3) return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+  return new Date(s);
+}
+
 function daysBetween(d1, d2) {
-  const p = s => { if (s instanceof Date) return s; const a = String(s).split('/'); return new Date(a[2], a[1]-1, a[0]); };
-  return Math.max(0, Math.round((p(d2) - p(d1)) / 86400000));
+  return Math.max(0, Math.round((parseData(d2) - parseData(d1)) / 86400000));
 }
+
 function slugify(s) {
-  return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
-    .replace(/\s+/g,'-').replace(/[^a-z0-9\-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  return String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').replace(/^-|-$/g, '');
 }
+
 function formatQty(qty, unita) {
-  if (unita === 'g' && qty >= 1000) return (qty/1000).toFixed(qty%1000 ? 1 : 0).replace(/\.0$/,'') + ' kg';
-  if (unita === 'ml' && qty >= 1000) return (qty/1000).toFixed(qty%1000 ? 1 : 0).replace(/\.0$/,'') + ' litri';
+  if (unita === 'g'  && qty >= 1000) return (qty / 1000).toFixed(qty % 1000 ? 1 : 0).replace(/\.0$/, '') + ' kg';
+  if (unita === 'ml' && qty >= 1000) return (qty / 1000).toFixed(qty % 1000 ? 1 : 0).replace(/\.0$/, '') + ' litri';
   if (unita === 'litri') return Number(qty).toFixed(qty % 1 ? 1 : 0) + ' litri';
   return Math.ceil(qty) + (unita ? ' ' + unita : '');
 }
@@ -254,7 +311,6 @@ function doGet(e) {
   const params = (e && e.parameter) ? e.parameter : {};
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const action = params.action || 'get';
-
   if (action === 'getList') return getListAction(ss, params.callback);
   if (action === 'set')     return setAction(ss, params.id, params.val, params.callback);
   if (action === 'reset')   return resetAction(ss, params.callback);
@@ -264,15 +320,11 @@ function doGet(e) {
 function getListAction(ss, callback) {
   const spesaSheet = ss.getSheetByName('spesa');
   if (!spesaSheet || spesaSheet.getLastRow() < 2) return jsonpResponse(callback, []);
-
-  // Stato spunte
   const state = {};
   const cambusaSheet = ss.getSheetByName('cambusa');
   if (cambusaSheet && cambusaSheet.getLastRow() > 0) {
     cambusaSheet.getDataRange().getValues().forEach(r => { if (r[0]) state[String(r[0])] = r[1] === true || r[1] === 'TRUE'; });
   }
-
-  // Lista spesa raggruppata per categoria
   const catMap = {}, catOrder = [];
   spesaSheet.getDataRange().getValues().slice(1).forEach(r => {
     const [id, nome, qty, , categoria] = r;
@@ -280,7 +332,6 @@ function getListAction(ss, callback) {
     if (!catMap[categoria]) { catMap[categoria] = []; catOrder.push(categoria); }
     catMap[categoria].push({ id: String(id), nome: String(nome), qty: String(qty || ''), checked: !!state[String(id)] });
   });
-
   return jsonpResponse(callback, catOrder.map(cat => ({ category: cat, items: catMap[cat] })));
 }
 
@@ -298,9 +349,9 @@ function setAction(ss, id, val, callback) {
   const data = sheet.getLastRow() > 0 ? sheet.getDataRange().getValues() : [];
   let found = false;
   for (let i = 0; i < data.length; i++) {
-    if (String(data[i][0]) === String(id)) { sheet.getRange(i+1,2).setValue(val==='true'); found=true; break; }
+    if (String(data[i][0]) === String(id)) { sheet.getRange(i + 1, 2).setValue(val === 'true'); found = true; break; }
   }
-  if (!found) sheet.appendRow([id, val==='true']);
+  if (!found) sheet.appendRow([id, val === 'true']);
   return jsonpResponse(callback, { ok: true });
 }
 
@@ -308,7 +359,7 @@ function resetAction(ss, callback) {
   const sheet = ss.getSheetByName('cambusa');
   if (sheet && sheet.getLastRow() > 0) {
     const data = sheet.getDataRange().getValues();
-    for (let i = 0; i < data.length; i++) { if (data[i][0]) sheet.getRange(i+1,2).setValue(false); }
+    for (let i = 0; i < data.length; i++) { if (data[i][0]) sheet.getRange(i + 1, 2).setValue(false); }
   }
   return jsonpResponse(callback, { ok: true });
 }
