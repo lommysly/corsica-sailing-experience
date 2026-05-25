@@ -577,23 +577,11 @@ window._showFormAgain = function(boat) {
   if (btn) { btn.innerHTML = '✏️ Modifica i miei dati'; btn.style.background = ''; btn.disabled = false; }
 };
 
-/* ── Fetch dati via JSONP (bypass CORS Google Apps Script) ── */
-function fetchCrewJSONP(boat) {
-  return new Promise((resolve, reject) => {
-    const cbName = '_gjcb_' + Date.now();
-    const script = document.createElement('script');
-    const timer = setTimeout(() => {
-      delete window[cbName]; script.remove();
-      reject(new Error('Timeout'));
-    }, 15000);
-    window[cbName] = (data) => {
-      clearTimeout(timer); delete window[cbName]; script.remove();
-      resolve(data);
-    };
-    script.src = SHEETS_URL + '?boat=' + boat + '&callback=' + cbName;
-    script.onerror = () => { clearTimeout(timer); delete window[cbName]; script.remove(); reject(new Error('Script error')); };
-    document.head.appendChild(script);
-  });
+/* ── Fetch dati da Google Apps Script ── */
+async function fetchCrewJSONP(boat) {
+  const res = await fetch(SHEETS_URL + '?boat=' + boat, { redirect: 'follow' });
+  const text = await res.text();
+  return JSON.parse(text);
 }
 
 /* ── Admin: scarica PDF con tutti i membri da Sheets ── */
