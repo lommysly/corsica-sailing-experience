@@ -58,17 +58,32 @@
     .ci-section.open .ci-section-body { display: block; }
 
     /* Items */
-    .ci-item { display: flex; align-items: center; gap: 14px; padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; transition: background .15s; }
+    .ci-item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,.05); transition: background .15s; }
     .ci-item:last-child { border-bottom: none; }
     .ci-item:hover { background: rgba(255,255,255,.04); }
-    .ci-item input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--turq); cursor: pointer; flex-shrink: 0; }
-    .ci-item label { flex: 1; font-size: .88rem; color: rgba(255,255,255,.8); cursor: pointer; line-height: 1.4; }
-    .ci-item.checked label { color: rgba(255,255,255,.4); text-decoration: line-through; }
-    .ci-item .note { font-size: .75rem; color: rgba(255,255,255,.35); display: block; margin-top: 2px; }
+    .ci-item input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--turq); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
+    .ci-item-body { flex: 1; }
+    .ci-item-label { font-size: .88rem; color: rgba(255,255,255,.8); line-height: 1.4; cursor: pointer; display: block; }
+    .ci-item.checked .ci-item-label { color: rgba(255,255,255,.35); text-decoration: line-through; }
+    .ci-item .hint { font-size: .75rem; color: rgba(255,255,255,.3); display: block; margin-top: 2px; }
+    .ci-item-note { width: 100%; margin-top: 7px; padding: 6px 10px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; color: rgba(255,255,255,.7); font-size: .78rem; resize: none; outline: none; font-family: inherit; transition: border-color .2s; }
+    .ci-item-note:focus { border-color: var(--turq); }
+    .ci-item-note::placeholder { color: rgba(255,255,255,.25); }
+    /* Sync indicator */
+    .sync-bar { display: flex; align-items: center; gap: 8px; font-size: .75rem; color: rgba(255,255,255,.4); margin-bottom: 16px; min-height: 20px; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.2); flex-shrink: 0; }
+    .sync-dot.ok { background: #34d399; }
+    .sync-dot.err { background: #f87171; }
+    .sync-dot.loading { background: var(--turq); animation: pulse .8s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    /* Boat tabs for checklist */
+    .boat-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .boat-tab { flex: 1; padding: 12px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 12px; color: rgba(255,255,255,.6); font-size: .85rem; font-weight: 600; cursor: pointer; text-align: center; transition: all .2s; }
+    .boat-tab.active { background: var(--turq); border-color: var(--turq); color: #fff; }
 
     /* Actions */
-    .ci-actions { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
-    .ci-btn { flex: 1; min-width: 160px; padding: 14px 20px; border: none; border-radius: 12px; font-size: .9rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .ci-actions { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+    .ci-btn { flex: 1; min-width: 140px; padding: 13px 18px; border: none; border-radius: 12px; font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .2s; }
     .ci-btn-reset { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.15); }
     .ci-btn-reset:hover { background: rgba(255,255,255,.14); color: #fff; }
     .ci-btn-print { background: var(--turq); color: #fff; }
@@ -162,6 +177,11 @@
 
     <!-- TAB 0: Check-in Barca (checklist) -->
     <div class="tab-panel active" id="tab-0">
+      <div class="boat-tabs">
+        <button class="boat-tab active" id="btab-Lagoon40" onclick="selectBoatCheckin('Lagoon40')">⛵ Lagoon 40</button>
+        <button class="boat-tab" id="btab-Oceanis48" onclick="selectBoatCheckin('Oceanis48')">⛵ Oceanis 48</button>
+      </div>
+      <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">—</span></div>
       <div class="ci-progress"><div class="ci-progress-fill" id="progressFill"></div></div>
       <div class="ci-progress-label" id="progressLabel">0 / 0 voci completate</div>
       <div id="checklistContainer"></div>
@@ -390,7 +410,6 @@
 
 <script>
 const ADMIN_PWD = 'Skipper2026';
-let currentBoat = 'lagoon';
 
 const SECTIONS_BASE = [
   {
@@ -487,57 +506,127 @@ const SECTIONS_BASE = [
   },
 ];
 
-const CHECKLIST = {
-  lagoon: { name: 'Lagoon 40', sections: SECTIONS_BASE },
-  oceanis: { name: 'Beneteau Oceanis 48', sections: [] }
+// ── Config ──────────────────────────────────────────
+const CHECKIN_API = 'https://script.google.com/macros/s/CHECKIN_DEPLOYMENT_ID/exec';
+const BOATS = {
+  Lagoon40:  { name: 'Lagoon 40',          sections: SECTIONS_BASE },
+  Oceanis48: { name: 'Beneteau Oceanis 48', sections: SECTIONS_BASE }
 };
-CHECKLIST.oceanis.sections = SECTIONS_BASE.map(s => ({
-  ...s,
-  items: s.items.map(it => ({ ...it, id: 'o_' + it.id }))
-}));
 
+// ── State ────────────────────────────────────────────
+let currentBoat = 'Lagoon40';
+let localState  = {};   // { [voceId]: { stato: bool, nota: string } }
+let saveTimer   = null;
+
+// ── Tab switching ────────────────────────────────────
 function switchTab(idx) {
   document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
   document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
 }
 
+// ── Lock / unlock ────────────────────────────────────
 function unlock() {
   const val = document.getElementById('pwdInput').value;
   if (val === ADMIN_PWD) {
     document.getElementById('lockScreen').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
-    renderChecklist(currentBoat);
+    loadFromSheets(currentBoat);
   } else {
     document.getElementById('lockErr').style.display = 'block';
   }
 }
 
-function selectBoatCI(boat) {
+// ── Boat selection ───────────────────────────────────
+function selectBoatCheckin(boat) {
   currentBoat = boat;
-  document.querySelectorAll('.boat-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn-' + boat).classList.add('active');
-  renderChecklist(boat);
+  document.querySelectorAll('.boat-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('btab-' + boat).classList.add('active');
+  loadFromSheets(boat);
 }
 
-function getSaved(boat) {
-  try { return JSON.parse(localStorage.getItem('checkin_' + boat)) || {}; } catch(e) { return {}; }
-}
-function setSaved(boat, state) {
-  localStorage.setItem('checkin_' + boat, JSON.stringify(state));
+// ── Sync indicator ───────────────────────────────────
+function setSyncState(state, msg) {
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  dot.className = 'sync-dot ' + state;
+  lbl.textContent = msg;
 }
 
+// ── Load from Google Sheets ──────────────────────────
+function loadFromSheets(boat) {
+  setSyncState('loading', 'Caricamento da Google Sheets…');
+  // Usa cache locale come fallback immediato
+  const cached = getCached(boat);
+  if (Object.keys(cached).length) {
+    localState = cached;
+    renderChecklist(boat);
+  }
+  fetch(CHECKIN_API + '?boat=' + boat)
+    .then(r => r.json())
+    .then(res => {
+      if (res.ok) {
+        localState = {};
+        Object.keys(res.data).forEach(id => {
+          localState[id] = { stato: res.data[id].stato, nota: res.data[id].nota };
+        });
+        setCached(boat, localState);
+        renderChecklist(boat);
+        setSyncState('ok', 'Sincronizzato · ' + new Date().toLocaleTimeString('it-IT'));
+      } else {
+        setSyncState('err', 'Errore caricamento — dati locali in uso');
+        renderChecklist(boat);
+      }
+    })
+    .catch(() => {
+      setSyncState('err', 'Offline — dati locali in uso');
+      renderChecklist(boat);
+    });
+}
+
+// ── Save single item to Sheets (debounced) ───────────
+function saveToSheets(voceId, stato, nota) {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    setSyncState('loading', 'Salvataggio…');
+    const body = JSON.stringify({ boat: currentBoat, voceId, stato, nota, skipper: 'Skipper' });
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = CHECKIN_API;
+    form.style.display = 'none';
+    const inp = document.createElement('input');
+    inp.name = 'payload'; inp.value = body;
+    // Usa fetch con no-cors come fallback sicuro
+    fetch(CHECKIN_API, {
+      method: 'POST',
+      body: body,
+      headers: { 'Content-Type': 'text/plain' }
+    })
+    .then(r => r.json())
+    .then(res => setSyncState(res.ok ? 'ok' : 'err', res.ok ? 'Salvato · ' + new Date().toLocaleTimeString('it-IT') : 'Errore salvataggio'))
+    .catch(() => setSyncState('err', 'Offline — salvato in locale'));
+  }, 800);
+}
+
+// ── Local cache ──────────────────────────────────────
+function getCached(boat) {
+  try { return JSON.parse(localStorage.getItem('ci_cache_' + boat)) || {}; } catch(e) { return {}; }
+}
+function setCached(boat, state) {
+  localStorage.setItem('ci_cache_' + boat, JSON.stringify(state));
+}
+
+// ── Render checklist ─────────────────────────────────
 function renderChecklist(boat) {
-  const data = CHECKLIST[boat];
-  const saved = getSaved(boat);
+  const sections = BOATS[boat].sections;
   const container = document.getElementById('checklistContainer');
   container.innerHTML = '';
 
-  data.sections.forEach((sec, si) => {
+  sections.forEach((sec, si) => {
     const div = document.createElement('div');
     div.className = 'ci-section open';
     div.id = 'sec-' + si;
 
-    const doneInSec = sec.items.filter(it => saved[it.id]).length;
+    const doneInSec = sec.items.filter(it => localState[it.id] && localState[it.id].stato).length;
 
     div.innerHTML = `
       <div class="ci-section-header" onclick="toggleSection('sec-${si}')">
@@ -547,11 +636,23 @@ function renderChecklist(boat) {
         <span class="arrow">▶</span>
       </div>
       <div class="ci-section-body">
-        ${sec.items.map(it => `
-          <div class="ci-item${saved[it.id] ? ' checked' : ''}" id="item-${it.id}" onclick="toggle('${it.id}','${boat}','sec-${si}')">
-            <input type="checkbox" id="cb-${it.id}" ${saved[it.id] ? 'checked' : ''} onclick="event.stopPropagation();toggle('${it.id}','${boat}','sec-${si}')"/>
-            <label for="cb-${it.id}">${it.text}${it.note ? `<span class="note">${it.note}</span>` : ''}</label>
-          </div>`).join('')}
+        ${sec.items.map(it => {
+          const s = localState[it.id] || {};
+          const checked = !!s.stato;
+          const nota = s.nota || '';
+          return `
+          <div class="ci-item${checked ? ' checked' : ''}" id="item-${it.id}">
+            <input type="checkbox" id="cb-${it.id}" ${checked ? 'checked' : ''}
+              onchange="onToggle('${it.id}','sec-${si}',this.checked)"/>
+            <div class="ci-item-body">
+              <span class="ci-item-label" onclick="document.getElementById('cb-${it.id}').click()">${it.text}</span>
+              ${it.note ? `<span class="hint">${it.note}</span>` : ''}
+              <textarea class="ci-item-note" rows="1" placeholder="Aggiungi una nota…"
+                onchange="onNota('${it.id}',this.value)"
+                onfocus="this.rows=3" onblur="this.rows=1">${escHtml(nota)}</textarea>
+            </div>
+          </div>`;
+        }).join('')}
       </div>`;
     container.appendChild(div);
   });
@@ -559,47 +660,69 @@ function renderChecklist(boat) {
   updateProgress(boat);
 }
 
-function toggle(id, boat, secId) {
-  const saved = getSaved(boat);
-  saved[id] = !saved[id];
-  setSaved(boat, saved);
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Toggle checkbox ───────────────────────────────────
+function onToggle(id, secId, checked) {
+  if (!localState[id]) localState[id] = { stato: false, nota: '' };
+  localState[id].stato = checked;
+  setCached(currentBoat, localState);
   const itemEl = document.getElementById('item-' + id);
-  const cb = document.getElementById('cb-' + id);
-  if (itemEl) itemEl.classList.toggle('checked', !!saved[id]);
-  if (cb) cb.checked = !!saved[id];
-  updateProgress(boat);
-  // aggiorna contatore sezione
+  if (itemEl) itemEl.classList.toggle('checked', checked);
+  updateProgress(currentBoat);
+  updateSecCount(secId);
+  saveToSheets(id, checked, localState[id].nota);
+}
+
+// ── Nota ──────────────────────────────────────────────
+function onNota(id, val) {
+  if (!localState[id]) localState[id] = { stato: false, nota: '' };
+  localState[id].nota = val;
+  setCached(currentBoat, localState);
+  saveToSheets(id, localState[id].stato, val);
+}
+
+// ── Section helpers ───────────────────────────────────
+function toggleSection(id) { document.getElementById(id).classList.toggle('open'); }
+
+function updateSecCount(secId) {
   const sec = document.getElementById(secId);
-  if (sec) {
-    const items = sec.querySelectorAll('.ci-item');
-    const done = sec.querySelectorAll('.ci-item.checked').length;
-    const countEl = sec.querySelector('.count');
-    if (countEl) countEl.textContent = done + '/' + items.length;
-  }
+  if (!sec) return;
+  const total = sec.querySelectorAll('.ci-item').length;
+  const done  = sec.querySelectorAll('.ci-item.checked').length;
+  const el = sec.querySelector('.count');
+  if (el) el.textContent = done + '/' + total;
 }
 
-function toggleSection(id) {
-  document.getElementById(id).classList.toggle('open');
-}
-
+// ── Progress bar ──────────────────────────────────────
 function updateProgress(boat) {
-  const data = CHECKLIST[boat];
-  const saved = getSaved(boat);
-  const total = data.sections.reduce((n, s) => n + s.items.length, 0);
-  const done  = data.sections.reduce((n, s) => n + s.items.filter(it => saved[it.id]).length, 0);
+  const sections = BOATS[boat].sections;
+  const total = sections.reduce((n, s) => n + s.items.length, 0);
+  const done  = sections.reduce((n, s) => n + s.items.filter(it => localState[it.id] && localState[it.id].stato).length, 0);
   const pct = total ? Math.round(done / total * 100) : 0;
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('progressLabel').textContent = done + ' / ' + total + ' voci completate (' + pct + '%)';
 }
 
+// ── Reset ─────────────────────────────────────────────
 function resetChecklist() {
-  if (!confirm('Azzerare tutte le spunte per questa barca?')) return;
-  localStorage.removeItem('checkin_' + currentBoat);
+  if (!confirm('Azzerare TUTTE le spunte e le note per ' + BOATS[currentBoat].name + '?')) return;
+  localState = {};
+  setCached(currentBoat, {});
   renderChecklist(currentBoat);
+  setSyncState('loading', 'Reset in corso…');
+  // Reset su Sheets: invia stato false per tutte le voci
+  const sections = BOATS[currentBoat].sections;
+  const allIds = sections.flatMap(s => s.items.map(it => it.id));
+  const promises = allIds.map(id =>
+    fetch(CHECKIN_API, { method: 'POST', body: JSON.stringify({ boat: currentBoat, voceId: id, stato: false, nota: '' }), headers: { 'Content-Type': 'text/plain' } }).catch(() => {})
+  );
+  Promise.all(promises).then(() => setSyncState('ok', 'Reset completato'));
 }
 
+// ── Print ─────────────────────────────────────────────
 function printChecklist() {
-  const boat = CHECKLIST[currentBoat];
+  const boat = BOATS[currentBoat];
   const now = new Date().toLocaleString('it-IT');
   document.getElementById('printMeta').textContent = 'Barca: ' + boat.name + '  ·  Stampato: ' + now + '  ·  Skipper: ___________________________';
   window.print();
