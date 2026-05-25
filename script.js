@@ -215,6 +215,8 @@ function loadFromStorage(boat) {
 }
 
 function addMember(boat, prefill) {
+  const hint = document.getElementById('crewEmptyHint');
+  if (hint) hint.style.display = 'none';
   memberCount[boat]++;
   const idx = memberCount[boat];
   const container = document.getElementById('members-' + boat);
@@ -502,7 +504,7 @@ async function saveMemberToSheets(boat) {
   if (cognome.length < 2) { alert('Cognome troppo corto — verifica di aver inserito il cognome completo.'); return; }
 
   const btn = document.getElementById('btnSalva-' + boat);
-  if (btn) { btn.textContent = 'Salvataggio...'; btn.disabled = true; }
+  if (btn) { btn.textContent = 'Invio in corso...'; btn.disabled = true; }
 
   const nomeCompleto = nome + ' ' + cognome;
   const data = {
@@ -543,7 +545,7 @@ async function saveMemberToSheets(boat) {
     }
     if (btn) { btn.textContent = '✅ Dati salvati!'; btn.style.background = 'var(--turq)'; }
   } catch(err) {
-    if (btn) { btn.textContent = 'Salva i miei dati'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = '📝 Compila i miei dati'; btn.disabled = false; }
     alert('Errore di rete. Riprova.');
   }
 }
@@ -559,7 +561,7 @@ window._showFormAgain = function(boat) {
   if (addBtn) addBtn.style.display = '';
   if (crewActions) crewActions.style.display = '';
   if (statusEl) { statusEl.style.display = 'none'; statusEl.innerHTML = ''; }
-  if (btn) { btn.textContent = '💾 Salva i miei dati'; btn.style.background = ''; btn.disabled = false; }
+  if (btn) { btn.innerHTML = '✏️ Modifica i miei dati'; btn.style.background = ''; btn.disabled = false; }
 };
 
 /* ── Admin: scarica PDF con tutti i membri da Sheets ── */
