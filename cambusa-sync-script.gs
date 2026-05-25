@@ -37,13 +37,15 @@ function setupConfig(sheet) {
   sheet.clearContents();
   sheet.setColumnWidth(1, 240); sheet.setColumnWidth(2, 160);
   sheet.getRange('A1:B1').setValues([['chiave','valore']]).setFontWeight('bold');
-  sheet.getRange('A2:B7').setValues([
-    ['persone_lagoon', 10],
-    ['persone_oceanis', 12],
-    ['data_inizio', '02/06/2026'],
-    ['data_fine', '07/06/2026'],
+  sheet.getRange('A2:B9').setValues([
+    ['persone', 10],
+    ['data_inizio', '29/05/2026'],
+    ['data_fine', '02/06/2026'],
+    ['check_in_ora', '17:00'],
+    ['check_out_ora', '17:00'],
     ['acqua_litri_per_persona_giorno', 1.5],
     ['acqua_litri_per_giorno_cucina', 3],
+    ['nota', 'Lagoon: 10 persone · Oceanis: 12 persone'],
   ]);
 }
 
