@@ -576,38 +576,32 @@ window._showFormAgain = function(boat) {
   if (btn) { btn.innerHTML = '✏️ Modifica i miei dati'; btn.style.background = ''; btn.disabled = false; }
 };
 
-/* ── Fetch dati da Google Apps Script ── */
-async function fetchCrewJSONP(boat) {
-  const res = await fetch(SHEETS_URL + '?boat=' + boat, { redirect: 'follow' });
-  const text = await res.text();
-  const trimmed = text.trim();
-  if (!trimmed.startsWith('{')) {
-    throw new Error('Risposta non JSON: ' + trimmed.substring(0, 120));
-  }
-  return JSON.parse(trimmed);
-}
-
-/* ── Admin: scarica PDF con tutti i membri da Sheets ── */
-async function adminDownloadPDF(boat, boatName, departureDate, arrivalDate) {
+/* ── Admin: genera PDF dai dati localStorage (nessuna rete) ── */
+function adminDownloadPDF(boat, boatName, departureDate, arrivalDate) {
   const pwd = prompt('Password amministratore:');
   if (pwd !== ADMIN_PASSWORDS[boat]) { alert('Password errata.'); return; }
 
-  const btn = document.getElementById('btnAdminPDF-' + boat);
-  if (btn) { btn.textContent = 'Caricamento dati...'; btn.disabled = true; }
-
-  try {
-    const json = await fetchCrewJSONP(boat);
-    if (!json.ok || !json.members || json.members.length === 0) {
-      alert('Nessun membro trovato nel foglio per questa barca.');
-      if (btn) { btn.innerHTML = '📄 Crea PDF (solo skipper)'; btn.disabled = false; }
-      return;
-    }
-    generateCrewPDF(json.members, boatName, departureDate, arrivalDate);
-    if (btn) { btn.innerHTML = '📄 Crea PDF (solo skipper)'; btn.disabled = false; }
-  } catch(err) {
-    alert('Errore: ' + err.message);
-    if (btn) { btn.innerHTML = '📄 Crea PDF (solo skipper)'; btn.disabled = false; }
+  const saved = loadFromStorage(boat);
+  if (!saved || saved.length === 0) {
+    alert('Nessun dato trovato per questa barca.\nAssicurati di essere sullo stesso dispositivo dove hai compilato i dati, oppure chiedi ai membri di compilare dal tuo dispositivo.');
+    return;
   }
+
+  const members = saved.map(m => ({
+    nome:        (m.nome || '') + ' ' + (m.cognome || ''),
+    nascita:     m.nascita     || '',
+    luogo:       (m.comuneNascita || '') + (m.provNascita ? ' (' + m.provNascita + ')' : ''),
+    nazionalita: m.nazionalita || '',
+    residenza:   [m.via, m.citta, m.prov].filter(Boolean).join(', '),
+    cap:         m.cap         || '',
+    tipoDoc:     m.tipoDoc     || '',
+    numDoc:      m.numDoc      || '',
+    scadDoc:     m.scadDoc     || '',
+    ruolo:       m.ruolo       || '',
+    cf:          m.cf          || ''
+  }));
+
+  generateCrewPDF(members, boatName, departureDate, arrivalDate);
 }
 
 /* ── Genera PDF unico con tutti i membri ────────── */
