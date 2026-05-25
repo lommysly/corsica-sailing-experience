@@ -576,32 +576,15 @@ window._showFormAgain = function(boat) {
   if (btn) { btn.innerHTML = '✏️ Modifica i miei dati'; btn.style.background = ''; btn.disabled = false; }
 };
 
-/* ── Admin: genera PDF dai dati localStorage (nessuna rete) ── */
-function adminDownloadPDF(boat, boatName, departureDate, arrivalDate) {
+/* ── Admin: apre il tab Google Sheet della barca ── */
+const SHEET_TABS = {
+  lagoon:  'https://docs.google.com/spreadsheets/d/1D7RIkF7SQn9yuDwBPuNW_pxWUXmyTpxmUGRbNt3KcnU/edit?gid=1864408211#gid=1864408211',
+  oceanis: 'https://docs.google.com/spreadsheets/d/1D7RIkF7SQn9yuDwBPuNW_pxWUXmyTpxmUGRbNt3KcnU/edit?gid=286068343#gid=286068343',
+};
+function adminDownloadPDF(boat) {
   const pwd = prompt('Password amministratore:');
   if (pwd !== ADMIN_PASSWORDS[boat]) { alert('Password errata.'); return; }
-
-  const saved = loadFromStorage(boat);
-  if (!saved || saved.length === 0) {
-    alert('Nessun dato trovato per questa barca.\nAssicurati di essere sullo stesso dispositivo dove hai compilato i dati, oppure chiedi ai membri di compilare dal tuo dispositivo.');
-    return;
-  }
-
-  const members = saved.map(m => ({
-    nome:        (m.nome || '') + ' ' + (m.cognome || ''),
-    nascita:     m.nascita     || '',
-    luogo:       (m.comuneNascita || '') + (m.provNascita ? ' (' + m.provNascita + ')' : ''),
-    nazionalita: m.nazionalita || '',
-    residenza:   [m.via, m.citta, m.prov].filter(Boolean).join(', '),
-    cap:         m.cap         || '',
-    tipoDoc:     m.tipoDoc     || '',
-    numDoc:      m.numDoc      || '',
-    scadDoc:     m.scadDoc     || '',
-    ruolo:       m.ruolo       || '',
-    cf:          m.cf          || ''
-  }));
-
-  generateCrewPDF(members, boatName, departureDate, arrivalDate);
+  window.open(SHEET_TABS[boat] || SHEET_TABS.lagoon, '_blank');
 }
 
 /* ── Genera PDF unico con tutti i membri ────────── */
