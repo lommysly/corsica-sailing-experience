@@ -3,29 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Check-in Barca · Corsica Experience</title>
+  <title>Check-in Lagoon 40 · Corsica Experience</title>
   <link rel="stylesheet" href="styles.css?v=20260525i" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
   <style>
     body { background: var(--ocean); color: #fff; min-height: 100vh; }
-    .ci-wrap { display: none; }
-    .ci-choice { max-width: 900px; margin: 0 auto; padding: 80px 20px; }
-    .ci-choice-header { text-align: center; margin-bottom: 36px; }
-    .ci-choice-header .label { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--turq); font-weight: 600; display: block; margin-bottom: 10px; }
-    .ci-choice-header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.4rem, 7vw, 4.2rem); font-weight: 300; margin-bottom: 10px; }
-    .ci-choice-header p { color: rgba(255,255,255,.65); max-width: 620px; margin: 0 auto; line-height: 1.7; }
-    .ci-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-    .ci-choice-card { display: block; min-height: 220px; padding: 28px; border-radius: 22px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.06); text-decoration: none; color: #fff; position: relative; overflow: hidden; transition: transform .2s ease, border-color .2s ease, background .2s ease; }
-    .ci-choice-card:hover { transform: translateY(-3px); border-color: var(--turq); background: rgba(28,167,168,.12); }
-    .ci-choice-card .type { font-size: .72rem; text-transform: uppercase; letter-spacing: .16em; color: var(--turq); font-weight: 700; margin-bottom: 8px; }
-    .ci-choice-card h2 { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 2.1rem; margin-bottom: 12px; }
-    .ci-choice-card p { color: rgba(255,255,255,.65); font-size: .9rem; line-height: 1.6; }
-    .ci-choice-card .cta { position: absolute; left: 28px; bottom: 24px; color: var(--turq); font-weight: 700; font-size: .9rem; }
-    .ci-note { margin-top: 28px; padding: 18px 20px; border-radius: 16px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.65); font-size: .9rem; line-height: 1.6; }
-    @media (max-width: 720px) { .ci-choice { padding-top: 48px; } .ci-choice-grid { grid-template-columns: 1fr; } }
-    .ci-wrap-old { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
+    .ci-wrap { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
     .ci-header { text-align: center; padding: 40px 0 32px; }
     .ci-header .label { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--turq); font-weight: 600; display: block; margin-bottom: 10px; }
     .ci-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 300; margin-bottom: 8px; }
@@ -154,34 +139,11 @@
   </div>
 </nav>
 
-<main class="ci-choice">
-  <div class="ci-choice-header">
-    <span class="label">Skipper Tool</span>
-    <h1>Check-in Skipper</h1>
-    <p>Seleziona la barca corretta prima di iniziare. Ogni check-in è isolato in una pagina dedicata e salva esclusivamente sul foglio della propria barca.</p>
-  </div>
-  <div class="ci-choice-grid">
-    <a class="ci-choice-card" href="checkin-lagoon.html">
-      <div class="type">Catamarano</div>
-      <h2>Lagoon 40</h2>
-      <p>Checklist dedicata al Lagoon 40. Nessun cambio barca interno, nessun rischio di salvataggio incrociato.</p>
-      <span class="cta">Apri check-in Lagoon →</span>
-    </a>
-    <a class="ci-choice-card" href="checkin-oceanis.html">
-      <div class="type">Monoscafo</div>
-      <h2>Beneteau Oceanis 48</h2>
-      <p>Checklist dedicata all'Oceanis 48. Stato, note e PDF restano separati da Lagoon.</p>
-      <span class="cta">Apri check-in Oceanis →</span>
-    </a>
-  </div>
-  <div class="ci-note">Atlantica non è inclusa in questo sito: verrà gestita nel sito dedicato con la stessa architettura a pagina singola per barca.</div>
-</main>
-
 <div class="ci-wrap">
   <div class="ci-header">
     <span class="label">Skipper Tool</span>
-    <h1>Check-in Barca</h1>
-    <p>Verifica pre-partenza — spunta ogni voce prima di salpare</p>
+    <h1>Check-in Lagoon 40</h1>
+    <p>Verifica pre-partenza dedicata — Lagoon 40</p>
   </div>
 
   <!-- Lock screen -->
@@ -211,9 +173,9 @@
 
     <!-- TAB 0: Check-in Barca (checklist) -->
     <div class="tab-panel active" id="tab-0">
-      <div class="boat-tabs">
-        <button class="boat-tab active" id="btab-Lagoon40" onclick="selectBoatCheckin('Lagoon40')">⛵ Lagoon 40</button>
-        <button class="boat-tab" id="btab-Oceanis48" onclick="selectBoatCheckin('Oceanis48')">⛵ Oceanis 48</button>
+      <div class="info-card" style="border-color:rgba(28,167,168,.35); background:rgba(28,167,168,.08)">
+        <h3>⛵ Barca selezionata</h3>
+        <p><strong>Lagoon 40</strong> — questa pagina salva e legge esclusivamente il check-in di questa barca.</p>
       </div>
       <div class="sync-bar"><div class="sync-dot" id="syncDot"></div><span id="syncLabel">—</span></div>
       <div class="ci-progress"><div class="ci-progress-fill" id="progressFill"></div></div>
@@ -548,7 +510,8 @@ const BOATS = {
 };
 
 // ── State ────────────────────────────────────────────
-let currentBoat = 'Lagoon40';
+const FIXED_BOAT = 'Lagoon40';
+let currentBoat = FIXED_BOAT;
 let localState  = {};   // { [voceId]: { stato: bool, nota: string } }
 let saveTimers  = {};
 
@@ -564,18 +527,16 @@ function unlock() {
   if (val === ADMIN_PWD) {
     document.getElementById('lockScreen').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
-    loadFromSheets(currentBoat);
+    loadFromSheets(FIXED_BOAT);
   } else {
     document.getElementById('lockErr').style.display = 'block';
   }
 }
 
 // ── Boat selection ───────────────────────────────────
-function selectBoatCheckin(boat) {
-  currentBoat = boat;
-  document.querySelectorAll('.boat-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('btab-' + boat).classList.add('active');
-  loadFromSheets(boat);
+function selectBoatCheckin() {
+  currentBoat = FIXED_BOAT;
+  loadFromSheets(FIXED_BOAT);
 }
 
 // ── Sync indicator ───────────────────────────────────
@@ -597,7 +558,7 @@ function loadFromSheets(boat) {
     delete window[cbName];
     const old = document.getElementById('_ci_script');
     if (old) old.remove();
-    if (boat !== currentBoat) return;
+    if (boat !== FIXED_BOAT) return;
     setSyncState('err', 'Timeout — dati locali in uso');
   }, 8000);
   window[cbName] = function(res) {
@@ -605,7 +566,7 @@ function loadFromSheets(boat) {
     delete window[cbName];
     const old = document.getElementById('_ci_script');
     if (old) old.remove();
-    if (boat !== currentBoat) return;
+    if (boat !== FIXED_BOAT) return;
     if (res.ok) {
       localState = {};
       Object.keys(res.data).forEach(id => {
@@ -626,7 +587,7 @@ function loadFromSheets(boat) {
   s.onerror = () => {
     clearTimeout(timeout);
     delete window[cbName];
-    if (boat !== currentBoat) return;
+    if (boat !== FIXED_BOAT) return;
     setSyncState('err', 'Offline — dati locali in uso');
   };
 }
@@ -710,7 +671,7 @@ function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 // ── Toggle checkbox ───────────────────────────────────
 function onToggle(id, secId, checked) {
-  const boat = currentBoat;
+  const boat = FIXED_BOAT;
   if (!localState[id]) localState[id] = { stato: false, nota: '' };
   localState[id].stato = checked;
   setCached(boat, localState);
@@ -723,7 +684,7 @@ function onToggle(id, secId, checked) {
 
 // ── Nota ──────────────────────────────────────────────
 function onNota(id, val) {
-  const boat = currentBoat;
+  const boat = FIXED_BOAT;
   if (!localState[id]) localState[id] = { stato: false, nota: '' };
   localState[id].nota = val;
   setCached(boat, localState);
@@ -754,17 +715,17 @@ function updateProgress(boat) {
 
 // ── Reset ─────────────────────────────────────────────
 function resetChecklist() {
-  if (!confirm('Azzerare TUTTE le spunte e le note per ' + BOATS[currentBoat].name + '?')) return;
+  if (!confirm('Azzerare TUTTE le spunte e le note per ' + BOATS[FIXED_BOAT].name + '?')) return;
   localState = {};
-  setCached(currentBoat, {});
-  renderChecklist(currentBoat);
+  setCached(FIXED_BOAT, {});
+  renderChecklist(FIXED_BOAT);
   setSyncState('loading', 'Reset in corso…');
   // Reset su Sheets: invia stato false per tutte le voci
-  const sections = BOATS[currentBoat].sections;
+  const sections = BOATS[FIXED_BOAT].sections;
   const allIds = sections.flatMap(s => s.items.map(it => it.id));
   const promises = allIds.map(id => {
     const p = new URLSearchParams();
-    p.append('boat', currentBoat); p.append('voceId', id); p.append('stato', 'false'); p.append('nota', ''); p.append('skipper', 'Skipper');
+    p.append('boat', FIXED_BOAT); p.append('voceId', id); p.append('stato', 'false'); p.append('nota', ''); p.append('skipper', 'Skipper');
     return fetch(CHECKIN_API, { method: 'POST', mode: 'no-cors', body: p }).catch(() => {});
   });
   Promise.all(promises).then(() => setSyncState('ok', 'Reset completato'));
@@ -772,7 +733,7 @@ function resetChecklist() {
 
 // ── Print ─────────────────────────────────────────────
 function printChecklist() {
-  const boat = BOATS[currentBoat];
+  const boat = BOATS[FIXED_BOAT];
   const now = new Date().toLocaleString('it-IT');
   document.getElementById('printMeta').textContent = 'Barca: ' + boat.name + '  ·  Stampato: ' + now + '  ·  Skipper: ___________________________';
   window.print();
