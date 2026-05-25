@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check-in Barca · Corsica Experience</title>
+  <link rel="stylesheet" href="styles.css?v=20260525i" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <style>
+    body { background: var(--ocean); color: #fff; min-height: 100vh; }
+    .ci-wrap { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
+    .ci-header { text-align: center; padding: 40px 0 32px; }
+    .ci-header .label { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--turq); font-weight: 600; display: block; margin-bottom: 10px; }
+    .ci-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 300; margin-bottom: 8px; }
+    .ci-header p { font-size: .9rem; color: rgba(255,255,255,.6); }
+
+    /* Boat selector */
+    .boat-select { display: flex; gap: 12px; margin-bottom: 36px; flex-wrap: wrap; }
+    .boat-btn { flex: 1; min-width: 140px; padding: 14px 16px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 12px; color: rgba(255,255,255,.7); font-size: .88rem; cursor: pointer; text-align: center; transition: all .2s; }
+    .boat-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .boat-btn.active { background: var(--turq); border-color: var(--turq); color: #fff; font-weight: 600; }
+
+    /* Progress bar */
+    .ci-progress { background: rgba(255,255,255,.08); border-radius: 20px; height: 6px; margin-bottom: 8px; overflow: hidden; }
+    .ci-progress-fill { height: 100%; background: var(--turq); border-radius: 20px; transition: width .3s ease; }
+    .ci-progress-label { font-size: .78rem; color: rgba(255,255,255,.5); margin-bottom: 28px; }
+
+    /* Sections */
+    .ci-section { margin-bottom: 20px; border-radius: 16px; overflow: hidden; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); }
+    .ci-section-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: rgba(255,255,255,.05); cursor: pointer; user-select: none; }
+    .ci-section-header .icon { font-size: 1.3rem; }
+    .ci-section-header .title { font-weight: 600; font-size: .95rem; flex: 1; }
+    .ci-section-header .count { font-size: .78rem; color: rgba(255,255,255,.45); }
+    .ci-section-header .arrow { font-size: .8rem; color: rgba(255,255,255,.35); transition: transform .2s; }
+    .ci-section.open .arrow { transform: rotate(90deg); }
+    .ci-section-body { display: none; padding: 8px 0; }
+    .ci-section.open .ci-section-body { display: block; }
+
+    /* Items */
+    .ci-item { display: flex; align-items: center; gap: 14px; padding: 13px 20px; border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; transition: background .15s; }
+    .ci-item:last-child { border-bottom: none; }
+    .ci-item:hover { background: rgba(255,255,255,.04); }
+    .ci-item input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--turq); cursor: pointer; flex-shrink: 0; }
+    .ci-item label { flex: 1; font-size: .88rem; color: rgba(255,255,255,.8); cursor: pointer; line-height: 1.4; }
+    .ci-item.checked label { color: rgba(255,255,255,.4); text-decoration: line-through; }
+    .ci-item .note { font-size: .75rem; color: rgba(255,255,255,.35); display: block; margin-top: 2px; }
+
+    /* Actions */
+    .ci-actions { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+    .ci-btn { flex: 1; min-width: 160px; padding: 14px 20px; border: none; border-radius: 12px; font-size: .9rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .ci-btn-reset { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.15); }
+    .ci-btn-reset:hover { background: rgba(255,255,255,.14); color: #fff; }
+    .ci-btn-print { background: var(--turq); color: #fff; }
+    .ci-btn-print:hover { background: #17898a; }
+
+    /* Lock screen */
+    .ci-lock { text-align: center; padding: 60px 20px; }
+    .ci-lock .lock-icon { font-size: 3rem; margin-bottom: 16px; }
+    .ci-lock p { color: rgba(255,255,255,.6); font-size: .9rem; margin-bottom: 24px; }
+    .ci-lock input { display: block; margin: 0 auto 16px; padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; font-size: 1rem; width: 260px; text-align: center; outline: none; }
+    .ci-lock input::placeholder { color: rgba(255,255,255,.35); }
+    .ci-lock button { padding: 12px 32px; background: var(--turq); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; }
+    .ci-lock .err { color: #f87171; font-size: .85rem; margin-top: 10px; display: none; }
+
+    /* Print styles */
+    @media print {
+      body { background: #fff !important; color: #111 !important; }
+      .ci-wrap { padding: 10mm 12mm !important; max-width: 100% !important; }
+      .ci-header { padding: 0 0 16px !important; }
+      .ci-header h1 { color: #0b3c5d !important; font-size: 1.8rem !important; }
+      .ci-header p, .ci-header .label { color: #555 !important; }
+      .boat-select, .ci-actions, .ci-lock { display: none !important; }
+      .ci-progress, .ci-progress-label { display: none !important; }
+      .ci-section { border: 1px solid #c0cdd8 !important; background: #fff !important; margin-bottom: 12px !important; break-inside: avoid; }
+      .ci-section-body { display: block !important; }
+      .ci-section-header { background: #e8f0f7 !important; cursor: default; }
+      .ci-section-header .title { color: #0b3c5d !important; }
+      .ci-section-header .arrow { display: none; }
+      .ci-item { border-bottom: 1px solid #eee !important; padding: 9px 16px !important; }
+      .ci-item label { color: #333 !important; font-size: .85rem !important; }
+      .ci-item.checked label { color: #aaa !important; }
+      .ci-item input[type=checkbox] { accent-color: #1ca7a8; }
+      .print-meta { display: block !important; }
+    }
+    .print-meta { display: none; font-size: .75rem; color: #999; text-align: right; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<nav class="nav scrolled" id="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html">
+      <span class="logo-icon">—</span>
+      <span class="logo-text">Corsica Experience</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="lagoon.html">Lagoon 40</a>
+      <a href="oceanis.html">Oceanis 48</a>
+    </div>
+  </div>
+</nav>
+
+<div class="ci-wrap">
+  <div class="ci-header">
+    <span class="label">Skipper Tool</span>
+    <h1>Check-in Barca</h1>
+    <p>Verifica pre-partenza — spunta ogni voce prima di salpare</p>
+  </div>
+
+  <!-- Lock screen -->
+  <div id="lockScreen" class="ci-lock">
+    <div class="lock-icon">🔒</div>
+    <p>Inserisci la password skipper per accedere alla checklist</p>
+    <input type="password" id="pwdInput" placeholder="Password" onkeydown="if(event.key==='Enter')unlock()" />
+    <button onclick="unlock()">Accedi</button>
+    <div class="err" id="lockErr">Password errata. Riprova.</div>
+  </div>
+
+  <!-- Main content (hidden until unlocked) -->
+  <div id="mainContent" style="display:none">
+
+    <!-- Boat selector -->
+    <div class="boat-select">
+      <button class="boat-btn active" id="btn-lagoon" onclick="selectBoatCI('lagoon')">⛵ Lagoon 40</button>
+      <button class="boat-btn" id="btn-oceanis" onclick="selectBoatCI('oceanis')">⛵ Oceanis 48</button>
+    </div>
+
+    <!-- Progress -->
+    <div class="ci-progress"><div class="ci-progress-fill" id="progressFill"></div></div>
+    <div class="ci-progress-label" id="progressLabel">0 / 0 voci completate</div>
+
+    <!-- Checklist -->
+    <div id="checklistContainer"></div>
+
+    <div class="print-meta" id="printMeta"></div>
+
+    <div class="ci-actions">
+      <button class="ci-btn ci-btn-reset" onclick="resetChecklist()">↺ Azzera tutto</button>
+      <button class="ci-btn ci-btn-print" onclick="printChecklist()">🖨️ Stampa Check-in</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PWD = 'Skipper2026';
+let currentBoat = 'lagoon';
+
+const CHECKLIST = {
+  lagoon: {
+    name: 'Lagoon 40',
+    sections: [
+      {
+        icon: '📋', title: 'Documenti di Bordo',
+        items: [
+          { id: 'doc1', text: 'Licenza di navigazione', note: 'Documento originale a bordo' },
+          { id: 'doc2', text: 'Patente nautica skipper', note: 'Valida per acque internazionali' },
+          { id: 'doc3', text: 'Crew list firmata', note: 'Copia per la capitaneria' },
+          { id: 'doc4', text: 'Assicurazione imbarcazione', note: 'Polizza con copertura estera' },
+          { id: 'doc5', text: 'Certificato stazza / iscrizione', note: '' },
+          { id: 'doc6', text: 'Documenti identità equipaggio', note: 'Tutti i membri a bordo' },
+        ]
+      },
+      {
+        icon: '🆘', title: 'Sicurezza e Salvataggio',
+        items: [
+          { id: 'sic1', text: 'Zattera di salvataggio', note: 'Revisione in data valida, collocazione verificata' },
+          { id: 'sic2', text: 'Giubbotti salvagente', note: 'Uno per ogni persona a bordo' },
+          { id: 'sic3', text: 'Imbragature e cavi di sicurezza', note: 'Controllo usura e chiusure' },
+          { id: 'sic4', text: 'Razzo di segnalazione / bengale', note: 'Non scaduti' },
+          { id: 'sic5', text: 'EPIRB / PLB attivato e registrato', note: 'Batteria ok, codice MMSI programmato' },
+          { id: 'sic6', text: 'VHF funzionante — canale 16', note: 'Test di trasmissione eseguito' },
+          { id: 'sic7', text: 'Kit pronto soccorso', note: 'Completo e non scaduto' },
+          { id: 'sic8', text: 'Estintori (2)', note: 'Pressione ok, revisionati' },
+          { id: 'sic9', text: 'Pompa di sentina manuale e automatica', note: 'Funzionante' },
+          { id: 'sic10', text: 'Ancora galleggiante', note: 'A bordo e accessibile' },
+        ]
+      },
+      {
+        icon: '⚙️', title: 'Motore e Impianti',
+        items: [
+          { id: 'mot1', text: 'Livello olio motore', note: 'Rabboccare se necessario' },
+          { id: 'mot2', text: 'Livello liquido refrigerante', note: '' },
+          { id: 'mot3', text: 'Cinghia alternatore integra', note: '' },
+          { id: 'mot4', text: 'Filtro carburante', note: 'Nessuna acqua nel gasolio' },
+          { id: 'mot5', text: 'Serbatoio carburante pieno', note: 'Nota la quantità a bordo' },
+          { id: 'mot6', text: 'Prese a mare aperte', note: 'Motore, scarico, WC' },
+          { id: 'mot7', text: 'Batterie — stato di carica', note: 'Avviamento e servizi ok' },
+          { id: 'mot8', text: 'Test avviamento motore', note: 'Lasciare girare 5 min al minimo' },
+          { id: 'mot9', text: 'Scarico acqua dal motore (fumata bianca)', note: 'Visibile durante il test' },
+        ]
+      },
+      {
+        icon: '⚓', title: 'Coperta e Manovre',
+        items: [
+          { id: 'cop1', text: 'Ancora e catena', note: 'Almeno 30m di catena + altra di riserva' },
+          { id: 'cop2', text: 'Cime di ormeggio (4+)', note: 'Prore, poppiere, spring' },
+          { id: 'cop3', text: 'Parabordi gonfiati e a bordo', note: '' },
+          { id: 'cop4', text: 'Scotte e drizze — stato e scorrevoli', note: 'Nessun nodo o usura' },
+          { id: 'cop5', text: 'Randa — condizioni e terzaroli', note: '' },
+          { id: 'cop6', text: 'Fiocco / genoa — apertura e rotaia', note: '' },
+          { id: 'cop7', text: 'Timoneria — gioco e risposta', note: 'Autopilota collegato e funzionante' },
+          { id: 'cop8', text: 'Bussola — calibrata', note: '' },
+          { id: 'cop9', text: 'Illuminazione di navigazione (luci di posizione)', note: 'Test notturno prima di salpare' },
+        ]
+      },
+      {
+        icon: '🗺️', title: 'Navigazione e Meteo',
+        items: [
+          { id: 'nav1', text: 'Chartplotter acceso e aggiornato', note: 'Carte nautiche zona aggiornate' },
+          { id: 'nav2', text: 'GPS funzionante', note: 'Fix acquisito' },
+          { id: 'nav3', text: 'Bollettino meteo consultato', note: 'Prossime 48h' },
+          { id: 'nav4', text: 'Piano di navigazione comunicato', note: 'Porto partenza → arrivo + tappe' },
+          { id: 'nav5', text: 'Notifica alle autorità marittime (se richiesta)', note: '' },
+          { id: 'nav6', text: 'Contatti di emergenza annotati', note: 'Guardia Costiera, porto arrivo' },
+        ]
+      },
+      {
+        icon: '🍽️', title: 'Cambusa e Comfort',
+        items: [
+          { id: 'cam1', text: 'Acqua potabile — serbatoi pieni', note: 'Almeno 20L per persona per 3 giorni' },
+          { id: 'cam2', text: 'Bombola gas — livello e valvola chiusa', note: 'Aprire solo a uso, chiudere dopo' },
+          { id: 'cam3', text: 'Provviste a bordo', note: 'Verificate per il numero di giorni' },
+          { id: 'cam4', text: 'Frigorifero funzionante', note: '' },
+          { id: 'cam5', text: 'WC — funzionante e valvole corrette', note: '' },
+          { id: 'cam6', text: 'Spazzatura smaltita a terra', note: 'Nessun rifiuto in mare' },
+        ]
+      },
+      {
+        icon: '👥', title: 'Briefing Equipaggio',
+        items: [
+          { id: 'bri1', text: 'Briefing sicurezza svolto', note: 'Posizione giubbotti, zattera, estintori' },
+          { id: 'bri2', text: 'Ruoli assegnati', note: 'Timoniere, vedetta, manovra' },
+          { id: 'bri3', text: 'Procedure di emergenza spiegate', note: 'Uomo in mare, abbandono nave' },
+          { id: 'bri4', text: 'Regole di bordo comunicate', note: '' },
+          { id: 'bri5', text: 'Mal di mare — farmaci disponibili', note: 'Verificato chi ne ha bisogno' },
+        ]
+      },
+    ]
+  },
+  oceanis: {
+    name: 'Beneteau Oceanis 48',
+    sections: [] // stesso contenuto, clonato da JS
+  }
+};
+
+// Oceanis ha la stessa checklist del Lagoon (stessa tipologia di barca)
+CHECKLIST.oceanis.sections = CHECKLIST.lagoon.sections.map(s => ({
+  ...s,
+  items: s.items.map(it => ({ ...it, id: 'o_' + it.id }))
+}));
+
+function unlock() {
+  const val = document.getElementById('pwdInput').value;
+  if (val === ADMIN_PWD) {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    renderChecklist(currentBoat);
+  } else {
+    document.getElementById('lockErr').style.display = 'block';
+  }
+}
+
+function selectBoatCI(boat) {
+  currentBoat = boat;
+  document.querySelectorAll('.boat-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + boat).classList.add('active');
+  renderChecklist(boat);
+}
+
+function getSaved(boat) {
+  try { return JSON.parse(localStorage.getItem('checkin_' + boat)) || {}; } catch(e) { return {}; }
+}
+function setSaved(boat, state) {
+  localStorage.setItem('checkin_' + boat, JSON.stringify(state));
+}
+
+function renderChecklist(boat) {
+  const data = CHECKLIST[boat];
+  const saved = getSaved(boat);
+  const container = document.getElementById('checklistContainer');
+  container.innerHTML = '';
+
+  data.sections.forEach((sec, si) => {
+    const div = document.createElement('div');
+    div.className = 'ci-section open';
+    div.id = 'sec-' + si;
+
+    const doneInSec = sec.items.filter(it => saved[it.id]).length;
+
+    div.innerHTML = `
+      <div class="ci-section-header" onclick="toggleSection('sec-${si}')">
+        <span class="icon">${sec.icon}</span>
+        <span class="title">${sec.title}</span>
+        <span class="count">${doneInSec}/${sec.items.length}</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="ci-section-body">
+        ${sec.items.map(it => `
+          <div class="ci-item${saved[it.id] ? ' checked' : ''}" id="item-${it.id}" onclick="toggle('${it.id}','${boat}','sec-${si}')">
+            <input type="checkbox" id="cb-${it.id}" ${saved[it.id] ? 'checked' : ''} onclick="event.stopPropagation();toggle('${it.id}','${boat}','sec-${si}')"/>
+            <label for="cb-${it.id}">${it.text}${it.note ? `<span class="note">${it.note}</span>` : ''}</label>
+          </div>`).join('')}
+      </div>`;
+    container.appendChild(div);
+  });
+
+  updateProgress(boat);
+}
+
+function toggle(id, boat, secId) {
+  const saved = getSaved(boat);
+  saved[id] = !saved[id];
+  setSaved(boat, saved);
+  const itemEl = document.getElementById('item-' + id);
+  const cb = document.getElementById('cb-' + id);
+  if (itemEl) itemEl.classList.toggle('checked', !!saved[id]);
+  if (cb) cb.checked = !!saved[id];
+  updateProgress(boat);
+  // aggiorna contatore sezione
+  const sec = document.getElementById(secId);
+  if (sec) {
+    const items = sec.querySelectorAll('.ci-item');
+    const done = sec.querySelectorAll('.ci-item.checked').length;
+    const countEl = sec.querySelector('.count');
+    if (countEl) countEl.textContent = done + '/' + items.length;
+  }
+}
+
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function updateProgress(boat) {
+  const data = CHECKLIST[boat];
+  const saved = getSaved(boat);
+  const total = data.sections.reduce((n, s) => n + s.items.length, 0);
+  const done  = data.sections.reduce((n, s) => n + s.items.filter(it => saved[it.id]).length, 0);
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = done + ' / ' + total + ' voci completate (' + pct + '%)';
+}
+
+function resetChecklist() {
+  if (!confirm('Azzerare tutte le spunte per questa barca?')) return;
+  localStorage.removeItem('checkin_' + currentBoat);
+  renderChecklist(currentBoat);
+}
+
+function printChecklist() {
+  const boat = CHECKLIST[currentBoat];
+  const now = new Date().toLocaleString('it-IT');
+  document.getElementById('printMeta').textContent = 'Barca: ' + boat.name + '  ·  Stampato: ' + now + '  ·  Skipper: ___________________________';
+  window.print();
+}
+</script>
+</body>
+</html>
