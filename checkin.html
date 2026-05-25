@@ -156,12 +156,6 @@
   <!-- Main content (hidden until unlocked) -->
   <div id="mainContent" style="display:none">
 
-    <!-- Boat selector -->
-    <div class="boat-select">
-      <button class="boat-btn active" id="btn-lagoon" onclick="selectBoatCI('lagoon')">⛵ Lagoon 40</button>
-      <button class="boat-btn" id="btn-oceanis" onclick="selectBoatCI('oceanis')">⛵ Oceanis 48</button>
-    </div>
-
     <!-- Tab navigation -->
     <div class="tab-nav" id="tabNav">
       <button class="tab-btn active" onclick="switchTab(0)">🚨 Check-in Barca</button>
@@ -603,12 +597,16 @@ function saveToSheets(voceId, stato, nota) {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     setSyncState('loading', 'Salvataggio…');
-    const body = JSON.stringify({ boat: currentBoat, voceId, stato, nota, skipper: 'Skipper' });
+    const params = new URLSearchParams();
+    params.append('boat', currentBoat);
+    params.append('voceId', voceId);
+    params.append('stato', stato ? 'true' : 'false');
+    params.append('nota', nota);
+    params.append('skipper', 'Skipper');
     fetch(CHECKIN_API, {
       method: 'POST',
       mode: 'no-cors',
-      body: body,
-      headers: { 'Content-Type': 'text/plain' }
+      body: params
     })
     .then(() => setSyncState('ok', 'Salvato · ' + new Date().toLocaleTimeString('it-IT')))
     .catch(() => setSyncState('err', 'Offline — salvato in locale'));
@@ -722,9 +720,11 @@ function resetChecklist() {
   // Reset su Sheets: invia stato false per tutte le voci
   const sections = BOATS[currentBoat].sections;
   const allIds = sections.flatMap(s => s.items.map(it => it.id));
-  const promises = allIds.map(id =>
-    fetch(CHECKIN_API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ boat: currentBoat, voceId: id, stato: false, nota: '' }), headers: { 'Content-Type': 'text/plain' } }).catch(() => {})
-  );
+  const promises = allIds.map(id => {
+    const p = new URLSearchParams();
+    p.append('boat', currentBoat); p.append('voceId', id); p.append('stato', 'false'); p.append('nota', ''); p.append('skipper', 'Skipper');
+    return fetch(CHECKIN_API, { method: 'POST', mode: 'no-cors', body: p }).catch(() => {});
+  });
   Promise.all(promises).then(() => setSyncState('ok', 'Reset completato'));
 }
 
