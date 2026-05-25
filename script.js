@@ -283,7 +283,7 @@ function addMember(boat, prefill) {
       <label>Scadenza Documento <span style="color:#e05">*</span></label>
       <input type="date" data-field="scadDoc" />
     </div>
-    <div class="crew-field">
+    <div class="crew-field crew-field-ruolo">
       <label>Ruolo a Bordo <span style="color:#e05">*</span></label>
       <select data-field="ruolo">
         <option value="" disabled selected>— Seleziona il tuo ruolo —</option>
@@ -469,7 +469,7 @@ async function saveMemberToSheets(boat) {
   const numDoc  = get('numDoc');
   const tipoDoc = get('tipoDoc');
   const ruolo   = get('ruolo');
-  const cf      = get('cf');
+  const cf      = get('cf').toUpperCase().replace(/\s/g, '');
   const mancanti = [];
   if (!nome)    mancanti.push('Nome');
   if (!cognome) mancanti.push('Cognome');
@@ -490,7 +490,7 @@ async function saveMemberToSheets(boat) {
     return;
   }
   if (!/^[A-Z0-9]{16}$/.test(cf)) {
-    alert('Codice Fiscale non valido.\nDeve essere esattamente 16 caratteri (lettere maiuscole e numeri).');
+    alert('Codice Fiscale non valido.\nDeve essere esattamente 16 caratteri (lettere maiuscole e numeri).\nInserito: "' + cf + '" (' + cf.length + ' caratteri)');
     return;
   }
   if (numDoc.length < 6) { alert('Numero documento non valido — deve contenere almeno 6 caratteri.'); return; }

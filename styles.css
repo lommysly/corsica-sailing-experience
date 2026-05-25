@@ -1032,6 +1032,7 @@ body {
 .crew-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .cf-field { grid-column: span 2; }
 .crew-field-full { grid-column: span 4; }
+.crew-field-ruolo { grid-column: span 2; }
 
 .crew-field-actions {
   display: flex; flex-direction: column; gap: 8px; justify-content: flex-end;
