@@ -175,6 +175,8 @@ function selectBoat(boat) {
     const saved = loadFromStorage(boat);
     if (saved.length > 0) {
       saved.forEach(data => addMember(boat, data));
+      const btn = document.getElementById('btnSalva-' + boat);
+      if (btn) { btn.innerHTML = '✏️ Modifica i miei dati'; }
     } else {
       addMember(boat);
     }

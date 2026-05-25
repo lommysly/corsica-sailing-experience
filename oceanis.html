@@ -311,6 +311,8 @@
         const saved = (() => { try { return JSON.parse(localStorage.getItem('crew_oceanis')) || []; } catch(e) { return []; } })();
         if (saved.length > 0) {
           saved.forEach(data => addMemberAndCount('oceanis', data));
+          const btn = document.getElementById('btnSalva-oceanis');
+          if (btn) btn.innerHTML = '✏️ Modifica i miei dati';
         } else {
           addMemberAndCount('oceanis');
         }
