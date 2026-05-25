@@ -158,6 +158,13 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
+/* ── Crew List — accettazione regole per barca (crewlist.html) ── */
+function toggleAccettaBoat(cb, boat) {
+  localStorage.setItem('regole_' + boat, cb.checked ? '1' : '');
+  const status = document.getElementById('accettaStatus-' + boat);
+  if (status) status.style.display = cb.checked ? 'block' : 'none';
+}
+
 /* ── Crew List — selezione barca ───────────────── */
 function selectBoat(boat) {
   const boatNames = { lagoon: '⛵ Lagoon 40', oceanis: '⛵ Beneteau Oceanis 48' };
@@ -181,6 +188,12 @@ function selectBoat(boat) {
       addMember(boat);
     }
   }
+  // ripristina stato checkbox regole
+  const accepted = localStorage.getItem('regole_' + boat) === '1';
+  const cb = document.getElementById('checkRegole-' + boat);
+  if (cb) cb.checked = accepted;
+  const st = document.getElementById('accettaStatus-' + boat);
+  if (st) st.style.display = accepted ? 'block' : 'none';
   // carica dashboard stato equipaggio
   loadCrewStatus(boat, 'crewStatusList-' + boat, 'crewStatusCount-' + boat);
   // scroll smooth al form
