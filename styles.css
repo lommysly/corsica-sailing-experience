@@ -1337,6 +1337,7 @@ body {
   .regole-extra { grid-template-columns: 1fr; gap: 20px; padding: 28px 20px; }
 
   /* Crew List */
+  .crew-status-grid { grid-template-columns: 1fr !important; }
   .crew-boat-cards { grid-template-columns: 1fr; max-width: 400px; }
   .cbc-img { height: 140px; }
   /* form: 2 colonne su 640 */

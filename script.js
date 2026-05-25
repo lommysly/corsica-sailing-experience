@@ -11,9 +11,9 @@ const ADMIN_PASSWORDS = {
 };
 
 /* ── Stato live equipaggio ──────────────────────── */
-async function loadCrewStatus(boat) {
-  const listEl  = document.getElementById('crewStatusList');
-  const countEl = document.getElementById('crewStatusCount');
+async function loadCrewStatus(boat, listId, countId) {
+  const listEl  = document.getElementById(listId  || 'crewStatusList');
+  const countEl = document.getElementById(countId || 'crewStatusCount');
   if (!listEl) return;
   listEl.innerHTML = '<span style="color:rgba(255,255,255,.3); font-size:.85rem;">Caricamento...</span>';
   try {
