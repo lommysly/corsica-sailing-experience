@@ -581,7 +581,11 @@ window._showFormAgain = function(boat) {
 async function fetchCrewJSONP(boat) {
   const res = await fetch(SHEETS_URL + '?boat=' + boat, { redirect: 'follow' });
   const text = await res.text();
-  return JSON.parse(text);
+  const trimmed = text.trim();
+  if (!trimmed.startsWith('{')) {
+    throw new Error('Risposta non JSON: ' + trimmed.substring(0, 120));
+  }
+  return JSON.parse(trimmed);
 }
 
 /* ── Admin: scarica PDF con tutti i membri da Sheets ── */
@@ -596,14 +600,14 @@ async function adminDownloadPDF(boat, boatName, departureDate, arrivalDate) {
     const json = await fetchCrewJSONP(boat);
     if (!json.ok || !json.members || json.members.length === 0) {
       alert('Nessun membro trovato nel foglio per questa barca.');
-      if (btn) { btn.innerHTML = '� Crea PDF (solo skipper)'; btn.disabled = false; }
+      if (btn) { btn.innerHTML = '📄 Crea PDF (solo skipper)'; btn.disabled = false; }
       return;
     }
     generateCrewPDF(json.members, boatName, departureDate, arrivalDate);
-    if (btn) { btn.innerHTML = '� Crea PDF (solo skipper)'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = '📄 Crea PDF (solo skipper)'; btn.disabled = false; }
   } catch(err) {
-    alert('Errore nel recupero dati. Riprova.');
-    if (btn) { btn.innerHTML = '� Crea PDF (solo skipper)'; btn.disabled = false; }
+    alert('Errore: ' + err.message);
+    if (btn) { btn.innerHTML = '📄 Crea PDF (solo skipper)'; btn.disabled = false; }
   }
 }
 
