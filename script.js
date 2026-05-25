@@ -531,35 +531,50 @@ async function saveMemberToSheets(boat) {
     regolaAccettata: true
   };
 
-  try {
-    await fetch(SHEETS_URL, {
-      method: 'POST', mode: 'no-cors',
-      body: JSON.stringify(data)
-    });
-    saveToStorage(boat);
-    // Nascondi il form e mostra schermata di conferma
-    const container = document.getElementById('members-' + boat);
-    const addBtn = container?.parentElement?.querySelector('.btn-add-member');
-    const crewActions = document.getElementById('btnSalva-' + boat)?.closest('.crew-actions');
-    const statusEl = document.getElementById('saveStatus-' + boat);
-    if (container) container.style.display = 'none';
-    if (addBtn) addBtn.style.display = 'none';
-    if (crewActions) crewActions.style.display = 'none';
-    if (statusEl) {
-      statusEl.innerHTML = `
-        <div style="font-size:1.4rem; margin-bottom:8px;">✅</div>
-        <strong>${nome} ${cognome}</strong> — dati inviati correttamente.<br>
-        <span style="font-size:.82rem; opacity:.75;">Puoi chiudere questa pagina. I tuoi dati sono stati salvati.</span><br>
-        <button onclick="window._showFormAgain('${boat}')" style="margin-top:12px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); color:#fff; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:.82rem;">✏️ Modifica i miei dati</button>
-      `;
-      statusEl.style.display = 'block';
-      statusEl.style.textAlign = 'center';
-    }
-    if (btn) { btn.textContent = '✅ Dati salvati!'; btn.style.background = 'var(--turq)'; }
-  } catch(err) {
-    if (btn) { btn.innerHTML = '📝 Compila i miei dati'; btn.disabled = false; }
-    alert('Errore di rete. Riprova.');
+  saveToStorage(boat);
+
+  // Invio tramite form hidden su iframe (bypass CORS garantito)
+  let iframe = document.getElementById('_submitFrame');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.name = '_submitFrame';
+    iframe.id = '_submitFrame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
   }
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = SHEETS_URL;
+  form.target = '_submitFrame';
+  form.style.display = 'none';
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'payload';
+  input.value = JSON.stringify(data);
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => form.remove(), 3000);
+
+  // Mostra conferma immediata
+  const container2 = document.getElementById('members-' + boat);
+  const addBtn2 = container2?.parentElement?.querySelector('.btn-add-member');
+  const crewActions2 = document.getElementById('btnSalva-' + boat)?.closest('.crew-actions');
+  const statusEl2 = document.getElementById('saveStatus-' + boat);
+  if (container2) container2.style.display = 'none';
+  if (addBtn2) addBtn2.style.display = 'none';
+  if (crewActions2) crewActions2.style.display = 'none';
+  if (statusEl2) {
+    statusEl2.innerHTML = `
+      <div style="font-size:1.4rem; margin-bottom:8px;">✅</div>
+      <strong>${nome} ${cognome}</strong> — dati inviati correttamente.<br>
+      <span style="font-size:.82rem; opacity:.75;">Puoi chiudere questa pagina. I tuoi dati sono stati salvati.</span><br>
+      <button onclick="window._showFormAgain('${boat}')" style="margin-top:12px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); color:#fff; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:.82rem;">✏️ Modifica i miei dati</button>
+    `;
+    statusEl2.style.display = 'block';
+    statusEl2.style.textAlign = 'center';
+  }
+  if (btn) { btn.textContent = '✅ Dati salvati!'; btn.style.background = 'var(--turq)'; btn.disabled = false; }
 }
 
 /* ── Mostra di nuovo il form dopo il salvataggio ── */
