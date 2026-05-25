@@ -222,6 +222,18 @@
         <p class="section-desc" style="color:rgba(255,255,255,.65)">Compila i tuoi dati personali e salvali. Ogni membro compila la propria scheda.</p>
       </div>
 
+      <!-- Pannello live: chi ha già compilato -->
+      <div id="crewStatusPanel" style="margin-bottom:28px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:20px 24px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+          <span style="font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.45);">✦ Equipaggio — stato compilazione</span>
+          <button onclick="loadCrewStatus('oceanis')" style="background:none; border:none; color:rgba(255,255,255,.4); font-size:.75rem; cursor:pointer; padding:4px 8px;">↺ Aggiorna</button>
+        </div>
+        <div id="crewStatusList" style="display:flex; flex-wrap:wrap; gap:10px;">
+          <span style="color:rgba(255,255,255,.3); font-size:.85rem;">Caricamento...</span>
+        </div>
+        <div id="crewStatusCount" style="margin-top:14px; font-size:.78rem; color:rgba(255,255,255,.4);"></div>
+      </div>
+
       <!-- Blocco se regole non accettate -->
       <div class="crew-locked" id="crewLocked">
         <div class="crew-locked-icon">🔒</div>
@@ -305,6 +317,7 @@
         updateCounter();
       }
       document.getElementById('step1').classList.add('done');
+      loadCrewStatus('oceanis');
     });
   </script>
 </body>

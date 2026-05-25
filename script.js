@@ -10,6 +10,38 @@ const ADMIN_PASSWORDS = {
   atlantica: 'Skipper2026'
 };
 
+/* ── Stato live equipaggio ──────────────────────── */
+async function loadCrewStatus(boat) {
+  const listEl  = document.getElementById('crewStatusList');
+  const countEl = document.getElementById('crewStatusCount');
+  if (!listEl) return;
+  listEl.innerHTML = '<span style="color:rgba(255,255,255,.3); font-size:.85rem;">Caricamento...</span>';
+  try {
+    const res = await fetch(SHEETS_URL + '?boat=' + boat);
+    const json = await res.json();
+    const members = (json.members || []).filter(m => m.nome && m.nome.trim());
+    if (members.length === 0) {
+      listEl.innerHTML = '<span style="color:rgba(255,255,255,.3); font-size:.85rem;">Nessuno ha ancora compilato.</span>';
+      if (countEl) countEl.textContent = '';
+      return;
+    }
+    listEl.innerHTML = members.map(m => {
+      const ruolo = m.ruolo || '';
+      const icon = ruolo.toLowerCase().includes('skipper') ? '⚓' : ruolo.toLowerCase().includes('co') ? '🧭' : '⛵';
+      return `<div style="display:flex; align-items:center; gap:8px; background:rgba(28,167,168,.12); border:1px solid rgba(28,167,168,.25); border-radius:10px; padding:8px 14px;">
+        <span style="font-size:1rem;">${icon}</span>
+        <div>
+          <div style="font-size:.88rem; font-weight:600; color:#fff;">${m.nome}</div>
+          <div style="font-size:.7rem; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.06em;">${ruolo || '—'}</div>
+        </div>
+      </div>`;
+    }).join('');
+    if (countEl) countEl.textContent = `${members.length} ${members.length === 1 ? 'membro ha' : 'membri hanno'} compilato`;
+  } catch(e) {
+    listEl.innerHTML = '<span style="color:rgba(255,255,255,.3); font-size:.85rem;">Impossibile caricare i dati.</span>';
+  }
+}
+
 /* ── Preloader ──────────────────────────────────── */
 window.addEventListener('load', () => {
   const loader = document.getElementById('preloader');
