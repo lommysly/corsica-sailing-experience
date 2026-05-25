@@ -17,9 +17,14 @@
 // 8. Incollalo in cambusa.html alla riga: const SHEETS_URL = '...'
 // ============================================================
 
+function getOrCreateSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  return ss.getSheetByName('cambusa') || ss.insertSheet('cambusa');
+}
+
 function doGet(e) {
   const params = e.parameter || {};
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('cambusa');
+  const sheet = getOrCreateSheet();
 
   if (params.action === 'set') {
     // Aggiorna o aggiunge una voce
