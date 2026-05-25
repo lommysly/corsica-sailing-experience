@@ -577,6 +577,25 @@ window._showFormAgain = function(boat) {
   if (btn) { btn.innerHTML = '✏️ Modifica i miei dati'; btn.style.background = ''; btn.disabled = false; }
 };
 
+/* ── Fetch dati via JSONP (bypass CORS Google Apps Script) ── */
+function fetchCrewJSONP(boat) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_gjcb_' + Date.now();
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      delete window[cbName]; script.remove();
+      reject(new Error('Timeout'));
+    }, 15000);
+    window[cbName] = (data) => {
+      clearTimeout(timer); delete window[cbName]; script.remove();
+      resolve(data);
+    };
+    script.src = SHEETS_URL + '?boat=' + boat + '&callback=' + cbName;
+    script.onerror = () => { clearTimeout(timer); delete window[cbName]; script.remove(); reject(new Error('Script error')); };
+    document.head.appendChild(script);
+  });
+}
+
 /* ── Admin: scarica PDF con tutti i membri da Sheets ── */
 async function adminDownloadPDF(boat, boatName, departureDate, arrivalDate) {
   const pwd = prompt('Password amministratore:');
@@ -586,18 +605,17 @@ async function adminDownloadPDF(boat, boatName, departureDate, arrivalDate) {
   if (btn) { btn.textContent = 'Caricamento dati...'; btn.disabled = true; }
 
   try {
-    const res = await fetch(SHEETS_URL + '?boat=' + boat);
-    const json = await res.json();
+    const json = await fetchCrewJSONP(boat);
     if (!json.ok || !json.members || json.members.length === 0) {
       alert('Nessun membro trovato nel foglio per questa barca.');
-      if (btn) { btn.textContent = '🔐 Scarica PDF (Admin)'; btn.disabled = false; }
+      if (btn) { btn.innerHTML = '� Crea PDF (solo skipper)'; btn.disabled = false; }
       return;
     }
     generateCrewPDF(json.members, boatName, departureDate, arrivalDate);
-    if (btn) { btn.textContent = '🔐 Scarica PDF (Admin)'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = '� Crea PDF (solo skipper)'; btn.disabled = false; }
   } catch(err) {
     alert('Errore nel recupero dati. Riprova.');
-    if (btn) { btn.textContent = '🔐 Scarica PDF (Admin)'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = '� Crea PDF (solo skipper)'; btn.disabled = false; }
   }
 }
 
