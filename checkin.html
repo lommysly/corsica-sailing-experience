@@ -148,106 +148,106 @@
 const ADMIN_PWD = 'Skipper2026';
 let currentBoat = 'lagoon';
 
-const CHECKLIST = {
-  lagoon: {
-    name: 'Lagoon 40',
-    sections: [
-      {
-        icon: '📋', title: 'Documenti di Bordo',
-        items: [
-          { id: 'doc1', text: 'Licenza di navigazione', note: 'Documento originale a bordo' },
-          { id: 'doc2', text: 'Patente nautica skipper', note: 'Valida per acque internazionali' },
-          { id: 'doc3', text: 'Crew list firmata', note: 'Copia per la capitaneria' },
-          { id: 'doc4', text: 'Assicurazione imbarcazione', note: 'Polizza con copertura estera' },
-          { id: 'doc5', text: 'Certificato stazza / iscrizione', note: '' },
-          { id: 'doc6', text: 'Documenti identità equipaggio', note: 'Tutti i membri a bordo' },
-        ]
-      },
-      {
-        icon: '🆘', title: 'Sicurezza e Salvataggio',
-        items: [
-          { id: 'sic1', text: 'Zattera di salvataggio', note: 'Revisione in data valida, collocazione verificata' },
-          { id: 'sic2', text: 'Giubbotti salvagente', note: 'Uno per ogni persona a bordo' },
-          { id: 'sic3', text: 'Imbragature e cavi di sicurezza', note: 'Controllo usura e chiusure' },
-          { id: 'sic4', text: 'Razzo di segnalazione / bengale', note: 'Non scaduti' },
-          { id: 'sic5', text: 'EPIRB / PLB attivato e registrato', note: 'Batteria ok, codice MMSI programmato' },
-          { id: 'sic6', text: 'VHF funzionante — canale 16', note: 'Test di trasmissione eseguito' },
-          { id: 'sic7', text: 'Kit pronto soccorso', note: 'Completo e non scaduto' },
-          { id: 'sic8', text: 'Estintori (2)', note: 'Pressione ok, revisionati' },
-          { id: 'sic9', text: 'Pompa di sentina manuale e automatica', note: 'Funzionante' },
-          { id: 'sic10', text: 'Ancora galleggiante', note: 'A bordo e accessibile' },
-        ]
-      },
-      {
-        icon: '⚙️', title: 'Motore e Impianti',
-        items: [
-          { id: 'mot1', text: 'Livello olio motore', note: 'Rabboccare se necessario' },
-          { id: 'mot2', text: 'Livello liquido refrigerante', note: '' },
-          { id: 'mot3', text: 'Cinghia alternatore integra', note: '' },
-          { id: 'mot4', text: 'Filtro carburante', note: 'Nessuna acqua nel gasolio' },
-          { id: 'mot5', text: 'Serbatoio carburante pieno', note: 'Nota la quantità a bordo' },
-          { id: 'mot6', text: 'Prese a mare aperte', note: 'Motore, scarico, WC' },
-          { id: 'mot7', text: 'Batterie — stato di carica', note: 'Avviamento e servizi ok' },
-          { id: 'mot8', text: 'Test avviamento motore', note: 'Lasciare girare 5 min al minimo' },
-          { id: 'mot9', text: 'Scarico acqua dal motore (fumata bianca)', note: 'Visibile durante il test' },
-        ]
-      },
-      {
-        icon: '⚓', title: 'Coperta e Manovre',
-        items: [
-          { id: 'cop1', text: 'Ancora e catena', note: 'Almeno 30m di catena + altra di riserva' },
-          { id: 'cop2', text: 'Cime di ormeggio (4+)', note: 'Prore, poppiere, spring' },
-          { id: 'cop3', text: 'Parabordi gonfiati e a bordo', note: '' },
-          { id: 'cop4', text: 'Scotte e drizze — stato e scorrevoli', note: 'Nessun nodo o usura' },
-          { id: 'cop5', text: 'Randa — condizioni e terzaroli', note: '' },
-          { id: 'cop6', text: 'Fiocco / genoa — apertura e rotaia', note: '' },
-          { id: 'cop7', text: 'Timoneria — gioco e risposta', note: 'Autopilota collegato e funzionante' },
-          { id: 'cop8', text: 'Bussola — calibrata', note: '' },
-          { id: 'cop9', text: 'Illuminazione di navigazione (luci di posizione)', note: 'Test notturno prima di salpare' },
-        ]
-      },
-      {
-        icon: '🗺️', title: 'Navigazione e Meteo',
-        items: [
-          { id: 'nav1', text: 'Chartplotter acceso e aggiornato', note: 'Carte nautiche zona aggiornate' },
-          { id: 'nav2', text: 'GPS funzionante', note: 'Fix acquisito' },
-          { id: 'nav3', text: 'Bollettino meteo consultato', note: 'Prossime 48h' },
-          { id: 'nav4', text: 'Piano di navigazione comunicato', note: 'Porto partenza → arrivo + tappe' },
-          { id: 'nav5', text: 'Notifica alle autorità marittime (se richiesta)', note: '' },
-          { id: 'nav6', text: 'Contatti di emergenza annotati', note: 'Guardia Costiera, porto arrivo' },
-        ]
-      },
-      {
-        icon: '🍽️', title: 'Cambusa e Comfort',
-        items: [
-          { id: 'cam1', text: 'Acqua potabile — serbatoi pieni', note: 'Almeno 20L per persona per 3 giorni' },
-          { id: 'cam2', text: 'Bombola gas — livello e valvola chiusa', note: 'Aprire solo a uso, chiudere dopo' },
-          { id: 'cam3', text: 'Provviste a bordo', note: 'Verificate per il numero di giorni' },
-          { id: 'cam4', text: 'Frigorifero funzionante', note: '' },
-          { id: 'cam5', text: 'WC — funzionante e valvole corrette', note: '' },
-          { id: 'cam6', text: 'Spazzatura smaltita a terra', note: 'Nessun rifiuto in mare' },
-        ]
-      },
-      {
-        icon: '👥', title: 'Briefing Equipaggio',
-        items: [
-          { id: 'bri1', text: 'Briefing sicurezza svolto', note: 'Posizione giubbotti, zattera, estintori' },
-          { id: 'bri2', text: 'Ruoli assegnati', note: 'Timoniere, vedetta, manovra' },
-          { id: 'bri3', text: 'Procedure di emergenza spiegate', note: 'Uomo in mare, abbandono nave' },
-          { id: 'bri4', text: 'Regole di bordo comunicate', note: '' },
-          { id: 'bri5', text: 'Mal di mare — farmaci disponibili', note: 'Verificato chi ne ha bisogno' },
-        ]
-      },
+const SECTIONS_BASE = [
+  {
+    icon: '🚨', title: 'HIGH FIVE — Priorità Assoluta',
+    note: 'Salpa ancora, Sentine, Batterie, Motore, Timoneria',
+    items: [
+      { id: 'hf1', text: 'Salpa ancora', note: 'Funzionamento verricello, calare e salpare 10 mt' },
+      { id: 'hf2', text: 'Sentina', note: 'Controllo se c\'è acqua, pompa elettrica e manuale funzionanti' },
+      { id: 'hf3', text: 'Batterie', note: 'Test tensione servizi e motore, verifica ricarica' },
+      { id: 'hf4', text: 'Motore', note: 'Accensione, marce, scarico acqua, fumi, olio, cinghia' },
+      { id: 'hf5', text: 'Timoneria', note: 'Fluidità, gioco, autopilota, barra di rispetto' },
     ]
   },
-  oceanis: {
-    name: 'Beneteau Oceanis 48',
-    sections: [] // stesso contenuto, clonato da JS
-  }
-};
+  {
+    icon: '⚓', title: 'Check-in in Coperta',
+    items: [
+      { id: 'cop1', text: 'Timone', note: 'Fluidità e gioco, catene/cavi/pistone autopilota. Timone di rispetto: localizzare perno' },
+      { id: 'cop2', text: 'Ancora principale / Salpa ancora', note: 'Analisi visiva catena e campana. Magnetotermico, dimensione catena, grillo/giunto, sagolino, verricello elettrico e frizione manuale' },
+      { id: 'cop3', text: 'Esterno barca — opera morta', note: 'Tuga, pulpiti, battagliola, falchetta: botte, crepe, delaminazione, ruggine' },
+      { id: 'cop4', text: 'Opera viva', note: 'Prima occasione: bulbo, timone, elica' },
+      { id: 'cop5', text: 'Albero, boma, crocette, sartie, paterazzi', note: 'Rettilineità, ammaccature, piede d\'albero. Sartie: tensione bilanciata, arridatoi, crocette' },
+      { id: 'cop6', text: 'Genoa e Randa', note: 'Apertura/chiusura avvolgifiocco e avvolgiranda, usura, stecche, lazy bag e lazy jack' },
+      { id: 'cop7', text: 'Scotte e drizze', note: 'Lunghezza e usura' },
+      { id: 'cop8', text: 'Bozzelli, carrelli e stopper', note: 'Stato e usura' },
+      { id: 'cop9', text: 'Steriggi', note: 'Guarnizioni e maniglie di chiusura' },
+      { id: 'cop10', text: 'Winch e maniglie', note: 'Numero e stato (almeno 2 + 1 rispetto)' },
+      { id: 'cop11', text: 'Luci di navigazione', note: 'Via (rosso/verde prua, engine light albero, coronamento poppa). Deck light e testa d\'albero' },
+      { id: 'cop12', text: 'Cime e parabordi', note: 'Ormeggio: 1 da 50m, 2 da 20/25m, altre varie. Parabordi: minimo 6' },
+      { id: 'cop13', text: 'Dotazioni sicurezza coperta', note: 'Riflettore radar, salvagente anulare + cimino, boetta luminosa, pompa sentina manuale, estintore plancia' },
+      { id: 'cop14', text: 'Zattera di salvataggio', note: 'Posizione, n° passeggeri, data scadenza/revisione, stato generale, sagolino innesco libero' },
+      { id: 'cop15', text: 'Tender e fuoribordo', note: 'Stato, remi, cimino galleggiante. Motore: carburante, olio, elica, chiavetta, kill-cord' },
+      { id: 'cop16', text: 'Ancora di rispetto', note: 'Localizzazione, catena e cima' },
+      { id: 'cop17', text: 'Taniche e liquidi motore', note: 'Acqua, gasolio, mix fuoribordo, olio, liquido raffreddamento' },
+      { id: 'cop18', text: 'Strumenti navigazione pozzetto', note: 'Bussola, GPS, LOG, ecoscandaglio, indicatore vento, VHF, indicatori acqua e batterie' },
+      { id: 'cop19', text: 'Barra di rispetto', note: 'Localizzare perno asse timone, prova funzionamento' },
+      { id: 'cop20', text: 'Altre dotazioni', note: 'Ancora rispetto, bombola gas (principale + rispetto), cavo 220V, tubo acqua, tanica gasolio 20L, tanica fuoribordo, olio, lifeline, sassola, buiolo, spugna, ramazza' },
+    ]
+  },
+  {
+    icon: '🔧', title: 'Check-in Sotto Coperta — Motore',
+    items: [
+      { id: 'mot1', text: 'Batterie — analisi visiva', note: 'Pulite, asciutte, non ossidate. Test voltaggio con utenze staccate' },
+      { id: 'mot2', text: 'Batterie — test carica', note: 'Fine giornata: ripetere test. Voltaggio variato molto = problema batteria' },
+      { id: 'mot3', text: 'Motore — base', note: 'Accensione/spegnimento, marce, acceleratore, folle, effetto evolutivo' },
+      { id: 'mot4', text: 'Motore — analisi visiva', note: 'Pulizia, vernice intatta (soprattutto attorno iniettori)' },
+      { id: 'mot5', text: 'Motore — Water', note: 'Filtro acqua salata e livello liquido raffreddamento' },
+      { id: 'mot6', text: 'Motore — Oil', note: 'Livello e colore olio motore' },
+      { id: 'mot7', text: 'Motore — Belt', note: 'Stato e tensione cinghia di trasmissione' },
+      { id: 'mot8', text: 'Motore — Bilge', note: 'Pulizia della sentina' },
+      { id: 'mot9', text: 'Motore — Leaks', note: 'Corrosione, calcare o liquidi presenti?' },
+      { id: 'mot10', text: 'Motore — Exhaust', note: 'Fumi motore e scarico acqua regolari' },
+    ]
+  },
+  {
+    icon: '🆘', title: 'Sicurezza Sotto Coperta',
+    items: [
+      { id: 'sic1', text: 'Sentina', note: 'Acqua presente (dolce o salata?), perdite/falle, pompa elettrica manuale/automatica, filtro, pompa manuale esterna' },
+      { id: 'sic2', text: 'Giubbotti salvagente', note: 'N° (1 per imbarcato), localizzazione, stato, tipo (minimo 250N)' },
+      { id: 'sic3', text: 'Cinture di sicurezza', note: 'Localizzazione e numero (consigliate almeno 4)' },
+      { id: 'sic4', text: 'Estintori', note: 'Localizzazione, stato/validità, tipo, uso, numero (almeno 2 sotto: 1 carteggio, 1 sala macchine)' },
+      { id: 'sic5', text: 'Fuochi / boette / razzi', note: 'Localizzazione, scadenza, numero (almeno 2 per tipo vicino carteggio)' },
+      { id: 'sic6', text: 'Kit pronto soccorso', note: 'Cerotti, bende, laccio emostatico, disinfettante, antidolorifici, antibiotico' },
+      { id: 'sic7', text: 'Cassetta attrezzi e spare parts', note: 'Martello, cacciaviti, pinza, chiavi, seghetto, nastro isolante, tappi turafalle, cinghie, girante, filtri, olio' },
+      { id: 'sic8', text: 'EPIRB', note: 'Localizzazione e stato (obbligatorio oltre 50NM)' },
+    ]
+  },
+  {
+    icon: '⚡', title: 'Impianti e Strumenti',
+    items: [
+      { id: 'imp1', text: 'Quadro elettrico', note: 'Indicatori livelli carburante, acqua, batterie. Controllare tutti gli switch' },
+      { id: 'imp2', text: 'Strumenti elettronici', note: 'GPS con carte aggiornate, stazione meteo, AIS e radar (se presenti)' },
+      { id: 'imp3', text: 'VHF', note: 'Funzionamento, MMSI inserito, procedura MayDay DSC' },
+      { id: 'imp4', text: 'GPS', note: 'Impostazione dati e accuratezza posizione porto su carta nautica' },
+      { id: 'imp5', text: 'Bow thruster', note: 'Funzionamento e batterie dedicate (se presente)' },
+      { id: 'imp6', text: 'Scarichi / acque', note: 'Acque bianche, dolci, salate. Pressione autoclave. WC funzionanti' },
+      { id: 'imp7', text: 'Carena — primo bagno', note: 'Botte, graffi su opera viva, bulbo, timone, elica' },
+      { id: 'imp8', text: 'Tender sotto coperta', note: 'Stato, tenuta pressione, remi, motore' },
+    ]
+  },
+  {
+    icon: '�', title: 'Documenti di Bordo',
+    items: [
+      { id: 'doc1', text: 'Licenza di navigazione (Call Sign)', note: 'Abilita navigazione — no visto periodico' },
+      { id: 'doc2', text: 'Certificato di sicurezza', note: 'In corso di validità' },
+      { id: 'doc3', text: 'Dichiarazione di potenza / certificato motore', note: '' },
+      { id: 'doc4', text: 'Polizza assicurazione', note: 'Obbligatoria per tutti i motori, incluso tender' },
+      { id: 'doc5', text: 'Licenza esercizio RTF (MMSI)', note: '' },
+      { id: 'doc6', text: 'Certificato limitato RTF del comandante', note: '' },
+      { id: 'doc7', text: 'Patente nautica in corso di validità', note: 'Se motore > 40 cv' },
+      { id: 'doc8', text: 'Documenti identità equipaggio', note: 'Documento per ogni persona a bordo' },
+      { id: 'doc9', text: 'Documenti nautici obbligatori', note: 'Portolani, elenco fari, carte nautiche, Carta 1111, avvisi ai naviganti' },
+      { id: 'doc10', text: 'Manuale d\'uso imbarcazione', note: 'Consigliabile' },
+    ]
+  },
+];
 
-// Oceanis ha la stessa checklist del Lagoon (stessa tipologia di barca)
-CHECKLIST.oceanis.sections = CHECKLIST.lagoon.sections.map(s => ({
+const CHECKLIST = {
+  lagoon: { name: 'Lagoon 40', sections: SECTIONS_BASE },
+  oceanis: { name: 'Beneteau Oceanis 48', sections: [] }
+};
+CHECKLIST.oceanis.sections = SECTIONS_BASE.map(s => ({
   ...s,
   items: s.items.map(it => ({ ...it, id: 'o_' + it.id }))
 }));
