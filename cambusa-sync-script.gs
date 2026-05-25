@@ -133,7 +133,7 @@ function setupDotazioni(sheet) {
   [220, 80, 120, 140, 200].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
   sheet.getRange('A1:E1').setValues([['Articolo','Quantità','Unità','Categoria','Note']]).setFontWeight('bold').setBackground('#e8f0f7');
   sheet.setFrozenRows(1);
-  sheet.getRange('A2:E24').setValues([
+  sheet.getRange('A2:E25').setValues([
     ['Sale grosso',1,'kg','Cucina',''],
     ['Sale fino',1,'conf.','Cucina',''],
     ['Olio EVO',2,'bottiglie','Cucina',''],
