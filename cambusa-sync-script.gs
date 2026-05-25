@@ -249,7 +249,7 @@ function formatQty(qty, unita) {
 
 // ---- WEB APP (lato sito) -----------------------------------
 function doGet(e) {
-  const params = e.parameter || {};
+  const params = (e && e.parameter) ? e.parameter : {};
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const action = params.action || 'get';
 
