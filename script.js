@@ -591,15 +591,11 @@ window._showFormAgain = function(boat) {
   if (btn) { btn.innerHTML = '✏️ Modifica i miei dati'; btn.style.background = ''; btn.disabled = false; }
 };
 
-/* ── Admin: apre il tab Google Sheet della barca ── */
-const SHEET_TABS = {
-  lagoon:  'https://docs.google.com/spreadsheets/d/1D7RIkF7SQn9yuDwBPuNW_pxWUXmyTpxmUGRbNt3KcnU/edit?gid=1864408211#gid=1864408211',
-  oceanis: 'https://docs.google.com/spreadsheets/d/1D7RIkF7SQn9yuDwBPuNW_pxWUXmyTpxmUGRbNt3KcnU/edit?gid=286068343#gid=286068343',
-};
+/* ── Admin: genera PDF da Apps Script (crew list completa da Sheets) ── */
 function adminDownloadPDF(boat) {
   const pwd = prompt('Password amministratore:');
   if (pwd !== ADMIN_PASSWORDS[boat]) { alert('Password errata.'); return; }
-  const url = SHEET_TABS[boat] || SHEET_TABS.lagoon;
+  const url = SHEETS_URL + '?action=pdf&boat=' + boat;
   const a = document.createElement('a');
   a.href = url;
   a.target = '_blank';
