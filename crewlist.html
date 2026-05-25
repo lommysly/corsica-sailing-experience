@@ -87,6 +87,16 @@
 
         <!-- LAGOON panel -->
         <div class="crew-panel" id="crew-lagoon">
+          <div id="crewStatusPanel-lagoon" style="margin-bottom:28px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:20px 24px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+              <span style="font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.45);">✦ Equipaggio — stato compilazione</span>
+              <button onclick="loadCrewStatus('lagoon','crewStatusList-lagoon','crewStatusCount-lagoon')" style="background:none; border:none; color:rgba(255,255,255,.4); font-size:.75rem; cursor:pointer; padding:4px 8px;">↺ Aggiorna</button>
+            </div>
+            <div id="crewStatusList-lagoon" style="display:flex; flex-wrap:wrap; gap:10px;">
+              <span style="color:rgba(255,255,255,.3); font-size:.85rem;">Caricamento...</span>
+            </div>
+            <div id="crewStatusCount-lagoon" style="margin-top:14px; font-size:.78rem; color:rgba(255,255,255,.4);"></div>
+          </div>
           <div class="crew-members" id="members-lagoon"></div>
           <div class="save-status" id="saveStatus-lagoon" style="display:none; margin:12px 0; padding:12px 16px; background:rgba(28,167,168,.15); border:1px solid var(--turq); border-radius:10px; color:#fff; font-size:.9rem;"></div>
           <div class="crew-actions">
@@ -96,6 +106,16 @@
 
         <!-- OCEANIS panel -->
         <div class="crew-panel" id="crew-oceanis">
+          <div id="crewStatusPanel-oceanis" style="margin-bottom:28px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:20px 24px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+              <span style="font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.45);">✦ Equipaggio — stato compilazione</span>
+              <button onclick="loadCrewStatus('oceanis','crewStatusList-oceanis','crewStatusCount-oceanis')" style="background:none; border:none; color:rgba(255,255,255,.4); font-size:.75rem; cursor:pointer; padding:4px 8px;">↺ Aggiorna</button>
+            </div>
+            <div id="crewStatusList-oceanis" style="display:flex; flex-wrap:wrap; gap:10px;">
+              <span style="color:rgba(255,255,255,.3); font-size:.85rem;">Caricamento...</span>
+            </div>
+            <div id="crewStatusCount-oceanis" style="margin-top:14px; font-size:.78rem; color:rgba(255,255,255,.4);"></div>
+          </div>
           <div class="crew-members" id="members-oceanis"></div>
           <div class="save-status" id="saveStatus-oceanis" style="display:none; margin:12px 0; padding:12px 16px; background:rgba(28,167,168,.15); border:1px solid var(--turq); border-radius:10px; color:#fff; font-size:.9rem;"></div>
           <div class="crew-actions">

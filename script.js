@@ -179,6 +179,8 @@ function selectBoat(boat) {
       addMember(boat);
     }
   }
+  // carica dashboard stato equipaggio
+  loadCrewStatus(boat, 'crewStatusList-' + boat, 'crewStatusCount-' + boat);
   // scroll smooth al form
   formArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
