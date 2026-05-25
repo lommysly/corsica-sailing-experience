@@ -140,7 +140,7 @@ function calcolaSpesa() {
     .filter(([k]) => k.startsWith('persone_'))
     .reduce((s, [, v]) => s + (Number(v) || 0), 0);
 
-  const giorni = daysBetween(config['data_inizio'], config['data_fine']) + 1;
+  const giorni = daysBetween(config['data_inizio'], config['data_fine']);
   const acqua_pp_gg = Number(config['acqua_litri_per_persona_giorno']) || 1.5;
   const acqua_cucina_gg = Number(config['acqua_litri_per_giorno_cucina']) || 3;
 
