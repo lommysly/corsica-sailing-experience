@@ -503,7 +503,7 @@ async function saveMemberToSheets(boat) {
   const nomeCompleto = nome + ' ' + cognome;
   const data = {
     boat,
-    nome: nomeCompleto, nomeOnly: nome, cognome, sesso,
+    nome: nomeCompleto, sesso,
     nascita, luogo: comuneNascita + (get('provNascita') ? ' (' + get('provNascita') + ')' : ''),
     nazionalita: get('nazionalita'),
     residenza: [get('via'), get('citta'), get('prov')].filter(Boolean).join(', '),
