@@ -105,7 +105,7 @@
       .ci-header { padding: 0 0 16px !important; }
       .ci-header h1 { color: #0b3c5d !important; font-size: 1.8rem !important; }
       .ci-header p, .ci-header .label { color: #555 !important; }
-      .boat-select, .ci-actions, .ci-lock { display: none !important; }
+      .boat-select, .boat-tabs, .tab-nav, .sync-bar, .ci-actions, .ci-lock { display: none !important; }
       .ci-progress, .ci-progress-label { display: none !important; }
       .ci-section { border: 1px solid #c0cdd8 !important; background: #fff !important; margin-bottom: 12px !important; break-inside: avoid; }
       .ci-section-body { display: block !important; }
@@ -113,8 +113,10 @@
       .ci-section-header .title { color: #0b3c5d !important; }
       .ci-section-header .arrow { display: none; }
       .ci-item { border-bottom: 1px solid #eee !important; padding: 9px 16px !important; }
-      .ci-item label { color: #333 !important; font-size: .85rem !important; }
-      .ci-item.checked label { color: #aaa !important; }
+      .ci-item-label { color: #333 !important; font-size: .85rem !important; }
+      .ci-item.checked .ci-item-label { color: #888 !important; }
+      .hint { color: #666 !important; }
+      .ci-item-note { border: none !important; background: transparent !important; color: #333 !important; padding: 3px 0 !important; min-height: auto !important; }
       .ci-item input[type=checkbox] { accent-color: #1ca7a8; }
       .print-meta { display: block !important; }
     }
@@ -313,7 +315,7 @@
     <!-- TAB 6: Cassetta pronto soccorso -->
     <div class="tab-panel" id="tab-6">
       <div class="info-card">
-        <h3>� Cassetta Pronto Soccorso — Oltre 12 Miglia</h3>
+        <h3>💊 Cassetta Pronto Soccorso — Oltre 12 Miglia</h3>
         <p style="margin-bottom:12px;font-size:.8rem;color:rgba(255,255,255,.5)">D.M. 03/2022 in vigore dal 8/6/22 — Contenitore PVC arancio stagna e galleggiante</p>
         <ul>
           <li>1 medicinale per mal di mare</li>
@@ -484,7 +486,7 @@ const SECTIONS_BASE = [
     ]
   },
   {
-    icon: '�', title: 'Documenti di Bordo',
+    icon: '📄', title: 'Documenti di Bordo',
     items: [
       { id: 'doc1', text: 'Licenza di navigazione (Call Sign)', note: 'Abilita navigazione — no visto periodico' },
       { id: 'doc2', text: 'Certificato di sicurezza', note: 'In corso di validità' },
@@ -510,7 +512,7 @@ const BOATS = {
 // ── State ────────────────────────────────────────────
 let currentBoat = 'Lagoon40';
 let localState  = {};   // { [voceId]: { stato: bool, nota: string } }
-let saveTimer   = null;
+let saveTimers  = {};
 
 // ── Tab switching ────────────────────────────────────
 function switchTab(idx) {
@@ -550,23 +552,22 @@ function setSyncState(state, msg) {
 function loadFromSheets(boat) {
   setSyncState('loading', 'Caricamento da Google Sheets…');
   const cached = getCached(boat);
-  if (Object.keys(cached).length) {
-    localState = cached;
-    renderChecklist(boat);
-  }
+  localState = cached;
+  renderChecklist(boat);
   const cbName = '_ci_cb_' + Date.now();
   const timeout = setTimeout(() => {
     delete window[cbName];
     const old = document.getElementById('_ci_script');
     if (old) old.remove();
+    if (boat !== currentBoat) return;
     setSyncState('err', 'Timeout — dati locali in uso');
-    if (!Object.keys(localState).length) renderChecklist(boat);
   }, 8000);
   window[cbName] = function(res) {
     clearTimeout(timeout);
     delete window[cbName];
     const old = document.getElementById('_ci_script');
     if (old) old.remove();
+    if (boat !== currentBoat) return;
     if (res.ok) {
       localState = {};
       Object.keys(res.data).forEach(id => {
@@ -587,18 +588,19 @@ function loadFromSheets(boat) {
   s.onerror = () => {
     clearTimeout(timeout);
     delete window[cbName];
+    if (boat !== currentBoat) return;
     setSyncState('err', 'Offline — dati locali in uso');
-    if (!Object.keys(localState).length) renderChecklist(boat);
   };
 }
 
 // ── Save single item to Sheets via no-cors POST ──────
-function saveToSheets(voceId, stato, nota) {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
+function saveToSheets(boat, voceId, stato, nota) {
+  const timerKey = boat + ':' + voceId;
+  clearTimeout(saveTimers[timerKey]);
+  saveTimers[timerKey] = setTimeout(() => {
     setSyncState('loading', 'Salvataggio…');
     const params = new URLSearchParams();
-    params.append('boat', currentBoat);
+    params.append('boat', boat);
     params.append('voceId', voceId);
     params.append('stato', stato ? 'true' : 'false');
     params.append('nota', nota);
@@ -670,22 +672,24 @@ function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 // ── Toggle checkbox ───────────────────────────────────
 function onToggle(id, secId, checked) {
+  const boat = currentBoat;
   if (!localState[id]) localState[id] = { stato: false, nota: '' };
   localState[id].stato = checked;
-  setCached(currentBoat, localState);
+  setCached(boat, localState);
   const itemEl = document.getElementById('item-' + id);
   if (itemEl) itemEl.classList.toggle('checked', checked);
-  updateProgress(currentBoat);
+  updateProgress(boat);
   updateSecCount(secId);
-  saveToSheets(id, checked, localState[id].nota);
+  saveToSheets(boat, id, checked, localState[id].nota);
 }
 
 // ── Nota ──────────────────────────────────────────────
 function onNota(id, val) {
+  const boat = currentBoat;
   if (!localState[id]) localState[id] = { stato: false, nota: '' };
   localState[id].nota = val;
-  setCached(currentBoat, localState);
-  saveToSheets(id, localState[id].stato, val);
+  setCached(boat, localState);
+  saveToSheets(boat, id, localState[id].stato, val);
 }
 
 // ── Section helpers ───────────────────────────────────
