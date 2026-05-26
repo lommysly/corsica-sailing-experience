@@ -19,6 +19,7 @@ function onOpen() {
     .addItem('🛒 Calcola Spesa', 'calcolaSpesa')
     .addSeparator()
     .addItem('🔄 Riscrive Dotazioni (sovrascrive)', 'forzaDotazioni')
+    .addItem('🍝 Riscrive Ricette (sovrascrive)', 'forzaRicette')
     .addToUi();
 }
 
@@ -48,7 +49,7 @@ function setupConfig(sheet) {
   sheet.clearContents();
   sheet.setColumnWidth(1, 240); sheet.setColumnWidth(2, 160);
   sheet.getRange('A1:B1').setValues([['chiave','valore']]).setFontWeight('bold');
-  sheet.getRange('A2:B8').setValues([
+  sheet.getRange('A2:B9').setValues([
     ['persone', 10],
     ['data_inizio', '29/05/2026'],
     ['data_fine', '02/06/2026'],
@@ -56,6 +57,7 @@ function setupConfig(sheet) {
     ['check_out_ora', '17:00'],
     ['acqua_litri_per_persona_giorno', 1.5],
     ['acqua_litri_per_giorno_cucina', 3],
+    ['acqua_litri_per_giorno_caffe', 1.5],
   ]);
 }
 
@@ -104,29 +106,73 @@ function setupMenu(sheet, ss) {
   }
 }
 
+var RICETTE_LIST = [
+  // Colazione a bordo
+  ['Colazione a bordo','Latte LC',200,'ml','Colazione'],
+  ['Colazione a bordo','Caffè',10,'g','Colazione'],
+  ['Colazione a bordo','Biscotti',40,'g','Colazione'],
+  ['Colazione a bordo','Brioche/merendine',1,'pz','Colazione'],
+  // Linguine tonno, limone, olive e pomodorini
+  ['Linguine tonno e limone','Linguine',120,'g','Pasta/Cereali'],
+  ['Linguine tonno e limone','Tonno',65,'g','Scatolame'],
+  ['Linguine tonno e limone','Pomodorini',80,'g','Verdure'],
+  ['Linguine tonno e limone','Olive Taggiasche',20,'g','Scatolame'],
+  ['Linguine tonno e limone','Limone',0.25,'pz','Frutta'],
+  ['Linguine tonno e limone','Aglio',0.1,'testa','Cucina'],
+  ['Linguine tonno e limone','Olio',20,'ml','Cucina'],
+  // Zucchine al sapore di cozza
+  ['Zucchine al sapore di cozza','Zucchine',150,'g','Verdure'],
+  ['Zucchine al sapore di cozza','Limone',0.25,'pz','Frutta'],
+  ['Zucchine al sapore di cozza','Pepe nero',2,'g','Cucina'],
+  ['Zucchine al sapore di cozza','Aglio',0.1,'testa','Cucina'],
+  ['Zucchine al sapore di cozza','Olio',15,'ml','Cucina'],
+  // Risotto allo zafferano
+  ['Risotto allo zafferano','Risotto',100,'g','Pasta/Cereali'],
+  ['Risotto allo zafferano','Zafferano',0.1,'bustina','Varie'],
+  ['Risotto allo zafferano','Grana',20,'g','Freschi'],
+  ['Risotto allo zafferano','Vino bianco',30,'ml','Bevande'],
+  ['Risotto allo zafferano','Olio',15,'ml','Cucina'],
+  ['Risotto allo zafferano','Basilico',3,'g','Varie'],
+  // Frittata alle erbe
+  ['Frittata alle erbe','Uova',2,'pz','Freschi'],
+  ['Frittata alle erbe','Menta/erbe',5,'g','Varie'],
+  ['Frittata alle erbe','Olio',10,'ml','Cucina'],
+  // Pasta fredda
+  ['Pasta fredda','Pasta fredda',100,'g','Pasta/Cereali'],
+  ['Pasta fredda','Tonno',40,'g','Scatolame'],
+  ['Pasta fredda','Mais',30,'g','Scatolame'],
+  ['Pasta fredda','Piselli',20,'g','Scatolame'],
+  // Insalata di riso
+  ['Insalata di riso','Riso insalata',100,'g','Pasta/Cereali'],
+  ['Insalata di riso','Condiriso',10,'g','Scatolame'],
+  ['Insalata di riso','Mais',30,'g','Scatolame'],
+  ['Insalata di riso','Piselli',20,'g','Scatolame'],
+  // Caprese
+  ['Caprese','Mozzarella',125,'g','Freschi'],
+  ['Caprese','Pomodorini',80,'g','Verdure'],
+  ['Caprese','Basilico',3,'g','Varie'],
+  ['Caprese','Olio',15,'ml','Cucina'],
+];
+
 function setupRicette(sheet) {
   if (sheet.getLastRow() > 1) return;
+  _scriviRicette(sheet);
+}
+
+function forzaRicette() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('ricette');
+  if (!sheet) { SpreadsheetApp.getUi().alert('Tab "ricette" non trovato. Esegui prima il Setup.'); return; }
+  _scriviRicette(sheet);
+  SpreadsheetApp.getUi().alert('✅ Ricette riscritte — ' + RICETTE_LIST.length + ' righe · ' + 7 + ' piatti.');
+}
+
+function _scriviRicette(sheet) {
   sheet.clearContents();
-  [200, 200, 80, 80, 140].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+  [200, 200, 80, 80, 140].forEach(function(w, i) { sheet.setColumnWidth(i + 1, w); });
   sheet.getRange('A1:E1').setValues([['Piatto','Ingrediente','Qtà/persona','Unità','Categoria']]).setFontWeight('bold').setBackground('#e8f0f7');
   sheet.setFrozenRows(1);
-  sheet.getRange('A2:E16').setValues([
-    ['Pasta al pesto','Pasta',100,'g','Pasta/Cereali'],
-    ['Pasta al pesto','Pesto',60,'g','Scatolame'],
-    ['Pasta al pesto','Grana',20,'g','Freschi'],
-    ['Colazione continentale','Latte',200,'ml','Freschi'],
-    ['Colazione continentale','Caffè',10,'g','Bevande'],
-    ['Colazione continentale','Biscotti',50,'g','Varie'],
-    ['Colazione continentale','Brioche',1,'pz','Varie'],
-    ['Insalata di tonno','Tonno',80,'g','Scatolame'],
-    ['Insalata di tonno','Pomodorini',100,'g','Verdure'],
-    ['Insalata di tonno','Rucola',30,'g','Verdure'],
-    ['Insalata di tonno','Mais',40,'g','Scatolame'],
-    ['Grigliate miste','Pollo/manzo',250,'g','Carne/Pesce'],
-    ['Grigliate miste','Zucchine',100,'g','Verdure'],
-    ['Grigliate miste','Patate',150,'g','Verdure'],
-    ['','','','',''],
-  ]);
+  sheet.getRange(2, 1, RICETTE_LIST.length, 5).setValues(RICETTE_LIST);
 }
 
 var DOTAZIONI_LIST = [
@@ -136,6 +182,7 @@ var DOTAZIONI_LIST = [
   ['Olio',                1,    'bottiglia',  'Cucina',        ''],
   ['Zucchero',            1,    'busta',      'Cucina',        ''],
   ['Aglio',               1,    'testa',      'Cucina',        ''],
+  ['Pepe nero',           1,    'conf.',      'Cucina',        'macinato'],
   // VERDURE
   ['Rucola/insalata mista',4,   'buste',      'Verdure',       ''],
   ['Pomodorini',           2,   'conf.',      'Verdure',       ''],
@@ -170,6 +217,7 @@ var DOTAZIONI_LIST = [
   ['Prosecco',             4,   'bottiglie',  'Bevande',       ''],
   ['Gin',                  1,   'bottiglia',  'Bevande',       'q.b.'],
   ['Tonica',               1,   'conf.',      'Bevande',       'q.b.'],
+  ['Ghiaccio',            10,   'kg',         'Bevande',       'Platonica o simile'],
   // AFFETTATI
   ['Prosciutto crudo',     3,   'etti',       'Affettati',     ''],
   ['Bresaola',             2,   'etti',       'Affettati',     ''],
@@ -208,6 +256,7 @@ var DOTAZIONI_LIST = [
   ['Carta argento',        1,   'rotolo',     'Pulizie',       ''],
   ['Bicchieri plastica',  80,   'pz',         'Pulizie',       ''],
   ['Piatti plastica',    100,   'pz',         'Pulizie',       ''],
+  ['Tovaglioli carta',     3,   'conf.',      'Pulizie',       ''],
 ];
 
 function setupDotazioni(sheet) {
@@ -246,6 +295,7 @@ function calcolaSpesa() {
   const giorni = daysBetween(config['data_inizio'], config['data_fine']);
   const acqua_pp   = Number(config['acqua_litri_per_persona_giorno']) || 1.5;
   const acqua_cuc  = Number(config['acqua_litri_per_giorno_cucina']) || 3;
+  const acqua_caf  = Number(config['acqua_litri_per_giorno_caffe'])  || 1.5;
 
   if (n_persone === 0) {
     SpreadsheetApp.getUi().alert('⚠️ Imposta "persone" nel tab config prima di calcolare.');
@@ -271,7 +321,7 @@ function calcolaSpesa() {
   // Acqua automatica
   ing['Acqua__litri'] = {
     nome: 'Acqua', categoria: 'Bevande', unita: 'litri',
-    qty: acqua_pp * n_persone * giorni + acqua_cuc * giorni
+    qty: acqua_pp * n_persone * giorni + acqua_cuc * giorni + acqua_caf * giorni
   };
 
   // Ordine categorie
