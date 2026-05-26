@@ -50,7 +50,7 @@ function setupConfig(sheet) {
   sheet.setColumnWidth(1, 240); sheet.setColumnWidth(2, 160);
   sheet.getRange('A1:B1').setValues([['chiave','valore']]).setFontWeight('bold');
   sheet.getRange('A2:B9').setValues([
-    ['persone', 10],
+    ['persone', 12],
     ['data_inizio', '29/05/2026'],
     ['data_fine', '02/06/2026'],
     ['check_in_ora', '17:00'],
@@ -209,15 +209,19 @@ var DOTAZIONI_LIST = [
   ['Pan Bauletto',         2,   'pz',         'Pasta/Cereali', ''],
   ['Grissini',             3,   'pz',         'Pasta/Cereali', ''],
   // BEVANDE
-  ['Acqua',               10,   'cartoni',    'Bevande',       ''],
-  ['Coca/bibite',          1,   'conf.',      'Bevande',       'q.b.'],
+  ['Acqua',               12,   'cartoni',    'Bevande',       ''],
+  ['Coca-Cola',            2,   'conf.',      'Bevande',       '24 lattine'],
+  ['Coca-Cola Zero',       2,   'conf.',      'Bevande',       '24 lattine'],
   ['Succo di frutta',      3,   'brick',      'Bevande',       ''],
-  ['Birra',               40,   'lattine',    'Bevande',       'Corona'],
+  ['Birra',               48,   'lattine',    'Bevande',       'Corona'],
   ['Vino bianco',          5,   'bottiglie',  'Bevande',       ''],
-  ['Prosecco',             4,   'bottiglie',  'Bevande',       ''],
-  ['Gin',                  1,   'bottiglia',  'Bevande',       'q.b.'],
-  ['Tonica',               1,   'conf.',      'Bevande',       'q.b.'],
-  ['Ghiaccio',            10,   'kg',         'Bevande',       'Platonica o simile'],
+  ['Prosecco',             6,   'bottiglie',  'Bevande',       'qualità — per gli spritz'],
+  ['Aperol',               2,   'bottiglie',  'Bevande',       'per Aperol Spritz'],
+  ['Campari',              1,   'bottiglia',  'Bevande',       'per Campari Spritz'],
+  ['Gin',                  2,   'bottiglie',  'Bevande',       'per gin tonic'],
+  ['Vodka',                1,   'bottiglia',  'Bevande',       'per vodka tonic'],
+  ['Tonica',               3,   'conf.',      'Bevande',       'gin tonic + vodka tonic'],
+  ['Ghiaccio',            15,   'kg',         'Bevande',       'Platonica o simile'],
   // AFFETTATI
   ['Prosciutto crudo',     3,   'etti',       'Affettati',     ''],
   ['Bresaola',             2,   'etti',       'Affettati',     ''],
