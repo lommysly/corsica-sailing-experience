@@ -17,6 +17,8 @@ function onOpen() {
     .addItem('⚙️ Setup (prima volta)', 'setup')
     .addSeparator()
     .addItem('🛒 Calcola Spesa', 'calcolaSpesa')
+    .addSeparator()
+    .addItem('🔄 Riscrive Dotazioni (sovrascrive)', 'forzaDotazioni')
     .addToUi();
 }
 
@@ -127,38 +129,106 @@ function setupRicette(sheet) {
   ]);
 }
 
+var DOTAZIONI_LIST = [
+  // BASE — Cucina
+  ['Sale grosso',         1,    'kg',        'Cucina',        ''],
+  ['Sale fino',           1,    'conf.',      'Cucina',        ''],
+  ['Olio',                1,    'bottiglia',  'Cucina',        ''],
+  ['Zucchero',            1,    'busta',      'Cucina',        ''],
+  ['Aglio',               1,    'testa',      'Cucina',        ''],
+  // VERDURE
+  ['Rucola/insalata mista',4,   'buste',      'Verdure',       ''],
+  ['Pomodorini',           2,   'conf.',      'Verdure',       ''],
+  ['Zucchine',             4,   'pz',         'Verdure',       ''],
+  ['Cetrioli',             4,   'pz',         'Verdure',       ''],
+  ['Avocado',              7,   'pz',         'Verdure',       ''],
+  // FRUTTA
+  ['Pesche',              10,   'pz',         'Frutta',        ''],
+  ['Mele/banane',         10,   'pz',         'Frutta',        ''],
+  ['Uva',                  2,   'grappoli',   'Frutta',        ''],
+  ['Arance',               1,   'conf.',      'Frutta',        'q.b.'],
+  ['Melone',               2,   'pz',         'Frutta',        ''],
+  ['Limoni',               4,   'pz',         'Frutta',        ''],
+  // COLAZIONE
+  ['Latte LC',             2,   'litri',      'Colazione',     ''],
+  ['Caffè',                1,   'conf.',      'Colazione',     ''],
+  ['Biscotti',             2,   'pacchi',     'Colazione',     ''],
+  ['Brioche/merendine',    2,   'pacchi',     'Colazione',     ''],
+  // PASTA/CEREALI
+  ['Pasta fredda',        1.5,  'kg',         'Pasta/Cereali', ''],
+  ['Linguine',            1.5,  'kg',         'Pasta/Cereali', ''],
+  ['Risotto',             1.5,  'kg',         'Pasta/Cereali', ''],
+  ['Riso insalata',       1.5,  'kg',         'Pasta/Cereali', ''],
+  ['Pan Bauletto',         2,   'pz',         'Pasta/Cereali', ''],
+  ['Grissini',             3,   'pz',         'Pasta/Cereali', ''],
+  // BEVANDE
+  ['Acqua',               10,   'cartoni',    'Bevande',       ''],
+  ['Coca/bibite',          1,   'conf.',      'Bevande',       'q.b.'],
+  ['Succo di frutta',      3,   'brick',      'Bevande',       ''],
+  ['Birra',               40,   'lattine',    'Bevande',       'Corona'],
+  ['Vino bianco',          5,   'bottiglie',  'Bevande',       ''],
+  ['Prosecco',             4,   'bottiglie',  'Bevande',       ''],
+  ['Gin',                  1,   'bottiglia',  'Bevande',       'q.b.'],
+  ['Tonica',               1,   'conf.',      'Bevande',       'q.b.'],
+  // AFFETTATI
+  ['Prosciutto crudo',     3,   'etti',       'Affettati',     ''],
+  ['Bresaola',             2,   'etti',       'Affettati',     ''],
+  ['Salame',               3,   'buste',      'Affettati',     ''],
+  ['Salamino',             1,   'pz',         'Affettati',     ''],
+  ['Mortadella',           3,   'etti',       'Affettati',     ''],
+  // FRESCHI
+  ['Formaggi misti',       1,   'conf.',      'Freschi',       'q.b.'],
+  ['Grana',                1,   'busta',      'Freschi',       ''],
+  ['Mozzarella',          12,   'pz',         'Freschi',       ''],
+  ['Mozzarella ciliegini', 3,   'buste',      'Freschi',       ''],
+  ['Uova',                25,   'pz',         'Freschi',       ''],
+  // VARIE
+  ['Taralli',              3,   'pacchi',     'Varie',         ''],
+  ['Patatine',             5,   'conf.',      'Varie',         ''],
+  ['Crostini',             2,   'conf.',      'Varie',         ''],
+  ['Salatini freschi',     1,   'conf.',      'Varie',         ''],
+  ['Zafferano',            1,   'bustine',    'Varie',         'per risotto'],
+  ['Menta/erbe',           1,   'mazzetto',   'Varie',         'per frittata'],
+  ['Basilico',             1,   'mazzetto',   'Varie',         'per risotto'],
+  // SCATOLAME
+  ['Tonno',               10,   'scatole',    'Scatolame',     ''],
+  ['Mais',                 3,   'conf.',      'Scatolame',     ''],
+  ['Piselli',              2,   'conf.',      'Scatolame',     ''],
+  ['Condiriso',            1,   'conf.',      'Scatolame',     ''],
+  ['Olive',                4,   'barattoli',  'Scatolame',     ''],
+  // PULIZIE
+  ['Bio per piatti',       1,   'conf.',      'Pulizie',       ''],
+  ['Sgrassatore',          1,   'spray',      'Pulizie',       ''],
+  ['Scottex/rotoloni',     1,   'rotolone',   'Pulizie',       ''],
+  ['Carta igienica',      10,   'rotoli',     'Pulizie',       ''],
+  ['Spugnette',            1,   'conf.',      'Pulizie',       ''],
+  ['Stracci/strofinacci',  1,   'conf.',      'Pulizie',       ''],
+  ['Sacchetti piccoli',   10,   'pz',         'Pulizie',       ''],
+  ['Sacchetti grandi neri',10,  'pz',         'Pulizie',       ''],
+  ['Carta argento',        1,   'rotolo',     'Pulizie',       ''],
+  ['Bicchieri plastica',  80,   'pz',         'Pulizie',       ''],
+  ['Piatti plastica',    100,   'pz',         'Pulizie',       ''],
+];
+
 function setupDotazioni(sheet) {
   if (sheet.getLastRow() > 1) return;
+  _scriviDotazioni(sheet);
+}
+
+function forzaDotazioni() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('dotazioni');
+  if (!sheet) { SpreadsheetApp.getUi().alert('Tab "dotazioni" non trovato. Esegui prima il Setup.'); return; }
+  _scriviDotazioni(sheet);
+  SpreadsheetApp.getUi().alert('✅ Dotazioni riscritte — ' + DOTAZIONI_LIST.length + ' articoli.');
+}
+
+function _scriviDotazioni(sheet) {
   sheet.clearContents();
-  [220, 80, 120, 140, 200].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+  [220, 80, 120, 140, 200].forEach(function(w, i) { sheet.setColumnWidth(i + 1, w); });
   sheet.getRange('A1:E1').setValues([['Articolo','Quantità','Unità','Categoria','Note']]).setFontWeight('bold').setBackground('#e8f0f7');
   sheet.setFrozenRows(1);
-  sheet.getRange('A2:E25').setValues([
-    ['Sale grosso',1,'kg','Cucina',''],
-    ['Sale fino',1,'conf.','Cucina',''],
-    ['Olio EVO',2,'bottiglie','Cucina',''],
-    ['Pepe nero',1,'conf.','Cucina',''],
-    ['Limoni',8,'pz','Cucina',''],
-    ['Aglio',2,'teste','Cucina',''],
-    ['Carta argento',2,'rotoli','Cucina',''],
-    ['Sacchetti piccoli',30,'pz','Cucina',''],
-    ['Sacchetti grandi neri',20,'pz','Cucina',''],
-    ['Bio per piatti',2,'conf.','Pulizie',''],
-    ['Sgrassatore',1,'spray','Pulizie',''],
-    ['Scottex / rotoloni',4,'rotoloni','Pulizie',''],
-    ['Carta igienica',12,'rotoli','Pulizie',''],
-    ['Spugnette',2,'conf.','Pulizie',''],
-    ['Tovaglioli carta',3,'conf.','Pulizie',''],
-    ['Birra',40,'lattine','Bevande','Corona/Peroni'],
-    ['Vino bianco',6,'bottiglie','Bevande',''],
-    ['Prosecco',4,'bottiglie','Bevande','aperitivo'],
-    ['Gin',2,'bottiglie','Bevande',''],
-    ['Tonica',12,'lattine','Bevande','Fever-Tree'],
-    ['Ghiaccio',10,'kg','Bevande','Platonica o simile'],
-    ['Succo di frutta',6,'brick','Bevande',''],
-    ['Coca / bibite',12,'lattine','Bevande',''],
-    ['','','','',''],
-  ]);
+  sheet.getRange(2, 1, DOTAZIONI_LIST.length, 5).setValues(DOTAZIONI_LIST);
 }
 
 // ---- CALCOLA SPESA ----------------------------------------
