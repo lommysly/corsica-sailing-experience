@@ -432,9 +432,45 @@ function doGet(e) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const action = params.action || 'get';
   if (action === 'getList') return getListAction(ss, params.callback);
+  if (action === 'getMenu') return getMenuAction(ss, params.callback);
   if (action === 'set')     return setAction(ss, params.id, params.val, params.callback);
   if (action === 'reset')   return resetAction(ss, params.callback);
   return getStateAction(ss, params.callback);
+}
+
+function getMenuAction(ss, callback) {
+  const config  = leggiConfig(ss.getSheetByName('config'));
+  const menuRaw = leggiMenuRaw(ss.getSheetByName('menu'));
+  const ricette = leggiRicette(ss.getSheetByName('ricette'));
+  const n_persone = Number(config['persone']) || 10;
+
+  const ricMap = {};
+  ricette.forEach(function(r) {
+    if (!ricMap[r.piatto]) ricMap[r.piatto] = [];
+    ricMap[r.piatto].push(r);
+  });
+
+  const giorni = menuRaw.map(function(row) {
+    const pasti = [];
+    [['Colazione', row.colazione], ['Pranzo', row.pranzo], ['Cena', row.cena]].forEach(function(pair) {
+      const pasto = pair[0], piatto = String(pair[1] || '').trim();
+      if (!piatto || piatto === '—') return;
+      const ings = (ricMap[piatto] || []).map(function(r) {
+        return { nome: r.ingrediente, qty: formatQty(r.qta_per_persona * n_persone, r.unita) };
+      });
+      pasti.push({ pasto: pasto, piatto: piatto, ingredienti: ings });
+    });
+    return { data: String(row.data), giorno: String(row.giorno), nota: String(row.nota || ''), pasti: pasti };
+  }).filter(function(g) { return g.pasti.length > 0; });
+
+  return jsonpResponse(callback, { n_persone: n_persone, giorni: giorni });
+}
+
+function leggiMenuRaw(sheet) {
+  if (!sheet || sheet.getLastRow() < 2) return [];
+  return sheet.getDataRange().getValues().slice(1).map(function(r) {
+    return { data: r[0], giorno: r[1], colazione: r[2] || '', pranzo: r[3] || '', cena: r[4] || '', nota: r[5] || '' };
+  });
 }
 
 function getListAction(ss, callback) {
