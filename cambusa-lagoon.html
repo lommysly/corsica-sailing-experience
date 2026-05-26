@@ -137,6 +137,7 @@
         </div>
         <div id="kbSyncStatus" class="kb-sync local">💾 Locale</div>
         <div class="kb-actions">
+          <a id="btnFoglio" href="#" target="_blank" rel="noopener" class="kb-action secondary" style="display:none;text-decoration:none">📋 Foglio</a>
           <button class="kb-action secondary" onclick="resetCambusa()">↺ Azzera</button>
           <button class="kb-action" onclick="window.print()">🖨️ Stampa</button>
         </div>
@@ -182,6 +183,22 @@ function unlockCambusa() {
   document.getElementById('kbContent').style.display='block';
   loadMenu();
   loadSpesa();
+  loadSheetUrl();
+}
+
+function loadSheetUrl() {
+  const cb = 'cbUrl_' + Date.now();
+  window[cb] = function(data) {
+    delete window[cb];
+    if (data && data.url) {
+      const btn = document.getElementById('btnFoglio');
+      if (btn) { btn.href = data.url; btn.style.display = 'inline-flex'; }
+    }
+  };
+  const s = document.createElement('script');
+  s.src = SHEETS_URL + '?action=getSheetUrl&callback=' + cb;
+  s.onerror = () => { delete window[cb]; };
+  document.head.appendChild(s);
 }
 
 /* ---- MENU ---- */

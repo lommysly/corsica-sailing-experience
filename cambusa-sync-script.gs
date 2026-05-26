@@ -20,6 +20,8 @@ function onOpen() {
     .addSeparator()
     .addItem('🔄 Riscrive Dotazioni (sovrascrive)', 'forzaDotazioni')
     .addItem('🍝 Riscrive Ricette (sovrascrive)', 'forzaRicette')
+    .addSeparator()
+    .addItem('🛡️ Proteggi Fogli (una volta)', 'proteggiAltriSheet')
     .addToUi();
 }
 
@@ -210,12 +212,12 @@ var DOTAZIONI_LIST = [
   ['Grissini',             3,   'pz',         'Pasta/Cereali', ''],
   // BEVANDE
   ['Acqua',               12,   'cartoni',    'Bevande',       ''],
-  ['Coca-Cola',            2,   'conf.',      'Bevande',       '24 lattine'],
+  ['Coca-Cola',            1,   'conf.',      'Bevande',       '24 lattine'],
   ['Coca-Cola Zero',       2,   'conf.',      'Bevande',       '24 lattine'],
   ['Succo di frutta',      3,   'brick',      'Bevande',       ''],
   ['Birra',               48,   'lattine',    'Bevande',       'Corona'],
-  ['Vino bianco',          5,   'bottiglie',  'Bevande',       ''],
-  ['Prosecco',             6,   'bottiglie',  'Bevande',       'qualità — per gli spritz'],
+  ['Vino bianco',          1,   'cassa',      'Bevande',       '6 bottiglie'],
+  ['Prosecco',             2,   'casse',      'Bevande',       '12 bottiglie · qualità'],
   ['Aperol',               2,   'bottiglie',  'Bevande',       'per Aperol Spritz'],
   ['Campari',              1,   'bottiglia',  'Bevande',       'per Campari Spritz'],
   ['Gin',                  2,   'bottiglie',  'Bevande',       'per gin tonic'],
@@ -351,13 +353,15 @@ function calcolaSpesa() {
   if (rows.length > 0) spesaSheet.getRange(2, 1, rows.length, 6).setValues(rows);
 
   sincronizzaCambusa(ss, rows.map(r => r[0]));
+  generaRiepilogo(ss, rows);
 
   SpreadsheetApp.getUi().alert(
     '✅ Spesa calcolata!\n\n' +
     '👥 ' + n_persone + ' persone · 📅 ' + giorni + ' giorni\n' +
     '☕ ' + n_col + ' colazioni · 🥗 ' + n_pran + ' pranzi · 🍝 ' + n_cen + ' cene\n' +
     '📦 ' + rows.length + ' articoli in lista\n\n' +
-    'La cambusa.html si aggiorna al prossimo accesso.'
+    '📋 Tab "riepilogo" aggiornato — condividilo con il link del foglio.\n' +
+    '🌐 La cambusa.html si aggiorna al prossimo accesso.'
   );
 }
 
@@ -435,10 +439,11 @@ function doGet(e) {
   const params = (e && e.parameter) ? e.parameter : {};
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const action = params.action || 'get';
-  if (action === 'getList') return getListAction(ss, params.callback);
-  if (action === 'getMenu') return getMenuAction(ss, params.callback);
-  if (action === 'set')     return setAction(ss, params.id, params.val, params.callback);
-  if (action === 'reset')   return resetAction(ss, params.callback);
+  if (action === 'getList')     return getListAction(ss, params.callback);
+  if (action === 'getMenu')     return getMenuAction(ss, params.callback);
+  if (action === 'getSheetUrl') return getSheetUrlAction(ss, params.callback);
+  if (action === 'set')         return setAction(ss, params.id, params.val, params.callback);
+  if (action === 'reset')       return resetAction(ss, params.callback);
   return getStateAction(ss, params.callback);
 }
 
@@ -528,4 +533,96 @@ function jsonpResponse(callback, data) {
   const json = JSON.stringify(data);
   const body = callback ? callback + '(' + json + ')' : json;
   return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+function getSheetUrlAction(ss, callback) {
+  return jsonpResponse(callback, { url: ss.getUrl() });
+}
+
+// ---- RIEPILOGO CONDIVISIBILE -----------------------------------
+function generaRiepilogo(ss, rows) {
+  const rSheet = ss.getSheetByName('riepilogo') || ss.insertSheet('riepilogo');
+  rSheet.clearContents();
+  rSheet.clearFormats();
+
+  const config  = leggiConfig(ss.getSheetByName('config'));
+  const persone = config['persone'] || 10;
+  const giorni  = daysBetween(config['data_inizio'], config['data_fine']);
+  const dataStr = Utilities.formatDate(new Date(), 'Europe/Rome', 'dd/MM/yyyy HH:mm');
+
+  [280, 130, 100, 80].forEach(function(w, i) { rSheet.setColumnWidth(i + 1, w); });
+
+  // Titolo
+  rSheet.getRange('A1:D1').merge()
+    .setValue('LISTA SPESA — CORSICA EXPERIENCE  ·  29 Mag–2 Giu 2026  ·  ' + persone + ' persone · ' + giorni + ' giorni')
+    .setFontSize(12).setFontWeight('bold').setBackground('#0b3c5d').setFontColor('#fff').setVerticalAlignment('middle');
+  rSheet.setRowHeight(1, 40);
+
+  // Info generazione
+  rSheet.getRange('A2:D2').merge()
+    .setValue('Generata il ' + dataStr + '  —  Per modifiche contatta l\'organizzatore')
+    .setFontSize(8).setFontColor('#777').setBackground('#f4f8fc').setVerticalAlignment('middle');
+
+  // Header tabella
+  rSheet.getRange('A3:D3').setValues([['Articolo', 'Quantità', 'Tipo', '✓ OK']])
+    .setFontWeight('bold').setBackground('#1a5276').setFontColor('#fff').setFontSize(9);
+  rSheet.setFrozenRows(3);
+
+  const CAT_EMOJI = {
+    'Cucina':'🧂','Verdure':'🥬','Frutta':'🍎','Pasta/Cereali':'🍝','Carne/Pesce':'🥩',
+    'Freschi':'🧀','Affettati':'🥩','Scatolame':'🥫','Colazione':'☕','Varie':'🧺',
+    'Bevande':'🥤','Pulizie':'🧽','Dotazioni':'⚓'
+  };
+
+  const catMap = {}, catOrder = [];
+  rows.forEach(function(r) {
+    const cat = r[4];
+    if (!catMap[cat]) { catMap[cat] = []; catOrder.push(cat); }
+    catMap[cat].push(r);
+  });
+
+  let rowIdx = 4;
+  catOrder.forEach(function(cat) {
+    rSheet.getRange(rowIdx, 1, 1, 4).merge()
+      .setValue((CAT_EMOJI[cat] || '📦') + '  ' + cat.toUpperCase())
+      .setFontWeight('bold').setFontSize(9).setBackground('#d6e4f0').setFontColor('#0b3c5d');
+    rowIdx++;
+
+    catMap[cat].forEach(function(r, idx) {
+      const bg = idx % 2 === 0 ? '#ffffff' : '#f7fafd';
+      rSheet.getRange(rowIdx, 1).setValue(r[1]).setBackground(bg).setFontSize(9);
+      rSheet.getRange(rowIdx, 2).setValue(r[2]).setBackground(bg).setFontSize(9).setFontWeight('bold').setFontColor('#0b3c5d');
+      rSheet.getRange(rowIdx, 3).setValue(r[5]).setBackground(bg).setFontSize(8).setFontColor('#aaa');
+      rSheet.getRange(rowIdx, 4).insertCheckboxes().setBackground(bg);
+      rowIdx++;
+    });
+  });
+
+  // Footer
+  rSheet.getRange(rowIdx, 1, 1, 3).merge()
+    .setValue('Totale: ' + rows.length + ' articoli')
+    .setFontWeight('bold').setFontSize(9).setBackground('#e8f0f7').setFontColor('#0b3c5d');
+  rSheet.getRange(rowIdx, 4).setBackground('#e8f0f7');
+}
+
+// ---- PROTEZIONE FOGLI -----------------------------------------
+function proteggiAltriSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const daProteggere = ['config', 'menu', 'ricette', 'dotazioni', 'spesa', 'cambusa'];
+  let count = 0;
+  daProteggere.forEach(function(name) {
+    const sheet = ss.getSheetByName(name);
+    if (!sheet) return;
+    sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET).forEach(function(p) { p.remove(); });
+    sheet.protect()
+      .setDescription('Tab gestita dallo script — non modificare manualmente')
+      .setWarningOnly(true);
+    count++;
+  });
+  SpreadsheetApp.getUi().alert(
+    '✅ Protezione applicata a ' + count + ' tab\n\n' +
+    'Chi apre config/menu/ricette/dotazioni/spesa/cambusa\n' +
+    'vedrà un avviso prima di poter modificare.\n\n' +
+    'Il tab "riepilogo" è libero — condividilo con il link del foglio.'
+  );
 }
