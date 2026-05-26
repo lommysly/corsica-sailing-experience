@@ -70,6 +70,9 @@
     .ing-pill { font-size: .73rem; padding: 3px 9px; border-radius: 7px; background: rgba(255,255,255,.06); color: rgba(255,255,255,.58); border: 1px solid rgba(255,255,255,.09); }
     .ing-pill strong { color: var(--turq-light); margin-right: 3px; }
     .menu-empty { text-align: center; padding: 60px 20px; color: rgba(255,255,255,.42); line-height: 1.9; }
+    .kb-sheet-banner { text-align: center; margin-bottom: 28px; }
+    .kb-sheet-banner a { display: inline-flex; align-items: center; gap: 9px; padding: 11px 22px; border-radius: 14px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.13); color: rgba(255,255,255,.68); text-decoration: none; font-size: .86rem; transition: background .2s, border-color .2s, color .2s; }
+    .kb-sheet-banner a:hover { background: rgba(255,255,255,.11); border-color: var(--turq); color: #fff; }
 
     @media (max-width: 820px) { .kb-grid { grid-template-columns: 1fr; } .kb-toolbar { align-items: stretch; } .kb-actions { width: 100%; } .kb-action { flex: 1; } }
     @media print { .nav, .kb-lock, .kb-toolbar, .kb-back, .kb-tabs { display: none !important; } body { background: #fff !important; color: #111 !important; } .kb-wrap { max-width: 100%; padding: 10mm !important; } .kb-header h1 { color: #0b3c5d !important; } .kb-header p, .kb-header .label { color: #555 !important; } .kb-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } .kb-section { break-inside: avoid; background: #fff !important; border: 1px solid #cbd5e1 !important; } .kb-section-head { background: #e8f0f7 !important; color: #0b3c5d !important; } .kb-item { border-top: 1px solid #eee !important; } .kb-item-name { color: #222 !important; } .kb-qty { color: #0b3c5d !important; } }
@@ -105,6 +108,12 @@
     <p>Menu dei giorni e lista della spesa per l'equipaggio Oceanis. Accesso con password, sincronizzata in tempo reale.</p>
   </div>
 
+  <div class="kb-sheet-banner">
+    <a href="https://docs.google.com/spreadsheets/d/1CfeX8hzCmV-5CWcaXFLJq5ZDB6ye0V9DNtiioKjtH20/edit?usp=sharing" target="_blank" rel="noopener">
+      📋 Visualizza foglio condiviso Oceanis →
+    </a>
+  </div>
+
   <section class="kb-lock" id="kbLock">
     <div class="icon">⛵</div>
     <p>Inserisci la password dell'equipaggio Oceanis.</p>
@@ -137,7 +146,7 @@
         </div>
         <div id="kbSyncStatus" class="kb-sync local">💾 Locale</div>
         <div class="kb-actions">
-          <a id="btnFoglio" href="#" target="_blank" rel="noopener" class="kb-action secondary" style="display:none;text-decoration:none">📋 Foglio</a>
+          <a href="https://docs.google.com/spreadsheets/d/1CfeX8hzCmV-5CWcaXFLJq5ZDB6ye0V9DNtiioKjtH20/edit?usp=sharing" target="_blank" rel="noopener" class="kb-action secondary" style="text-decoration:none">📋 Foglio</a>
           <button class="kb-action secondary" onclick="resetCambusa()">↺ Azzera</button>
           <button class="kb-action" onclick="window.print()">🖨️ Stampa</button>
         </div>
@@ -183,22 +192,6 @@ function unlockCambusa() {
   document.getElementById('kbContent').style.display='block';
   loadMenu();
   loadSpesa();
-  loadSheetUrl();
-}
-
-function loadSheetUrl() {
-  const cb = 'cbUrl_' + Date.now();
-  window[cb] = function(data) {
-    delete window[cb];
-    if (data && data.url) {
-      const btn = document.getElementById('btnFoglio');
-      if (btn) { btn.href = data.url; btn.style.display = 'inline-flex'; }
-    }
-  };
-  const s = document.createElement('script');
-  s.src = SHEETS_URL + '?action=getSheetUrl&callback=' + cb;
-  s.onerror = () => { delete window[cb]; };
-  document.head.appendChild(s);
 }
 
 /* ---- MENU ---- */
