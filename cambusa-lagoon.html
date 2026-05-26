@@ -70,6 +70,17 @@
     .ing-pill { font-size: .73rem; padding: 3px 9px; border-radius: 7px; background: rgba(255,255,255,.06); color: rgba(255,255,255,.58); border: 1px solid rgba(255,255,255,.09); }
     .ing-pill strong { color: var(--turq-light); margin-right: 3px; }
     .menu-empty { text-align: center; padding: 60px 20px; color: rgba(255,255,255,.42); line-height: 1.9; }
+    .kb-add-form { display: none; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; }
+    .kb-add-form.visible { display: block; }
+    .kb-add-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch; }
+    .kb-add-input { flex: 1; min-width: 130px; padding: 10px 13px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.07); color: #fff; font-size: .88rem; outline: none; }
+    .kb-add-input::placeholder { color: rgba(255,255,255,.28); }
+    .kb-add-select { padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(20,40,70,.95); color: #fff; font-size: .82rem; outline: none; cursor: pointer; }
+    .kb-add-btn { padding: 10px 18px; border-radius: 10px; border: none; background: var(--turq); color: #fff; font-weight: 700; cursor: pointer; white-space: nowrap; font-size: .88rem; }
+    .kb-del { display: none; border: none; background: rgba(248,113,113,.12); color: #f87171; border-radius: 7px; width: 28px; height: 28px; cursor: pointer; font-size: .85rem; align-items: center; justify-content: center; flex-shrink: 0; align-self: center; }
+    body.edit-mode .kb-del { display: flex; }
+    body.edit-mode .kb-item { grid-template-columns: 22px 1fr auto 32px; }
+    .kb-action.edit-on { background: rgba(255,200,0,.15); border-color: rgba(255,200,0,.3) !important; color: #fcd34d !important; }
     .kb-sheet-banner { text-align: center; margin-bottom: 28px; }
     .kb-sheet-banner a { display: inline-flex; align-items: center; gap: 9px; padding: 11px 22px; border-radius: 14px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.13); color: rgba(255,255,255,.68); text-decoration: none; font-size: .86rem; transition: background .2s, border-color .2s, color .2s; }
     .kb-sheet-banner a:hover { background: rgba(255,255,255,.11); border-color: var(--turq); color: #fff; }
@@ -146,9 +157,31 @@
         </div>
         <div id="kbSyncStatus" class="kb-sync local">💾 Locale</div>
         <div class="kb-actions">
+          <button class="kb-action secondary edit-on" id="btnEdit" onclick="toggleEditMode()">✏️ Modifica</button>
           <a href="https://docs.google.com/spreadsheets/d/1CfeX8hzCmV-5CWcaXFLJq5ZDB6ye0V9DNtiioKjtH20/edit?usp=sharing" target="_blank" rel="noopener" class="kb-action secondary" style="text-decoration:none">📋 Foglio</a>
           <button class="kb-action secondary" onclick="resetCambusa()">↺ Azzera</button>
           <button class="kb-action" onclick="window.print()">🖨️ Stampa</button>
+        </div>
+      </div>
+      <div class="kb-add-form" id="kbAddForm">
+        <div style="font-size:.72rem;color:rgba(255,255,255,.42);margin-bottom:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em">➕ Aggiungi articolo</div>
+        <div class="kb-add-row">
+          <input class="kb-add-input" id="addNome" placeholder="Nome articolo" onkeydown="if(event.key==='Enter')addNewItem()" />
+          <input class="kb-add-input" id="addQty" placeholder="Qtà (es. 2 kg)" style="max-width:140px" onkeydown="if(event.key==='Enter')addNewItem()" />
+          <select class="kb-add-select" id="addCat">
+            <option value="Cucina">🧂 Cucina</option>
+            <option value="Verdure">🥬 Verdure</option>
+            <option value="Frutta">🍎 Frutta</option>
+            <option value="Pasta/Cereali">🍝 Pasta/Cereali</option>
+            <option value="Freschi">🧀 Freschi</option>
+            <option value="Affettati">🥩 Affettati</option>
+            <option value="Scatolame">🥫 Scatolame</option>
+            <option value="Colazione">☕ Colazione</option>
+            <option value="Bevande" selected>🥤 Bevande</option>
+            <option value="Varie">🧺 Varie</option>
+            <option value="Pulizie">🧽 Pulizie</option>
+          </select>
+          <button class="kb-add-btn" onclick="addNewItem()">+ Aggiungi</button>
         </div>
       </div>
       <div class="kb-grid" id="kbGrid"></div>
@@ -291,11 +324,13 @@ function renderSpesa() {
     return `<section class="kb-section"><div class="kb-section-head"><span class="emoji">${icon}</span><h2>${sec.category}</h2><span class="kb-count" id="cnt-${sid}">${done}/${sec.items.length}</span></div><div class="kb-list">${sec.items.map(itemHtml).join('')}</div></section>`;
   }).join('');
   updateProgress();
+  if (editMode) { document.body.classList.add('edit-mode'); document.getElementById('kbAddForm').classList.add('visible'); }
 }
 
 function itemHtml(it) {
   const done = !!cambusaState[it.id];
-  return `<label class="kb-item${done?' done':''}" id="item-${it.id}"><input type="checkbox" ${done?'checked':''} onchange="toggleItem('${it.id}',this.checked)"/><span class="kb-item-name">${it.nome}</span><span class="kb-qty">${it.qty||''}</span></label>`;
+  const safeNome = it.nome.replace(/'/g,"\\'");
+  return `<label class="kb-item${done?' done':''}" id="item-${it.id}"><input type="checkbox" ${done?'checked':''} onchange="toggleItem('${it.id}',this.checked)"/><span class="kb-item-name">${it.nome}</span><span class="kb-qty">${it.qty||''}</span><button class="kb-del" title="Rimuovi" onclick="removeItem(event,'${it.id}','${safeNome}')">🗑</button></label>`;
 }
 
 function toggleItem(id, checked) {
@@ -332,6 +367,58 @@ function resetCambusa() {
   s.src = SHEETS_URL + '?action=reset&callback=' + cb;
   document.head.appendChild(s);
   renderSpesa();
+}
+
+/* ---- EDIT MODE ---- */
+let editMode = false;
+
+function toggleEditMode() {
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
+  const btn = document.getElementById('btnEdit');
+  if (btn) { btn.textContent = editMode ? '✅ Fine modifica' : '✏️ Modifica'; btn.classList.toggle('edit-on', editMode); }
+  document.getElementById('kbAddForm').classList.toggle('visible', editMode);
+}
+
+function addNewItem() {
+  const nome = document.getElementById('addNome').value.trim();
+  const qty  = document.getElementById('addQty').value.trim();
+  const cat  = document.getElementById('addCat').value;
+  if (!nome) { document.getElementById('addNome').focus(); return; }
+  setSyncStatus('busy', '↻ Aggiunta…');
+  const cb = 'cbAdd_' + Date.now();
+  window[cb] = function(data) {
+    delete window[cb];
+    if (data && data.ok) {
+      const newItem = { id: data.id, nome: data.nome, qty: data.qty || '', checked: false };
+      let sec = CAMBUSA.find(s => s.category === data.categoria);
+      if (sec) { sec.items.push(newItem); }
+      else { CAMBUSA.push({ category: data.categoria, items: [newItem] }); }
+      document.getElementById('addNome').value = '';
+      document.getElementById('addQty').value = '';
+      setSyncStatus('ok', '☁️ Sincronizzato');
+      renderSpesa();
+    } else { setSyncStatus('local', '⚠️ Errore aggiunta'); }
+  };
+  const s = document.createElement('script');
+  s.src = SHEETS_URL + '?action=addItem&nome=' + encodeURIComponent(nome) + '&qty=' + encodeURIComponent(qty) + '&cat=' + encodeURIComponent(cat) + '&callback=' + cb;
+  s.onerror = () => { delete window[cb]; setSyncStatus('local', '⚠️ Errore'); };
+  document.head.appendChild(s);
+}
+
+function removeItem(event, id, nome) {
+  event.preventDefault(); event.stopPropagation();
+  if (!confirm('Rimuovere "' + nome + '" dalla lista?')) return;
+  setSyncStatus('busy', '↻ Rimozione…');
+  CAMBUSA.forEach(sec => { const i = sec.items.findIndex(it => it.id === id); if (i >= 0) sec.items.splice(i, 1); });
+  CAMBUSA = CAMBUSA.filter(sec => sec.items.length > 0);
+  delete cambusaState[id]; saveCambusa(); renderSpesa();
+  const cb = 'cbDel_' + Date.now();
+  window[cb] = () => { delete window[cb]; setSyncStatus('ok', '☁️ Sincronizzato'); };
+  const s = document.createElement('script');
+  s.src = SHEETS_URL + '?action=removeItem&id=' + encodeURIComponent(id) + '&callback=' + cb;
+  s.onerror = () => { delete window[cb]; setSyncStatus('local', '⚠️ Errore'); };
+  document.head.appendChild(s);
 }
 
 /* ---- TAB SWITCH ---- */

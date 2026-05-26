@@ -442,6 +442,8 @@ function doGet(e) {
   if (action === 'getList')     return getListAction(ss, params.callback);
   if (action === 'getMenu')     return getMenuAction(ss, params.callback);
   if (action === 'getSheetUrl') return getSheetUrlAction(ss, params.callback);
+  if (action === 'addItem')     return addItemAction(ss, params.nome, params.qty, params.cat, params.callback);
+  if (action === 'removeItem')  return removeItemAction(ss, params.id, params.callback);
   if (action === 'set')         return setAction(ss, params.id, params.val, params.callback);
   if (action === 'reset')       return resetAction(ss, params.callback);
   return getStateAction(ss, params.callback);
@@ -537,6 +539,35 @@ function jsonpResponse(callback, data) {
 
 function getSheetUrlAction(ss, callback) {
   return jsonpResponse(callback, { url: ss.getUrl() });
+}
+
+function addItemAction(ss, nome, qty, cat, callback) {
+  if (!nome) return jsonpResponse(callback, { ok: false });
+  const spesaSheet = ss.getSheetByName('spesa') || ss.insertSheet('spesa');
+  const id = slugify(nome) + '-' + String(Date.now()).slice(-6);
+  spesaSheet.appendRow([id, nome, qty || '', '', cat || 'Varie', 'manuale']);
+  const cambusaSheet = ss.getSheetByName('cambusa') || ss.insertSheet('cambusa');
+  cambusaSheet.appendRow([id, false]);
+  return jsonpResponse(callback, { ok: true, id: id, nome: nome, qty: qty || '', categoria: cat || 'Varie' });
+}
+
+function removeItemAction(ss, id, callback) {
+  if (!id) return jsonpResponse(callback, { ok: false });
+  const spesaSheet = ss.getSheetByName('spesa');
+  if (spesaSheet && spesaSheet.getLastRow() > 0) {
+    const data = spesaSheet.getDataRange().getValues();
+    for (var i = data.length - 1; i >= 0; i--) {
+      if (String(data[i][0]) === String(id)) { spesaSheet.deleteRow(i + 1); break; }
+    }
+  }
+  const cambusaSheet = ss.getSheetByName('cambusa');
+  if (cambusaSheet && cambusaSheet.getLastRow() > 0) {
+    const cData = cambusaSheet.getDataRange().getValues();
+    for (var j = cData.length - 1; j >= 0; j--) {
+      if (String(cData[j][0]) === String(id)) { cambusaSheet.deleteRow(j + 1); break; }
+    }
+  }
+  return jsonpResponse(callback, { ok: true });
 }
 
 // ---- RIEPILOGO CONDIVISIBILE -----------------------------------
