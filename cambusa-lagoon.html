@@ -55,6 +55,7 @@
     .kb-item-name { display: block; color: rgba(255,255,255,.86); font-size: .9rem; line-height: 1.35; }
     .kb-item.done .kb-item-name { color: rgba(255,255,255,.38); text-decoration: line-through; }
     .kb-qty { color: var(--turq-light); font-size: .78rem; font-weight: 700; white-space: nowrap; }
+    .kb-nota { display: block; font-size: .72rem; color: rgba(255,255,255,.36); margin-top: 2px; font-weight: 400; }
     .kb-meta { margin-top: 22px; color: rgba(255,255,255,.45); font-size: .8rem; text-align: center; }
 
     /* Menu giornaliero */
@@ -277,7 +278,7 @@ function fmtData(d) {
   return d;
 }
 
-/* ---- SPESA ---- */
+/* ---- SPESA (legge dal riepilogo — fonte di verità) ---- */
 function loadSpesa() {
   setSyncStatus('busy', '↻ Caricamento...');
   showSpesaMsg('Caricamento lista dal foglio…');
@@ -294,20 +295,20 @@ function loadSpesa() {
       renderSpesa();
     } else {
       setSyncStatus('local', '⚠️ Lista vuota');
-      showSpesaMsg('Lista non ancora generata.<br>Apri il foglio Lagoon → <strong>🧭 Cambusa → Calcola Spesa</strong>.');
+      showSpesaMsg('Riepilogo non ancora generato.<br>Apri il foglio Lagoon → <strong>🧭 Cambusa → Genera Riepilogo</strong>.');
     }
   };
   const s = document.createElement('script');
-  s.src = SHEETS_URL + '?action=getList&callback=' + cb;
+  s.src = SHEETS_URL + '?action=getRiepilogo&callback=' + cb;
   s.onerror = () => { clearTimeout(tm); delete window[cb]; setSyncStatus('local','⚠️ Errore'); showSpesaMsg('Impossibile raggiungere il foglio.'); };
   document.head.appendChild(s);
 }
 
-function pushToSheets(id, val) {
+function pushToSheets(nome, val) {
   const cb = 'cbSet_' + Date.now();
   window[cb] = function() { delete window[cb]; setSyncStatus('ok','☁️ Sincronizzato'); };
   const s = document.createElement('script');
-  s.src = SHEETS_URL + '?action=set&id=' + encodeURIComponent(id) + '&val=' + val + '&callback=' + cb;
+  s.src = SHEETS_URL + '?action=setRiepilogoCheck&nome=' + encodeURIComponent(nome) + '&val=' + val + '&callback=' + cb;
   s.onerror = () => { delete window[cb]; setSyncStatus('local','⚠️ Errore sync'); };
   document.head.appendChild(s);
 }
@@ -330,10 +331,12 @@ function renderSpesa() {
 function itemHtml(it) {
   const done = !!cambusaState[it.id];
   const safeNome = it.nome.replace(/'/g,"\\'");
-  return `<label class="kb-item${done?' done':''}" id="item-${it.id}"><input type="checkbox" ${done?'checked':''} onchange="toggleItem('${it.id}',this.checked)"/><span class="kb-item-name">${it.nome}</span><span class="kb-qty">${it.qty||''}</span><button class="kb-del" title="Rimuovi" onclick="removeItem(event,'${it.id}','${safeNome}')">🗑</button></label>`;
+  const qtyStr = [it.qty, it.unit].filter(Boolean).join(' ');
+  const notaHtml = it.nota ? `<span class="kb-nota">${it.nota}</span>` : '';
+  return `<label class="kb-item${done?' done':''}" id="item-${it.id}"><input type="checkbox" ${done?'checked':''} onchange="toggleItem('${it.id}','${safeNome}',this.checked)"/><span class="kb-item-name">${it.nome}${notaHtml}</span><span class="kb-qty">${qtyStr}</span><button class="kb-del" title="Rimuovi" onclick="removeItem(event,'${it.id}','${safeNome}')">🗑</button></label>`;
 }
 
-function toggleItem(id, checked) {
+function toggleItem(id, nome, checked) {
   cambusaState[id] = checked;
   saveCambusa();
   const el = document.getElementById('item-' + id);
@@ -346,7 +349,7 @@ function toggleItem(id, checked) {
     }
   });
   updateProgress();
-  setSyncStatus('busy','↻ Salvataggio…'); pushToSheets(id, checked);
+  setSyncStatus('busy','↻ Salvataggio…'); pushToSheets(nome, checked);
 }
 
 function updateProgress() {

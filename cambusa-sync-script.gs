@@ -17,6 +17,7 @@ function onOpen() {
     .addItem('⚙️ Setup (prima volta)', 'setup')
     .addSeparator()
     .addItem('🛒 Calcola Spesa', 'calcolaSpesa')
+    .addItem('📋 Genera Riepilogo', 'generaRiepilogo')
     .addSeparator()
     .addItem('🔄 Riscrive Dotazioni (sovrascrive)', 'forzaDotazioni')
     .addItem('🍝 Riscrive Ricette (sovrascrive)', 'forzaRicette')
@@ -154,6 +155,27 @@ var RICETTE_LIST = [
   ['Caprese','Pomodorini',80,'g','Verdure'],
   ['Caprese','Basilico',3,'g','Varie'],
   ['Caprese','Olio',15,'ml','Cucina'],
+  // Pesce spada alla messinese
+  ['Pesce spada alla messinese','Pesce spada',200,'g','Pesce'],
+  ['Pesce spada alla messinese','Pomodorini',100,'g','Verdure'],
+  ['Pesce spada alla messinese','Olive',30,'g','Scatolame'],
+  ['Pesce spada alla messinese','Capperi',15,'g','Cucina'],
+  ['Pesce spada alla messinese','Aglio',0.1,'testa','Cucina'],
+  ['Pesce spada alla messinese','Olio',20,'ml','Cucina'],
+  // Avocado toast con uova e bacon
+  ['Avocado toast con uova','Avocado',0.5,'pz','Verdure'],
+  ['Avocado toast con uova','Uova',2,'pz','Freschi'],
+  ['Avocado toast con uova','Bacon',40,'g','Freschi'],
+  ['Avocado toast con uova','Pane',2,'fette','Pane/Forno'],
+  ['Avocado toast con uova','Pomodorini',60,'g','Verdure'],
+  ['Avocado toast con uova','Mozzarella',60,'g','Freschi'],
+  // Pasta fredda alla crudaiola
+  ['Pasta fredda alla crudaiola','Pasta',100,'g','Pasta/Cereali'],
+  ['Pasta fredda alla crudaiola','Pomodorini',80,'g','Verdure'],
+  ['Pasta fredda alla crudaiola','Mozzarella',80,'g','Freschi'],
+  ['Pasta fredda alla crudaiola','Basilico',3,'g','Varie'],
+  ['Pasta fredda alla crudaiola','Aglio',0.1,'testa','Cucina'],
+  ['Pasta fredda alla crudaiola','Olio',20,'ml','Cucina'],
 ];
 
 function setupRicette(sheet) {
@@ -166,7 +188,8 @@ function forzaRicette() {
   const sheet = ss.getSheetByName('ricette');
   if (!sheet) { SpreadsheetApp.getUi().alert('Tab "ricette" non trovato. Esegui prima il Setup.'); return; }
   _scriviRicette(sheet);
-  SpreadsheetApp.getUi().alert('✅ Ricette riscritte — ' + RICETTE_LIST.length + ' righe · ' + 7 + ' piatti.');
+  const nPiatti = new Set(RICETTE_LIST.map(function(r){return r[0];})).size;
+  SpreadsheetApp.getUi().alert('✅ Ricette riscritte — ' + RICETTE_LIST.length + ' righe · ' + nPiatti + ' piatti.');
 }
 
 function _scriviRicette(sheet) {
@@ -179,90 +202,99 @@ function _scriviRicette(sheet) {
 
 var DOTAZIONI_LIST = [
   // BASE — Cucina
-  ['Sale grosso',         1,    'kg',        'Cucina',        ''],
-  ['Sale fino',           1,    'conf.',      'Cucina',        ''],
-  ['Olio',                1,    'bottiglia',  'Cucina',        ''],
-  ['Zucchero',            1,    'busta',      'Cucina',        ''],
-  ['Aglio',               1,    'testa',      'Cucina',        ''],
-  ['Pepe nero',           1,    'conf.',      'Cucina',        'macinato'],
+  ['Sale grosso',          1,   'kg',        'Cucina',        ''],
+  ['Sale fino',            1,   'conf.',     'Cucina',        ''],
+  ['Olio',                 1,   'bottiglia', 'Cucina',        ''],
+  ['Zucchero',             1,   'busta',     'Cucina',        ''],
+  ['Aglio',                1,   'testa',     'Cucina',        ''],
+  ['Pepe nero',            1,   'conf.',     'Cucina',        'macinato'],
+  ['Origano',              1,   'conf.',     'Cucina',        ''],
   // VERDURE
-  ['Rucola/insalata mista',4,   'buste',      'Verdure',       ''],
-  ['Pomodorini',           2,   'conf.',      'Verdure',       ''],
-  ['Zucchine',             4,   'pz',         'Verdure',       ''],
-  ['Cetrioli',             4,   'pz',         'Verdure',       ''],
-  ['Avocado',              7,   'pz',         'Verdure',       ''],
+  ['Rucola/insalata mista',4,   'buste',     'Verdure',       ''],
+  ['Pomodorini',           2,   'conf.',     'Verdure',       ''],
+  ['Zucchine',             4,   'pz',        'Verdure',       ''],
+  ['Cetrioli',             4,   'pz',        'Verdure',       ''],
+  ['Avocado',              7,   'pz',        'Verdure',       ''],
+  ['Scalogno/cipollotto',  4,   'pz',        'Verdure',       ''],
   // FRUTTA
-  ['Pesche',              10,   'pz',         'Frutta',        ''],
-  ['Mele/banane',         10,   'pz',         'Frutta',        ''],
-  ['Uva',                  2,   'grappoli',   'Frutta',        ''],
-  ['Arance',               1,   'conf.',      'Frutta',        'q.b.'],
-  ['Melone',               2,   'pz',         'Frutta',        ''],
-  ['Limoni',               4,   'pz',         'Frutta',        ''],
+  ['Pesche',              10,   'pz',        'Frutta',        ''],
+  ['Mele/banane',         10,   'pz',        'Frutta',        ''],
+  ['Uva',                  2,   'grappoli',  'Frutta',        ''],
+  ['Arance',               2,   'conf.',     'Frutta',        'anche per spritz'],
+  ['Melone',               2,   'pz',        'Frutta',        ''],
+  ['Limoni',               6,   'pz',        'Frutta',        ''],
   // COLAZIONE
-  ['Latte LC',             2,   'litri',      'Colazione',     ''],
-  ['Caffè',                1,   'conf.',      'Colazione',     ''],
-  ['Biscotti',             2,   'pacchi',     'Colazione',     ''],
-  ['Brioche/merendine',    2,   'pacchi',     'Colazione',     ''],
+  ['Latte LC',             4,   'litri',     'Colazione',     ''],
+  ['Caffè',                1,   'conf.',     'Colazione',     ''],
+  ['Biscotti',             2,   'pacchi',    'Colazione',     ''],
+  ['Brioche/merendine',    2,   'pacchi',    'Colazione',     ''],
+  ['Yogurt greco',        10,   'pz',        'Colazione',     'vari gusti'],
+  ['Cereali/Muesli',       2,   'conf.',     'Colazione',     ''],
+  ['Nutella',              1,   'barattolo', 'Colazione',     ''],
   // PASTA/CEREALI
-  ['Pasta fredda',        1.5,  'kg',         'Pasta/Cereali', ''],
-  ['Linguine',            1.5,  'kg',         'Pasta/Cereali', ''],
-  ['Risotto',             1.5,  'kg',         'Pasta/Cereali', ''],
-  ['Riso insalata',       1.5,  'kg',         'Pasta/Cereali', ''],
-  ['Pan Bauletto',         2,   'pz',         'Pasta/Cereali', ''],
-  ['Grissini',             3,   'pz',         'Pasta/Cereali', ''],
+  ['Pasta fredda',        1.5,  'kg',        'Pasta/Cereali', ''],
+  ['Linguine',            1.5,  'kg',        'Pasta/Cereali', ''],
+  ['Risotto',             1.5,  'kg',        'Pasta/Cereali', ''],
+  ['Riso insalata',       1.5,  'kg',        'Pasta/Cereali', ''],
+  ['Pan Bauletto',         2,   'pz',        'Pasta/Cereali', ''],
+  ['Grissini',             3,   'pz',        'Pasta/Cereali', ''],
   // BEVANDE
-  ['Acqua',               12,   'cartoni',    'Bevande',       ''],
-  ['Coca-Cola',            1,   'conf.',      'Bevande',       '24 lattine'],
-  ['Coca-Cola Zero',       2,   'conf.',      'Bevande',       '24 lattine'],
-  ['Succo di frutta',      3,   'brick',      'Bevande',       ''],
-  ['Birra',               48,   'lattine',    'Bevande',       'Corona'],
-  ['Vino bianco',          1,   'cassa',      'Bevande',       '6 bottiglie'],
-  ['Prosecco',             2,   'casse',      'Bevande',       '12 bottiglie · qualità'],
-  ['Aperol',               2,   'bottiglie',  'Bevande',       'per Aperol Spritz'],
-  ['Campari',              1,   'bottiglia',  'Bevande',       'per Campari Spritz'],
-  ['Gin',                  2,   'bottiglie',  'Bevande',       'per gin tonic'],
-  ['Vodka',                1,   'bottiglia',  'Bevande',       'per vodka tonic'],
-  ['Tonica',               3,   'conf.',      'Bevande',       'gin tonic + vodka tonic'],
-  ['Ghiaccio',            15,   'kg',         'Bevande',       'Platonica o simile'],
+  ['Acqua naturale',        7,   'cartoni',   'Bevande',       '42 bottiglie da 1,5L'],
+  ['Acqua gasata',          5,   'cartoni',   'Bevande',       '30 bottiglie da 1,5L'],
+  ['Coca-Cola',             1,   'conf.',     'Bevande',       '12 lattine'],
+  ['Coca-Cola Zero',        1,   'conf.',     'Bevande',       '12 lattine'],
+  ['Succo di frutta/ACE',  4,   'brick',     'Bevande',       ''],
+  ['Birra',               48,   'lattine',   'Bevande',       'Corona o simile'],
+  ['Vino bianco',          2,   'casse',     'Bevande',       '12 bottiglie'],
+  ['Prosecco',             3,   'casse',     'Bevande',       '18 bottiglie · qualità'],
+  ['Aperol',               2,   'bottiglie', 'Bevande',       'per Aperol Spritz'],
+  ['Campari',              1,   'bottiglia', 'Bevande',       'per Campari Spritz'],
+  ['Seltz/Soda',           2,   'conf.',     'Bevande',       'per spritz'],
+  ['Gin',                  2,   'bottiglie', 'Bevande',       'per gin tonic'],
+  ['Vodka',                1,   'bottiglia', 'Bevande',       'per vodka tonic'],
+  ['Tonica',               3,   'conf.',     'Bevande',       'gin tonic + vodka tonic'],
+  ['Ghiaccio',            20,   'kg',        'Bevande',       'Platonica o simile'],
   // AFFETTATI
-  ['Prosciutto crudo',     3,   'etti',       'Affettati',     ''],
-  ['Bresaola',             2,   'etti',       'Affettati',     ''],
-  ['Salame',               3,   'buste',      'Affettati',     ''],
-  ['Salamino',             1,   'pz',         'Affettati',     ''],
-  ['Mortadella',           3,   'etti',       'Affettati',     ''],
+  ['Prosciutto crudo',     3,   'etti',      'Affettati',     ''],
+  ['Bresaola',             2,   'etti',      'Affettati',     ''],
+  ['Salame',               3,   'buste',     'Affettati',     ''],
+  ['Salamino',             1,   'pz',        'Affettati',     ''],
+  ['Mortadella',           3,   'etti',      'Affettati',     ''],
   // FRESCHI
-  ['Formaggi misti',       1,   'conf.',      'Freschi',       'q.b.'],
-  ['Grana',                1,   'busta',      'Freschi',       ''],
-  ['Mozzarella',          12,   'pz',         'Freschi',       ''],
-  ['Mozzarella ciliegini', 3,   'buste',      'Freschi',       ''],
-  ['Uova',                25,   'pz',         'Freschi',       ''],
+  ['Formaggi misti',       1,   'conf.',     'Freschi',       'q.b.'],
+  ['Grana',                1,   'busta',     'Freschi',       ''],
+  ['Mozzarella',          12,   'pz',        'Freschi',       ''],
+  ['Mozzarella ciliegini', 3,   'buste',     'Freschi',       ''],
+  ['Uova',                25,   'pz',        'Freschi',       ''],
   // VARIE
-  ['Taralli',              3,   'pacchi',     'Varie',         ''],
-  ['Patatine',             5,   'conf.',      'Varie',         ''],
-  ['Crostini',             2,   'conf.',      'Varie',         ''],
-  ['Salatini freschi',     1,   'conf.',      'Varie',         ''],
-  ['Zafferano',            1,   'bustine',    'Varie',         'per risotto'],
-  ['Menta/erbe',           1,   'mazzetto',   'Varie',         'per frittata'],
-  ['Basilico',             1,   'mazzetto',   'Varie',         'per risotto'],
+  ['Taralli',              3,   'pacchi',    'Varie',         ''],
+  ['Patatine',             5,   'conf.',     'Varie',         ''],
+  ['Crostini',             2,   'conf.',     'Varie',         ''],
+  ['Salatini freschi',     1,   'conf.',     'Varie',         ''],
+  ['Zafferano',            1,   'bustine',   'Varie',         'per risotto'],
+  ['Menta/erbe',           1,   'mazzetto',  'Varie',         'per frittata'],
+  ['Basilico',             1,   'mazzetto',  'Varie',         'per risotto'],
+  ['Prezzemolo',           1,   'mazzetto',  'Varie',         ''],
+  ['Erba cipollina',       1,   'mazzetto',  'Varie',         ''],
   // SCATOLAME
-  ['Tonno',               10,   'scatole',    'Scatolame',     ''],
-  ['Mais',                 3,   'conf.',      'Scatolame',     ''],
-  ['Piselli',              2,   'conf.',      'Scatolame',     ''],
-  ['Condiriso',            1,   'conf.',      'Scatolame',     ''],
-  ['Olive',                4,   'barattoli',  'Scatolame',     ''],
+  ['Tonno',               10,   'scatole',   'Scatolame',     ''],
+  ['Mais',                 3,   'conf.',     'Scatolame',     ''],
+  ['Piselli',              2,   'conf.',     'Scatolame',     ''],
+  ['Condiriso',            1,   'conf.',     'Scatolame',     ''],
+  ['Olive',                4,   'barattoli', 'Scatolame',     ''],
   // PULIZIE
-  ['Bio per piatti',       1,   'conf.',      'Pulizie',       ''],
-  ['Sgrassatore',          1,   'spray',      'Pulizie',       ''],
-  ['Scottex/rotoloni',     1,   'rotolone',   'Pulizie',       ''],
-  ['Carta igienica',      10,   'rotoli',     'Pulizie',       ''],
-  ['Spugnette',            1,   'conf.',      'Pulizie',       ''],
-  ['Stracci/strofinacci',  1,   'conf.',      'Pulizie',       ''],
-  ['Sacchetti piccoli',   10,   'pz',         'Pulizie',       ''],
-  ['Sacchetti grandi neri',10,  'pz',         'Pulizie',       ''],
-  ['Carta argento',        1,   'rotolo',     'Pulizie',       ''],
-  ['Bicchieri plastica',  80,   'pz',         'Pulizie',       ''],
-  ['Piatti plastica',    100,   'pz',         'Pulizie',       ''],
-  ['Tovaglioli carta',     3,   'conf.',      'Pulizie',       ''],
+  ['Bio per piatti',       1,   'conf.',     'Pulizie',       ''],
+  ['Sgrassatore',          1,   'spray',     'Pulizie',       ''],
+  ['Scottex/rotoloni',     1,   'rotolone',  'Pulizie',       ''],
+  ['Carta igienica',      10,   'rotoli',    'Pulizie',       ''],
+  ['Spugnette',            1,   'conf.',     'Pulizie',       ''],
+  ['Stracci/strofinacci',  1,   'conf.',     'Pulizie',       ''],
+  ['Sacchetti piccoli',   10,   'pz',        'Pulizie',       ''],
+  ['Sacchetti grandi neri',10,  'pz',        'Pulizie',       ''],
+  ['Carta argento',        1,   'rotolo',    'Pulizie',       ''],
+  ['Bicchieri plastica',  80,   'pz',        'Pulizie',       ''],
+  ['Piatti plastica',    100,   'pz',        'Pulizie',       ''],
+  ['Tovaglioli carta',     3,   'conf.',     'Pulizie',       ''],
 ];
 
 function setupDotazioni(sheet) {
@@ -324,18 +356,14 @@ function calcolaSpesa() {
     });
   });
 
-  // Acqua automatica
-  ing['Acqua__litri'] = {
-    nome: 'Acqua', categoria: 'Bevande', unita: 'litri',
-    qty: acqua_pp * n_persone * giorni + acqua_cuc * giorni + acqua_caf * giorni
-  };
+  // Acqua: gestita manualmente nelle dotazioni (naturale + gasata)
 
   // Ordine categorie
   const catOrder = ['Cucina','Verdure','Frutta','Pasta/Cereali','Carne/Pesce','Freschi','Scatolame','Colazione','Varie','Bevande','Pulizie'];
   const sortCat = (a, b) => {
     const ia = catOrder.indexOf(a.categoria) >= 0 ? catOrder.indexOf(a.categoria) : 99;
     const ib = catOrder.indexOf(b.categoria) >= 0 ? catOrder.indexOf(b.categoria) : 99;
-    return ia - ib || a.nome.localeCompare(b.nome);
+    return ia - ib || (a.nome || a.articolo || '').localeCompare(b.nome || b.articolo || '');
   };
 
   const rows = [];
@@ -353,7 +381,6 @@ function calcolaSpesa() {
   if (rows.length > 0) spesaSheet.getRange(2, 1, rows.length, 6).setValues(rows);
 
   sincronizzaCambusa(ss, rows.map(r => r[0]));
-  generaRiepilogo(ss, rows);
 
   SpreadsheetApp.getUi().alert(
     '✅ Spesa calcolata!\n\n' +
@@ -361,7 +388,8 @@ function calcolaSpesa() {
     '☕ ' + n_col + ' colazioni · 🥗 ' + n_pran + ' pranzi · 🍝 ' + n_cen + ' cene\n' +
     '📦 ' + rows.length + ' articoli in lista\n\n' +
     '📋 Tab "riepilogo" aggiornato — condividilo con il link del foglio.\n' +
-    '🌐 La cambusa.html si aggiorna al prossimo accesso.'
+    '🌐 La cambusa.html si aggiorna al prossimo accesso.\n' +
+    '📋 Usa "Genera Riepilogo" per creare/aggiornare il tab condivisibile.'
   );
 }
 
@@ -439,13 +467,15 @@ function doGet(e) {
   const params = (e && e.parameter) ? e.parameter : {};
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const action = params.action || 'get';
-  if (action === 'getList')     return getListAction(ss, params.callback);
-  if (action === 'getMenu')     return getMenuAction(ss, params.callback);
-  if (action === 'getSheetUrl') return getSheetUrlAction(ss, params.callback);
-  if (action === 'addItem')     return addItemAction(ss, params.nome, params.qty, params.cat, params.callback);
-  if (action === 'removeItem')  return removeItemAction(ss, params.id, params.callback);
-  if (action === 'set')         return setAction(ss, params.id, params.val, params.callback);
-  if (action === 'reset')       return resetAction(ss, params.callback);
+  if (action === 'getList')            return getListAction(ss, params.callback);
+  if (action === 'getRiepilogo')       return getRiepilogoAction(ss, params.callback);
+  if (action === 'setRiepilogoCheck')  return setRiepilogoCheckAction(ss, params.nome, params.val, params.callback);
+  if (action === 'getMenu')            return getMenuAction(ss, params.callback);
+  if (action === 'getSheetUrl')        return getSheetUrlAction(ss, params.callback);
+  if (action === 'addItem')            return addItemAction(ss, params.nome, params.qty, params.cat, params.callback);
+  if (action === 'removeItem')         return removeItemAction(ss, params.id, params.callback);
+  if (action === 'set')                return setAction(ss, params.id, params.val, params.callback);
+  if (action === 'reset')              return resetAction(ss, params.callback);
   return getStateAction(ss, params.callback);
 }
 
@@ -502,6 +532,44 @@ function getListAction(ss, callback) {
   return jsonpResponse(callback, catOrder.map(cat => ({ category: cat, items: catMap[cat] })));
 }
 
+function getRiepilogoAction(ss, callback) {
+  const sheet = ss.getSheetByName('riepilogo');
+  if (!sheet || sheet.getLastRow() < 4) return jsonpResponse(callback, []);
+  const data = sheet.getRange(4, 1, sheet.getLastRow() - 3, 5).getValues();
+  const result = [];
+  data.forEach(function(r) {
+    const colA = String(r[0] || '').trim();
+    if (!colA) return;
+    // Riga di categoria: B-D vuote
+    if (!r[1] && !r[2] && !r[3]) {
+      result.push({ category: colA, items: [] });
+      return;
+    }
+    if (result.length === 0) return;
+    const id = colA.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+                   .replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
+    result[result.length - 1].items.push({
+      id: id, nome: colA,
+      qty: String(r[1] || ''), unit: String(r[2] || ''), nota: String(r[3] || ''),
+      checked: r[4] === true || r[4] === 'TRUE'
+    });
+  });
+  return jsonpResponse(callback, result.filter(function(c) { return c.items.length > 0; }));
+}
+
+function setRiepilogoCheckAction(ss, nome, val, callback) {
+  const sheet = ss.getSheetByName('riepilogo');
+  if (!sheet || !nome) return jsonpResponse(callback, { ok: false });
+  const data = sheet.getDataRange().getValues();
+  for (var i = 3; i < data.length; i++) {
+    if (String(data[i][0]).trim() === String(nome).trim()) {
+      sheet.getRange(i + 1, 5).setValue(val === 'true');
+      return jsonpResponse(callback, { ok: true });
+    }
+  }
+  return jsonpResponse(callback, { ok: false });
+}
+
 function getStateAction(ss, callback) {
   const sheet = ss.getSheetByName('cambusa');
   const state = {};
@@ -523,10 +591,15 @@ function setAction(ss, id, val, callback) {
 }
 
 function resetAction(ss, callback) {
-  const sheet = ss.getSheetByName('cambusa');
-  if (sheet && sheet.getLastRow() > 0) {
-    const data = sheet.getDataRange().getValues();
-    for (let i = 0; i < data.length; i++) { if (data[i][0]) sheet.getRange(i + 1, 2).setValue(false); }
+  // Reset riepilogo column E (sovereign source of truth)
+  const rSheet = ss.getSheetByName('riepilogo');
+  if (rSheet && rSheet.getLastRow() > 3) {
+    const data = rSheet.getRange(4, 1, rSheet.getLastRow() - 3, 5).getValues();
+    for (var i = 0; i < data.length; i++) {
+      if (String(data[i][0]).trim() && data[i][1]) {
+        rSheet.getRange(i + 4, 5).setValue(false);
+      }
+    }
   }
   return jsonpResponse(callback, { ok: true });
 }
@@ -570,32 +643,46 @@ function removeItemAction(ss, id, callback) {
   return jsonpResponse(callback, { ok: true });
 }
 
-// ---- RIEPILOGO CONDIVISIBILE -----------------------------------
-function generaRiepilogo(ss, rows) {
+// ---- RIEPILOGO CONDIVISIBILE (sovrano — non sovrascritto da Calcola Spesa) ----
+function generaRiepilogo() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const spesaSheet = ss.getSheetByName('spesa');
+  if (!spesaSheet || spesaSheet.getLastRow() < 2) {
+    SpreadsheetApp.getUi().alert('⚠️ Esegui prima "Calcola Spesa".');
+    return;
+  }
+
+  // Mappa note: articolo → nota (da tab dotazioni)
+  const noteMap = {};
+  const dotSheet = ss.getSheetByName('dotazioni');
+  if (dotSheet && dotSheet.getLastRow() > 1) {
+    dotSheet.getDataRange().getValues().slice(1).forEach(function(r) {
+      if (r[0]) noteMap[String(r[0])] = r[4] ? String(r[4]) : '';
+    });
+  }
+
+  const config  = leggiConfig(ss.getSheetByName('config'));
+  const persone = config['persone'] || 12;
+  const giorni  = daysBetween(config['data_inizio'], config['data_fine']);
+  const dataStr = Utilities.formatDate(new Date(), 'Europe/Rome', 'dd/MM/yyyy HH:mm');
+
   const rSheet = ss.getSheetByName('riepilogo') || ss.insertSheet('riepilogo');
   rSheet.clearContents();
   rSheet.clearFormats();
 
-  const config  = leggiConfig(ss.getSheetByName('config'));
-  const persone = config['persone'] || 10;
-  const giorni  = daysBetween(config['data_inizio'], config['data_fine']);
-  const dataStr = Utilities.formatDate(new Date(), 'Europe/Rome', 'dd/MM/yyyy HH:mm');
+  // 5 colonne: Articolo | Quantità | Unità | Note | ✓ OK
+  [220, 75, 95, 200, 55].forEach(function(w, i) { rSheet.setColumnWidth(i + 1, w); });
 
-  [280, 130, 100, 80].forEach(function(w, i) { rSheet.setColumnWidth(i + 1, w); });
-
-  // Titolo
-  rSheet.getRange('A1:D1').merge()
+  rSheet.getRange('A1:E1').merge()
     .setValue('LISTA SPESA — CORSICA EXPERIENCE  ·  29 Mag–2 Giu 2026  ·  ' + persone + ' persone · ' + giorni + ' giorni')
     .setFontSize(12).setFontWeight('bold').setBackground('#0b3c5d').setFontColor('#fff').setVerticalAlignment('middle');
   rSheet.setRowHeight(1, 40);
 
-  // Info generazione
-  rSheet.getRange('A2:D2').merge()
-    .setValue('Generata il ' + dataStr + '  —  Per modifiche contatta l\'organizzatore')
+  rSheet.getRange('A2:E2').merge()
+    .setValue('Generata il ' + dataStr + '  —  Modifica liberamente: Calcola Spesa non sovrascriverà questo tab')
     .setFontSize(8).setFontColor('#777').setBackground('#f4f8fc').setVerticalAlignment('middle');
 
-  // Header tabella
-  rSheet.getRange('A3:D3').setValues([['Articolo', 'Quantità', 'Tipo', '✓ OK']])
+  rSheet.getRange('A3:E3').setValues([['Articolo', 'Quantità', 'Unità', 'Note', '✓ OK']])
     .setFontWeight('bold').setBackground('#1a5276').setFontColor('#fff').setFontSize(9);
   rSheet.setFrozenRows(3);
 
@@ -606,34 +693,47 @@ function generaRiepilogo(ss, rows) {
   };
 
   const catMap = {}, catOrder = [];
-  rows.forEach(function(r) {
-    const cat = r[4];
+  spesaSheet.getDataRange().getValues().slice(1).forEach(function(r) {
+    const cat = r[4]; if (!cat || !r[1]) return;
     if (!catMap[cat]) { catMap[cat] = []; catOrder.push(cat); }
-    catMap[cat].push(r);
+    // Separa numero e unità dalla quantità formattata (es. "1.5 kg" → "1.5" + "kg")
+    const qtyRaw  = String(r[2] || '');
+    const parts   = qtyRaw.split(' ');
+    const qtyNum  = parts[0];
+    const qtyUnit = parts.length > 1 ? parts.slice(1).join(' ') : (r[3] ? String(r[3]) : '');
+    const nota    = noteMap[String(r[1])] || '';
+    catMap[cat].push({ nome: String(r[1]), num: qtyNum, unit: qtyUnit, nota: nota });
   });
 
   let rowIdx = 4;
   catOrder.forEach(function(cat) {
-    rSheet.getRange(rowIdx, 1, 1, 4).merge()
-      .setValue((CAT_EMOJI[cat] || '📦') + '  ' + cat.toUpperCase())
+    rSheet.getRange(rowIdx, 1, 1, 5).merge()
+      .setValue((CAT_EMOJI[cat] || '📦') + '  ' + cat)
       .setFontWeight('bold').setFontSize(9).setBackground('#d6e4f0').setFontColor('#0b3c5d');
     rowIdx++;
-
-    catMap[cat].forEach(function(r, idx) {
+    catMap[cat].forEach(function(item, idx) {
       const bg = idx % 2 === 0 ? '#ffffff' : '#f7fafd';
-      rSheet.getRange(rowIdx, 1).setValue(r[1]).setBackground(bg).setFontSize(9);
-      rSheet.getRange(rowIdx, 2).setValue(r[2]).setBackground(bg).setFontSize(9).setFontWeight('bold').setFontColor('#0b3c5d');
-      rSheet.getRange(rowIdx, 3).setValue(r[5]).setBackground(bg).setFontSize(8).setFontColor('#aaa');
-      rSheet.getRange(rowIdx, 4).insertCheckboxes().setBackground(bg);
+      rSheet.getRange(rowIdx, 1).setValue(item.nome).setBackground(bg).setFontSize(9);
+      rSheet.getRange(rowIdx, 2).setValue(item.num).setBackground(bg).setFontSize(11)
+        .setFontWeight('bold').setFontColor('#0b3c5d').setHorizontalAlignment('right');
+      rSheet.getRange(rowIdx, 3).setValue(item.unit).setBackground(bg).setFontSize(9).setFontColor('#444');
+      rSheet.getRange(rowIdx, 4).setValue(item.nota).setBackground(bg).setFontSize(8).setFontColor('#888');
+      rSheet.getRange(rowIdx, 5).insertCheckboxes().setBackground(bg);
       rowIdx++;
     });
   });
 
-  // Footer
-  rSheet.getRange(rowIdx, 1, 1, 3).merge()
-    .setValue('Totale: ' + rows.length + ' articoli')
+  const totalItems = Object.values(catMap).reduce(function(s, a) { return s + a.length; }, 0);
+  rSheet.getRange(rowIdx, 1, 1, 4).merge()
+    .setValue('Totale: ' + totalItems + ' articoli')
     .setFontWeight('bold').setFontSize(9).setBackground('#e8f0f7').setFontColor('#0b3c5d');
-  rSheet.getRange(rowIdx, 4).setBackground('#e8f0f7');
+  rSheet.getRange(rowIdx, 5).setBackground('#e8f0f7');
+
+  SpreadsheetApp.getUi().alert(
+    '✅ Riepilogo generato!\n\n' +
+    '📋 Puoi modificare liberamente il tab "riepilogo".\n' +
+    'Calcola Spesa NON lo sovrascriverà mai più.'
+  );
 }
 
 // ---- PROTEZIONE FOGLI -----------------------------------------
