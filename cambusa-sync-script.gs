@@ -19,6 +19,7 @@ function onOpen() {
     .addItem('🛒 Calcola Spesa', 'calcolaSpesa')
     .addItem('📋 Genera Riepilogo', 'generaRiepilogo')
     .addSeparator()
+    .addItem('📅 Imposta Menu (sovrascrive)', 'forzaMenu')
     .addItem('🔄 Riscrive Dotazioni (sovrascrive)', 'forzaDotazioni')
     .addItem('🍝 Riscrive Ricette (sovrascrive)', 'forzaRicette')
     .addSeparator()
@@ -177,6 +178,39 @@ var RICETTE_LIST = [
   ['Pasta fredda alla crudaiola','Aglio',0.1,'testa','Cucina'],
   ['Pasta fredda alla crudaiola','Olio',20,'ml','Cucina'],
 ];
+
+// ---- MENU GIORNALIERO ----------------------------------------
+// Colonne: [data, giorno, colazione, pranzo, cena, nota]
+var MENU_LIST = [
+  ['29/05/2026', 'Venerdì',   '—',                 '',                          '',                           'Check-in 17:00 · Apericena in navigazione'],
+  ['30/05/2026', 'Sabato',    'Colazione a bordo', 'Frittata alle erbe',         'Pesce spada alla messinese', ''],
+  ['31/05/2026', 'Domenica',  'Colazione a bordo', 'Avocado toast con uova',     'Linguine tonno e limone',    ''],
+  ['01/06/2026', 'Lunedì',    'Colazione a bordo', 'Pasta fredda alla crudaiola','Risotto allo zafferano',     ''],
+  ['02/06/2026', 'Martedì',   'Colazione a bordo', '—',                          '—',                          'Check-out'],
+];
+
+function forzaMenu() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('menu');
+  if (!sheet) { SpreadsheetApp.getUi().alert('Tab "menu" non trovato. Esegui prima il Setup.'); return; }
+  // Trova ogni riga per data e aggiorna colazione/pranzo/cena
+  const data = sheet.getDataRange().getValues();
+  MENU_LIST.forEach(function(m) {
+    for (var i = 1; i < data.length; i++) {
+      const dataCell = String(data[i][0] instanceof Date
+        ? Utilities.formatDate(data[i][0], 'Europe/Rome', 'dd/MM/yyyy')
+        : data[i][0]).trim();
+      if (dataCell === m[0]) {
+        sheet.getRange(i + 1, 3).setValue(m[2]); // colazione
+        sheet.getRange(i + 1, 4).setValue(m[3]); // pranzo
+        sheet.getRange(i + 1, 5).setValue(m[4]); // cena
+        if (m[5]) sheet.getRange(i + 1, 6).setValue(m[5]); // nota (solo se presente)
+        break;
+      }
+    }
+  });
+  SpreadsheetApp.getUi().alert('✅ Menu impostato — ' + MENU_LIST.length + ' giorni.');
+}
 
 function setupRicette(sheet) {
   if (sheet.getLastRow() > 1) return;
