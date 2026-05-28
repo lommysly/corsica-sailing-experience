@@ -787,6 +787,7 @@ body {
   backdrop-filter: blur(8px);
 }
 .pg-col h4 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.pg-col p { color: rgba(255,255,255,.75); line-height: 1.6; }
 .pg-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .pg-col ul li { font-size: .9rem; color: rgba(255,255,255,.65); line-height: 1.5; padding-left: 16px; position: relative; }
 .pg-col ul li::before { content: '—'; position: absolute; left: 0; color: var(--turq); font-weight: 700; }
