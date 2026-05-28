@@ -197,6 +197,8 @@
 <script>
 const CAMBUSA_PASSWORD = 'Lagoon';
 const CAMBUSA_KEY     = 'cambusa_lagoon_v1';
+const AUTH_KEY        = 'auth_cambusa_lg_ts';
+const AUTH_TTL        = 14 * 24 * 60 * 60 * 1000; // 14 giorni
 const SHEETS_URL      = 'https://script.google.com/macros/s/AKfycbxRXxwlm9UkspuvaXa0_bpnErGhvt9IO8PuOo07U4D8y1gu2jIIQM9RSLDjzac1TZlOQQ/exec';
 
 const CAT_ICONS = {
@@ -221,14 +223,25 @@ function showSpesaMsg(msg) {
   document.getElementById('kbGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:rgba(255,255,255,.5);line-height:1.8">${msg}</div>`;
 }
 
-function unlockCambusa() {
-  const pwd = document.getElementById('kbPwd').value;
-  if (pwd !== CAMBUSA_PASSWORD) { document.getElementById('kbErr').style.display='block'; return; }
+function doUnlock() {
   document.getElementById('kbLock').style.display='none';
   document.getElementById('kbContent').style.display='block';
   loadMenu();
   loadSpesa();
 }
+function unlockCambusa() {
+  const pwd = document.getElementById('kbPwd').value;
+  if (pwd !== CAMBUSA_PASSWORD) { document.getElementById('kbErr').style.display='block'; return; }
+  localStorage.setItem(AUTH_KEY, Date.now().toString());
+  doUnlock();
+}
+// Auto-login se token valido
+(function() {
+  try {
+    const ts = parseInt(localStorage.getItem(AUTH_KEY) || '0', 10);
+    if (ts && Date.now() - ts < AUTH_TTL) doUnlock();
+  } catch(e) {}
+})();
 
 /* ---- MENU ---- */
 function loadMenu() {
