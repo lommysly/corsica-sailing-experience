@@ -4,200 +4,250 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Briefing Pre-Crociera — Corsica Experience</title>
-  <link rel="stylesheet" href="styles.css?v=20260528i" />
+  <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
-  <style>
-    .brief-wrap { max-width: 980px; margin: 0 auto; padding: 52px 20px 90px; }
-    .brief-hero { text-align: center; margin-bottom: 44px; }
-    .brief-hero .label { display: block; margin-bottom: 10px; color: var(--turq); font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
-    .brief-hero h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 300; margin-bottom: 12px; }
-    .brief-hero p { max-width: 680px; margin: 0 auto; color: rgba(255,255,255,.7); line-height: 1.7; }
-
-    .brief-grid { display: grid; gap: 22px; }
-    @media (min-width: 900px) { .brief-grid { grid-template-columns: 1fr 1fr; } }
-
-    .brief-card {
-      background: rgba(255,255,255,.045);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 22px;
-      overflow: hidden;
-    }
-    .brief-card-header {
-      display: flex; align-items: center; gap: 12px;
-      padding: 18px 22px;
-      background: rgba(255,255,255,.06);
-      border-bottom: 1px solid rgba(255,255,255,.1);
-    }
-    .brief-card-header .emoji { font-size: 1.6rem; }
-    .brief-card-header h2 { font-size: 1.15rem; font-weight: 700; color: #fff; }
-
-    .brief-body { padding: 22px 24px 26px; }
-    .brief-body h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.25rem; font-weight: 600; color: var(--turq-light);
-      margin: 18px 0 10px;
-    }
-    .brief-body h3:first-child { margin-top: 0; }
-    .brief-body p { color: rgba(255,255,255,.78); line-height: 1.75; margin-bottom: 12px; }
-    .brief-body ul { margin: 8px 0 12px 18px; color: rgba(255,255,255,.75); line-height: 1.7; }
-    .brief-body li { margin-bottom: 6px; }
-    .brief-body strong { color: var(--turq-light); }
-    .brief-note {
-      margin-top: 14px; padding: 14px 16px;
-      background: rgba(28,167,168,.12); border-left: 3px solid var(--turq);
-      border-radius: 0 var(--r-sm) var(--r-sm) 0;
-      font-size: .92rem; color: rgba(255,255,255,.75); line-height: 1.55;
-    }
-    .brief-boats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-    .brief-boat {
-      background: rgba(28,167,168,.15); border: 1px solid rgba(28,167,168,.35);
-      color: var(--turq-light); padding: 8px 14px; border-radius: 50px;
-      font-size: .82rem; font-weight: 600;
-    }
-
-    .brief-full { grid-column: 1 / -1; }
-    @media (max-width: 900px) { .brief-full { grid-column: auto; } }
-
-    .checklist-ref {
-      margin-top: 28px; padding: 20px 22px;
-      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px; text-align: center;
-    }
-    .checklist-ref p { color: rgba(255,255,255,.65); margin-bottom: 14px; }
-    .checklist-ref a {
-      display: inline-block; background: var(--turq); color: #fff;
-      padding: 12px 22px; border-radius: 12px; font-weight: 700; text-decoration: none;
-    }
-  </style>
 </head>
 <body>
 
-<nav class="nav scrolled" id="nav">
-  <div class="nav-inner">
-    <a class="nav-logo" href="index.html"><span class="logo-icon">—</span><span>Corsica Experience</span></a>
-    <div class="nav-links">
+  <nav class="nav scrolled" id="nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="index.html">
+        <span class="logo-icon">—</span>
+        <span>Corsica Experience</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#itinerario">Itinerario</a>
+        <a href="index.html#meteo">Meteo</a>
+        <a href="regole.html">Regole</a>
+        <a href="cambusa.html">Cambusa</a>
+        <a href="briefing.html" class="active">Briefing</a>
+        <a href="inventario-oceanis.html">Inventario</a>
+        <a href="crewlist.html" class="nav-cta">Crew List</a>
+      </div>
+      <button class="nav-burger" id="navBurger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav-mobile" id="navMobile">
       <a href="index.html">Home</a>
+      <a href="index.html#itinerario">Itinerario</a>
       <a href="index.html#meteo">Meteo</a>
       <a href="regole.html">Regole</a>
       <a href="cambusa.html">Cambusa</a>
-      <a href="briefing.html">Briefing</a>
-      <a href="crewlist.html" class="nav-cta">Crew List</a>
+      <a href="briefing.html" style="color:var(--turq);font-weight:700;">Briefing →</a>
+      <a href="inventario-oceanis.html">Inventario</a>
+      <a href="crewlist.html">Crew List</a>
     </div>
-    <button class="nav-burger" id="navBurger" aria-label="Menu"><span></span><span></span><span></span></button>
-  </div>
-  <div class="nav-mobile" id="navMobile">
-    <a href="index.html">Home</a>
-    <a href="index.html#meteo">Meteo</a>
-    <a href="regole.html">Regole</a>
-    <a href="cambusa.html">Cambusa</a>
-    <a href="briefing.html">Briefing</a>
-    <a href="crewlist.html">Crew List</a>
-  </div>
-</nav>
+  </nav>
 
-<main class="brief-wrap">
-  <div class="brief-hero">
-    <span class="label">Pre-Partenza</span>
-    <h1>Briefing Pre-Crociera</h1>
-    <p>Tutto ciò che devi sapere prima di salire a bordo: dalla valigia alla vita di bordo, per una settimana indimenticabile in sicurezza e armonia.</p>
-    <div class="brief-boats">
-      <span class="brief-boat">⛵ Lagoon 40</span>
-      <span class="brief-boat">⛵ Oceanis 48</span>
-      <span class="brief-boat">⛵ Atlantica</span>
+  <div class="page-hero">
+    <div class="page-hero-bg" style="background-image:url('img/hero.jpg')"></div>
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <a href="index.html" class="back-link">← Torna alla home</a>
+      <span class="label light">Pre-Partenza</span>
+      <h1 class="page-hero-title">Briefing Pre-Crociera</h1>
+      <p class="page-hero-sub">Tutto ciò che devi sapere prima di salire a bordo. Un racconto in presenza per prepararti a una settimana indimenticabile in sicurezza, armonia e rispetto del mare.</p>
     </div>
   </div>
 
-  <div class="brief-grid">
-    <article class="brief-card">
-      <div class="brief-card-header">
-        <span class="emoji">🧳</span>
-        <h2>Valigia e Info Utili</h2>
-      </div>
-      <div class="brief-body">
-        <h3>Bagagli</h3>
-        <p>Usate <strong>bagagli morbidi e leggeri</strong>. Le valigie rigide, una volta svuotate, non trovano spazio a bordo. Gli armadietti sono progettati per contenitori flessibili.</p>
-
-        <h3>Temperature e Abbigliamento</h3>
-        <ul>
-          <li>Minime: <strong>20°C</strong> — Massime: <strong>35°C</strong></li>
-          <li>Acqua: <strong>25-30°C</strong></li>
-          <li>Tanti costumi, bermuda, cappello, creme solari</li>
-          <li>Vestiti più pesanti e pantaloni lunghi per la sera</li>
-          <li><strong>Giacca a vento</strong> per giornate ventilate</li>
-          <li><strong>Scarpe da tennis a suola chiara</strong> per camminare a bordo durante la navigazione</li>
-        </ul>
-
-        <h3>Dotazioni a Bordo</h3>
-        <ul>
-          <li>Set di lenzuola/asciugamani a cabina a settimana (inclusi)</li>
-          <li><strong>Teli da mare non inclusi</strong> — portate i vostri</li>
-          <li>Chi è freddoloso: portate un sacco a pelo personale</li>
-        </ul>
-
-        <h3>Elettricità</h3>
-        <p>Gli scafi erogano corrente a <strong>12 Volt</strong> (come le macchine), non 220V. Per ricaricare cellulari e fotocamere portate <strong>caricatori 12V</strong>.</p>
-        <p class="brief-note">💡 <strong>Suggerimento:</strong> su alcuni modelli con generatore è disponibile 220V, ma è sempre meglio avere il caricatore 12V come backup.</p>
-
-        <h3>Salute</h3>
-        <p>A bordo c'è una cassetta di pronto soccorso, ma portate i vostri <strong>farmaci abituali</strong>. Comunicatemi in via privata eventuali <strong>patologie o allergie</strong> prima della partenza.</p>
-      </div>
-    </article>
-
-    <article class="brief-card">
-      <div class="brief-card-header">
-        <span class="emoji">⛵</span>
-        <h2>Vita di Bordo</h2>
-      </div>
-      <div class="brief-body">
-        <h3>La Magia della Barca</h3>
-        <p>La barca a vela crea una magia unica: amicizie che durano una vita, ritmi lenti, panorami incredibili, libertà totale. I rapporti diventano semplici e piacevoli.</p>
-
-        <h3>Convivenza a Bordo</h3>
-        <p>Vivere in gruppo su una barca è come <strong>condividere una casa</strong>. Anche su imbarcazioni grandi e confortevoli, gli spazi sono limitati. Serve il <strong>massimo rispetto</strong> delle esigenze altrui.</p>
-        
-        <p class="brief-note">✨ <strong>Il segreto:</strong> approcciatevi con tolleranza e mantenete gli spazi comuni in ordine. Con il giusto approccio, vivrete un'esperienza indimenticabile.</p>
-
-        <h3>Sicurezza in Navigazione</h3>
-        <p>All'inizio della crociera, prima di prendere il mare, vi spiegherò come usare i <strong>supporti di emergenza</strong> della vostra imbarcazione. È una procedura standard, simile al briefing di un aereo, mirata alla vostra sicurezza.</p>
-
-        <h3>Scarpe a Bordo</h3>
-        <p>In determinate condizioni di vento e mare, potrò chiedervi di indossare scarpe. Munitevi di <strong>scarpe da tennis leggere a suola bianca</strong> da usare esclusivamente a bordo.</p>
-
-        <h3>Risparmio Idrico</h3>
-        <p>I rifornimenti d'acqua sono rari e richiedono tempo. Per non rubare momenti preziosi alla vacanza, usate l'acqua con parsimonia.</p>
-        
-        <p class="brief-note">🚿 <strong>Consiglio smart:</strong> se amate le docce lunghe, comprate <strong>sapone marino</strong> (in farmacia, Decathlon o Amazon). Fate il bagno in mare, lavatevi con il sapone marino, tuffatevi e risciacquatevi alla fine con l'acqua dolce sulla poppa. Fare il bagno al tramonto è meraviglioso!</p>
-      </div>
-    </article>
-
-    <article class="brief-card brief-full">
-      <div class="brief-card-header">
-        <span class="emoji">📋</span>
-        <h2>Checklist di Sicurezza</h2>
-      </div>
-      <div class="brief-body">
-        <p>Il briefing a bordo include la verifica di tutte le dotazioni di sicurezza. Lo skipper vi guiderà attraverso:</p>
-        <ul>
-          <li>Posizione e uso dei <strong>giubbotti di salvataggio</strong></li>
-          <li>Localizzazione <strong>cassetta pronto soccorso</strong></li>
-          <li>Uso dei <strong>fuochi e segnali di soccorso</strong></li>
-          <li>Procedura <strong>uomo in mare</strong> (MOB)</li>
-          <li>Uso della <strong>VHF</strong> e canale di emergenza 16</li>
-          <li>Posizione <strong>estintori</strong> e tipo</li>
-        </ul>
-        <p class="brief-note">🎯 <strong>Ricorda:</strong> queste procedure sono standard per tutte le imbarcazioni (Lagoon 40, Oceanis 48 e Atlantica) e sono mirate a garantire la sicurezza di tutti l'equipaggio.</p>
-      </div>
-    </article>
+  <div style="background:var(--ocean);padding:30px 0;">
+    <div class="container" style="text-align:center;">
+      <p style="color:rgba(255,255,255,.7);margin:0;font-size:.9rem;">
+        Questo briefing è valido per tutte le barche della flotta:
+        <span style="color:var(--turq-light);font-weight:700;">Lagoon 40</span> · 
+        <span style="color:var(--turq-light);font-weight:700;">Oceanis 48</span> · 
+        <span style="color:var(--turq-light);font-weight:700;">Atlantica</span>
+      </p>
+    </div>
   </div>
 
-  <div class="checklist-ref">
-    <p>Per il check-in tecnico della barca e la checklist completa di sicurezza:</p>
-    <a href="checkin.html">Vai al Check-in Barca →</a>
-  </div>
-</main>
+  <section class="regoles" id="valigia" style="padding-top:80px;padding-bottom:60px;">
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Preparazione</span>
+        <h2 class="h2">Cosa Portare (e Cosa No)</h2>
+      </div>
+      <div class="regoles-grid">
+        <div class="regola-card reveal-up">
+          <div class="rc-icon">01</div>
+          <h4>Bagagli Morbidi = Spazio in Cabina</h4>
+          <p>Le <strong>valigie rigide</strong>, una volta svuotate, non trovano spazio a bordo. Gli armadietti sono progettati per <strong>contenitori flessibili</strong>. Un sacco da viaggio morbido è l'ideale.</p>
+        </div>
+        <div class="regola-card reveal-up d1">
+          <div class="rc-icon">02</div>
+          <h4>Temperature Previste</h4>
+          <p>Aria: <strong>20°C min — 35°C max</strong>. Acqua: <strong>25-30°C</strong>. Portate costumi, bermuda, cappello, creme solari alta protezione. Giacca a vento per giornate ventilate.</p>
+        </div>
+        <div class="regola-card reveal-up d2">
+          <div class="rc-icon">03</div>
+          <h4>Scarpe a Bordo</h4>
+          <p><strong>Scarpe da tennis con suola chiara/bianca</strong> — da usare SOLO a bordo durante la navigazione. Le suole scure lasciano segni difficili da pulire.</p>
+        </div>
+        <div class="regola-card reveal-up">
+          <div class="rc-icon">04</div>
+          <h4>Dotazioni Incluse vs Da Portare</h4>
+          <p><strong>Incluso:</strong> set lenzuola/asciugamani (cambio a settimana). <strong>Da portare:</strong> teli da mare (obbligatori!), sacco a pelo (se freddolosi).</p>
+        </div>
+        <div class="regola-card reveal-up d1">
+          <div class="rc-icon">05</div>
+          <h4>Elettricità 12V</h4>
+          <p>Gli scafi erogano corrente a <strong>12 Volt</strong> (come le macchine), non 220V. Portate <strong>caricabatterie 12V</strong> o power bank caricate a terra.</p>
+        </div>
+        <div class="regola-card reveal-up d2">
+          <div class="rc-icon">06</div>
+          <h4>Salute e Farmaci</h4>
+          <p>Portate i vostri <strong>farmaci abituali</strong>. Comunicate al skipper <strong>in privato</strong> eventuali patologie o allergie alimentari prima della partenza.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script src="script.js?v=20260528i"></script>
+  <section class="portare" id="vita-bordo">
+    <div class="portare-bg"></div>
+    <div class="container">
+      <div class="section-header centered">
+        <span class="label light">Convivenza</span>
+        <h2 class="h2 light">La Magia della Barca</h2>
+      </div>
+      <div class="portare-grid">
+        <div class="pg-col reveal-left">
+          <h4>Perché la Barca Cambia la Vita</h4>
+          <p>La barca a vela crea una <strong>magia unica</strong>: amicizie che durano una vita, ritmi lenti, panorami incredibili, libertà totale. I rapporti diventano semplici e piacevoli.</p>
+        </div>
+        <div class="pg-col reveal-up d1">
+          <h4>Convivenza: Una Casa Condivisa</h4>
+          <p>Vivere in gruppo su una barca è come <strong>condividere una casa</strong>. Spazi limitati, massimo rispetto delle esigenze altrui. Approcciatevi con tolleranza e mantenete gli spazi comuni in ordine.</p>
+        </div>
+        <div class="pg-col reveal-right d2">
+          <h4>Risparmio Idrico</h4>
+          <p>Serbatoi limitati, rifornimenti rari. Docce brevi. <strong>Doccia da marinaio:</strong> bagno in mare, sapone marino, risciacquo rapido con acqua dolce in poppa.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="regoles" id="sicurezza" style="padding-top:80px;padding-bottom:60px;">
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Sicurezza</span>
+        <h2 class="h2">Briefing di Sicurezza a Bordo</h2>
+        <p style="color:var(--text-mid);max-width:680px;">Prima di prendere il mare, facciamo un <strong>briefing obbligatorio di 20 minuti</strong>. È obbligo del comandante e diritto di ogni membro dell'equipaggio.</p>
+      </div>
+      <div class="regoles-grid">
+        <div class="regola-card reveal-up">
+          <div class="rc-icon">01</div>
+          <h4>Giubbotti di Salvataggio</h4>
+          <p>Ogni membro deve sapere dove si trova il proprio giubbotto, come si indossa, come si gonfia e dove è il cordolo per agganciarsi alla life line. <strong>Prova pratica durante il briefing.</strong></p>
+        </div>
+        <div class="regola-card reveal-up d1">
+          <div class="rc-icon">02</div>
+          <h4>Zattera di Salvataggio</h4>
+          <p>Posizione: sul ponte, contenitore arancione. <strong>CRITICO:</strong> la sagola deve essere <strong>assicurata alla barca</strong> prima di lanciare. Lanciare senza assicurare = zattera via e barca affonda.</p>
+        </div>
+        <div class="regola-card reveal-up d2">
+          <div class="rc-icon">03</div>
+          <h4>Asta Uomo a Mare</h4>
+          <p>Boa luminosa con bandierina. Posizione: pozzetto o pulpito. Lanciare immediatamente se qualcuno cade in mare per segnalare la posizione.</p>
+        </div>
+        <div class="regola-card reveal-up">
+          <div class="rc-icon">04</div>
+          <h4>Fuochi e Segnali</h4>
+          <p>Razzi rossi (emergenza), boette fumogene arancioni (posizione), lettorio (notturno). Ogni dispositivo ha istruzioni sulla confezione.</p>
+        </div>
+        <div class="regola-card reveal-up d1">
+          <div class="rc-icon">05</div>
+          <h4>Estintori</h4>
+          <p>Posizioni: cucina, pozzetto, corridoio. Uso: P.A.S.S. — Pull, Aim, Squeeze, Sweep.</p>
+        </div>
+        <div class="regola-card reveal-up d2">
+          <div class="rc-icon">06</div>
+          <h4>Radio VHF Canale 16</h4>
+          <p>Accensione: tasto Power. Chiamata: premere PTT, parlare, rilasciare per ascoltare. Canale 16: emergenze. Mayday: pericolo vita/morte.</p>
+        </div>
+        <div class="regola-card reveal-up">
+          <div class="rc-icon">07</div>
+          <h4>Procedura Uomo in Mare (MOB)</h4>
+          <p>1) GRIDARE "UOMO IN MARE!" 2) Lanciare asta uomo a mare 3) Fissare la persona con lo sguardo 4) Comandante coordina recupero.</p>
+        </div>
+        <div class="regola-card reveal-up d1">
+          <div class="rc-icon">08</div>
+          <h4>Testa (WC) — Istruzioni Vitali</h4>
+          <p><strong>FONDAMENTALE:</strong> nel WC elettrico <strong>SOLO materiale biologico</strong>. NIENTE carta igienica, assorbenti, cotton fioc. Tutto nel cestino!</p>
+        </div>
+        <div class="regola-card reveal-up d2">
+          <div class="rc-icon">09</div>
+          <h4>Cucina a Gas</h4>
+          <p>Valvola gas: aprire solo quando si cucina, chiudere subito dopo. Non lasciare mai fiamma incustodita. Incendio grasso: MAI acqua — coprire con coperchio.</p>
+        </div>
+        <div class="regola-card reveal-up">
+          <div class="rc-icon">10</div>
+          <h4>Movimenti a Bordo</h4>
+          <p><strong>Regola d'oro:</strong> "Una mano per te, una per la barca". Passare sotto boma: <strong>chinarsi sempre</strong>.</p>
+        </div>
+        <div class="regola-card reveal-up d1">
+          <div class="rc-icon">11</div>
+          <h4>Oblò e Boccaporti</h4>
+          <p>In navigazione: <strong>SEMPRE CHIUSI</strong>. L'onda del motoscafo a 15 nodi entra e inonda cabine e dinette.</p>
+        </div>
+        <div class="regola-card reveal-up d2">
+          <div class="rc-icon">12</div>
+          <h4>Documenti Personali</h4>
+          <p><strong>Ognuno</strong> deve avere documento di riconoscimento valido. In caso di controllo Guardia Costiera, nessuno può garantire per altri.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="regoles" id="regole" style="padding-top:60px;padding-bottom:80px;">
+    <div class="container">
+      <div class="section-header">
+        <span class="label">Integrazione</span>
+        <h2 class="h2">Le Regole di Bordo</h2>
+      </div>
+      <div class="regoles-extra">
+        <div class="re-block">
+          <h4>Convivenza</h4>
+          <ul>
+            <li>Rispetto reciproco e comunicazione educata</li>
+            <li>Spazi comuni sempre in ordine</li>
+            <li>Silenzio rispettoso (no musica alta)</li>
+            <li>Fumare solo in zone designate</li>
+          </ul>
+        </div>
+        <div class="re-block">
+          <h4>Sicurezza Pratica</h4>
+          <ul>
+            <li>Giubbotto obbligatorio in certe condizioni</li>
+            <li>Scarpe con suola chiara in navigazione</li>
+            <li>Non sul pulpito in movimento</li>
+            <li>Oblò chiusi in navigazione</li>
+          </ul>
+        </div>
+        <div class="re-block">
+          <h4>Per Dettagli Completi</h4>
+          <ul>
+            <li>Consulta la pagina <a href="regole.html" style="color:var(--turq-light);font-weight:700;">Regole di Bordo</a></li>
+            <li>Il briefing spiega COSA fare e DOVE trovare le cose</li>
+            <li>Le regole spiegano COME convivere bene</li>
+            <li>Entrambi sono essenziali per una crociera riuscita</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--ocean);padding:60px 0;">
+    <div class="container" style="text-align:center;">
+      <h3 style="color:#fff;font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;margin-bottom:16px;">Check-in Tecnico</h3>
+      <p style="color:rgba(255,255,255,.7);margin-bottom:24px;">Per la checklist completa delle dotazioni che lo skipper userà durante il check-in della barca:</p>
+      <a href="checkin.html" style="display:inline-block;background:var(--turq);color:#fff;padding:14px 28px;border-radius:12px;font-weight:700;text-decoration:none;">Vai al Check-in Barca →</a>
+    </div>
+  </section>
+
+<script src="script.js"></script>
 </body>
 </html>
