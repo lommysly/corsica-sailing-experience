@@ -11,6 +11,7 @@
   <style>
     body { background: var(--ocean); color: #fff; min-height: 100vh; }
     .ci-wrap { display: none; }
+    .ci-choice { display: none; }
     .ci-choice { max-width: 900px; margin: 0 auto; padding: 80px 20px; }
     .ci-choice-header { text-align: center; margin-bottom: 36px; }
     .ci-choice-header .label { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--turq); font-weight: 600; display: block; margin-bottom: 10px; }
@@ -154,7 +155,15 @@
   </div>
 </nav>
 
-<main class="ci-choice">
+<div id="choiceLock" class="ci-lock">
+  <div class="lock-icon">🔒</div>
+  <p>Area skipper: inserisci la password per accedere a check-in e inventario.</p>
+  <input type="password" id="choicePwdInput" placeholder="Password skipper" onkeydown="if(event.key==='Enter')unlockChoice()" />
+  <button onclick="unlockChoice()">Accedi</button>
+  <div class="err" id="choiceLockErr">Password errata. Riprova.</div>
+</div>
+
+<main class="ci-choice" id="choiceContent">
   <div class="ci-choice-header">
     <span class="label">Skipper Tool</span>
     <h1>Check-in Skipper</h1>
@@ -172,6 +181,12 @@
       <h2>Beneteau Oceanis 48</h2>
       <p>Checklist dedicata all'Oceanis 48. Stato, note e PDF restano separati da Lagoon.</p>
       <span class="cta">Apri check-in Oceanis →</span>
+    </a>
+    <a class="ci-choice-card" href="inventario-oceanis.html">
+      <div class="type">Inventario</div>
+      <h2>Inventario Oceanis</h2>
+      <p>Dotazioni e ore motore di Sharel/Oceanis 48. Da usare insieme al check-in tecnico.</p>
+      <span class="cta">Apri inventario →</span>
     </a>
   </div>
 </main>
@@ -443,6 +458,16 @@
 
 <script>
 const ADMIN_PWD = 'Skipper2026';
+
+function unlockChoice() {
+  const val = document.getElementById('choicePwdInput').value;
+  if (val === ADMIN_PWD) {
+    document.getElementById('choiceLock').style.display = 'none';
+    document.getElementById('choiceContent').style.display = 'block';
+  } else {
+    document.getElementById('choiceLockErr').style.display = 'block';
+  }
+}
 
 const SECTIONS_BASE = [
   {

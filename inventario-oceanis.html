@@ -81,6 +81,12 @@
     .inv-notes textarea { width: 100%; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; color: #fff; padding: 14px 16px; font-size: .88rem; line-height: 1.6; resize: vertical; min-height: 100px; outline: none; box-sizing: border-box; }
     .inv-notes textarea::placeholder { color: rgba(255,255,255,.22); }
     .inv-notes textarea:focus { border-color: var(--turq); }
+    .inv-lock { text-align: center; padding: 70px 20px; color: #fff; }
+    .inv-lock .lock-icon { font-size: 3rem; margin-bottom: 16px; }
+    .inv-lock p { color: rgba(255,255,255,.65); margin-bottom: 22px; }
+    .inv-lock input { display: block; margin: 0 auto 14px; padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; font-size: 1rem; width: 260px; text-align: center; outline: none; }
+    .inv-lock button { padding: 12px 32px; background: var(--turq); color: #fff; border: none; border-radius: 10px; font-size: .95rem; font-weight: 600; cursor: pointer; }
+    .inv-lock .err { color: #f87171; font-size: .85rem; margin-top: 10px; display: none; }
 
     @media (max-width: 600px) {
       .inv-ore { grid-template-columns: 1fr; }
@@ -101,7 +107,7 @@
       <a href="index.html">Home</a>
       <a href="regole.html">Regole</a>
       <a href="crewlist.html">Crew List</a>
-      <a href="checkin.html">Check-in</a>
+      <a href="checkin.html">🔐 Area Skipper</a>
       <a href="cambusa.html">Cambusa</a>
       <a href="inventario-oceanis.html" class="active">Inventario</a>
     </div>
@@ -111,13 +117,21 @@
     <a href="index.html">Home</a>
     <a href="regole.html">Regole</a>
     <a href="crewlist.html">Crew List</a>
-    <a href="checkin.html">Check-in</a>
+    <a href="checkin.html">🔐 Area Skipper</a>
     <a href="cambusa.html">Cambusa</a>
     <a href="inventario-oceanis.html" style="color:var(--turq);font-weight:700;">Inventario →</a>
   </div>
 </nav>
 
-<main class="inv-wrap">
+<div id="invLock" class="inv-lock">
+  <div class="lock-icon">🔒</div>
+  <p>Area skipper: inserisci la password per accedere all'inventario Oceanis.</p>
+  <input type="password" id="invPwdInput" placeholder="Password skipper" onkeydown="if(event.key==='Enter')unlockInventory()" />
+  <button onclick="unlockInventory()">Accedi</button>
+  <div class="err" id="invLockErr">Password errata. Riprova.</div>
+</div>
+
+<main class="inv-wrap" id="invContent" style="display:none">
   <a href="cambusa-oceanis.html" class="kb-back">← Cambusa Oceanis</a>
 
   <div class="inv-header">
@@ -172,6 +186,17 @@
 
 <script src="script.js?v=20260528i"></script>
 <script>
+const INV_ADMIN_PWD = 'Skipper2026';
+function unlockInventory() {
+  const val = document.getElementById('invPwdInput').value;
+  if (val === INV_ADMIN_PWD) {
+    document.getElementById('invLock').style.display = 'none';
+    document.getElementById('invContent').style.display = 'block';
+  } else {
+    document.getElementById('invLockErr').style.display = 'block';
+  }
+}
+
 document.getElementById('navBurger').addEventListener('click', () => {
   document.getElementById('navMobile').classList.toggle('open');
 });
