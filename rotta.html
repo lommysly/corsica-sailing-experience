@@ -292,6 +292,9 @@
     .temp-block { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.05); border-radius: 10px; padding: 7px 12px; font-size: .82rem; }
     .temp-block .ti { font-size: 1.1rem; }
 
+    @media (max-width: 768px) {
+      .hero { padding-top: 72px; }
+    }
     @media (max-width: 420px) {
       .astro-bar { grid-template-columns: 1fr; }
       .leg-grid { grid-template-columns: 1fr 1fr; }
@@ -878,10 +881,6 @@
 
 <script src="script.js?v=20260528r"></script>
 <script>
-  document.getElementById('navBurger').addEventListener('click', () => {
-    document.getElementById('navMobile').classList.toggle('open');
-  });
-
   function toggleDay(id) {
     const card = document.getElementById(id);
     card.classList.toggle('open');
